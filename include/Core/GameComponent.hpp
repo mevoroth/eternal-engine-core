@@ -1,5 +1,5 @@
-#ifndef _GAMEOBJECT_HPP_
-#define _GAMEOBJECT_HPP_
+#ifndef _GAME_COMPONENT_HPP_
+#define _GAME_COMPONENT_HPP_
 
 #include "Time/Time.hpp"
 
@@ -9,7 +9,7 @@ namespace Eternal
 	{
 		using namespace Eternal::Time;
 
-		class GameObject
+		class GameComponent
 		{
 		public:
 			virtual void Begin() = 0;
