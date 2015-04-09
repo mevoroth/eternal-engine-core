@@ -64,6 +64,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\Core\Game.hpp" />
+    <ClInclude Include="include\Core\GameObject.hpp" />
+    <ClInclude Include="include\Core\GameState.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Core\Game.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
