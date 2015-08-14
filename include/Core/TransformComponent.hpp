@@ -20,12 +20,11 @@ namespace Eternal
 			virtual void End() override;
 
 			void AttachTo(TransformComponent* Parent);
-			Components::Transform GetRelativeToWorldComputed() const;
 
 			Components::Transform Transform;
+
 		private:
-			Components::Transform _RelativeToWorld;
-			TransformComponent* _Parent;
+			TransformComponent* _Parent = nullptr;
 		};
 	}
 }
