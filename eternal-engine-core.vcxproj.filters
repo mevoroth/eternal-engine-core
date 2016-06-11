@@ -4,6 +4,12 @@
     <Filter Include="Core">
       <UniqueIdentifier>{c94d8248-248e-4a1a-96b1-7a12e507a4b1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Task">
+      <UniqueIdentifier>{7ea7735d-c6ae-4488-a5d0-170558f306f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Imgui">
+      <UniqueIdentifier>{f339b2ac-a76d-4898-a14e-4afc92323b0f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Game.hpp">
@@ -21,6 +27,18 @@
     <ClInclude Include="include\Core\TransformComponent.hpp">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="include\Task\ImguiBeginTask.hpp">
+      <Filter>Task</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Task\ImguiEndTask.hpp">
+      <Filter>Task</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Imgui\D3D11ImguiVertexBuffer.hpp">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Task\ControlsTask.hpp">
+      <Filter>Task</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Game.cpp">
@@ -35,5 +53,28 @@
     <ClCompile Include="src\Core\TransformComponent.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="src\Task\ImguiBeginTask.cpp">
+      <Filter>Task</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task\ImguiEndTask.cpp">
+      <Filter>Task</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Imgui\D3D11ImguiVertexBuffer.cpp">
+      <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task\ControlsTask.cpp">
+      <Filter>Task</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shaders\Imgui\imgui.vs.hlsl">
+      <Filter>Imgui</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\Imgui\imgui.ps.hlsl">
+      <Filter>Imgui</Filter>
+    </FxCompile>
+    <FxCompile Include="shaders\Imgui\imgui.common.hlsl">
+      <Filter>Imgui</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

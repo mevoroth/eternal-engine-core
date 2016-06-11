@@ -71,7 +71,7 @@
     <LibraryPath>$(SolutionDir)\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(VCInstallDir)PlatformSDK\include;$(ProjectDir);$(SolutionDir)\eternal-engine-utils\include;$(SolutionDir)\eternal-engine-components\include;$(ProjectDir)\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(VCInstallDir)PlatformSDK\include;$(ProjectDir);$(SolutionDir)\eternal-engine-utils\include;$(SolutionDir)\eternal-engine-components\include;$(ProjectDir)\include;$(SolutionDir)\eternal-engine-extern\imgui;$(SolutionDir)\eternal-engine-graphics\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -140,12 +140,31 @@
     <ClInclude Include="include\Core\GameObject.hpp" />
     <ClInclude Include="include\Core\GameState.hpp" />
     <ClInclude Include="include\Core\TransformComponent.hpp" />
+    <ClInclude Include="include\Imgui\D3D11ImguiVertexBuffer.hpp" />
+    <ClInclude Include="include\Task\ControlsTask.hpp" />
+    <ClInclude Include="include\Task\ImguiBeginTask.hpp" />
+    <ClInclude Include="include\Task\ImguiEndTask.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Game.cpp" />
     <ClCompile Include="src\Core\GameComponent.cpp" />
     <ClCompile Include="src\Core\GameObject.cpp" />
     <ClCompile Include="src\Core\TransformComponent.cpp" />
+    <ClCompile Include="src\Imgui\D3D11ImguiVertexBuffer.cpp" />
+    <ClCompile Include="src\Task\ImguiBeginTask.cpp" />
+    <ClCompile Include="src\Task\ImguiEndTask.cpp" />
+    <ClCompile Include="src\Task\ControlsTask.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="shaders\Imgui\imgui.common.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="shaders\Imgui\imgui.ps.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="shaders\Imgui\imgui.vs.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
