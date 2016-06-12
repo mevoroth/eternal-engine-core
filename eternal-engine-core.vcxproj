@@ -142,6 +142,7 @@
     <ClInclude Include="include\Core\TransformComponent.hpp" />
     <ClInclude Include="include\Imgui\D3D11ImguiVertexBuffer.hpp" />
     <ClInclude Include="include\Task\ControlsTask.hpp" />
+    <ClInclude Include="include\Task\DebugTask.hpp" />
     <ClInclude Include="include\Task\ImguiBeginTask.hpp" />
     <ClInclude Include="include\Task\ImguiEndTask.hpp" />
   </ItemGroup>
@@ -151,6 +152,7 @@
     <ClCompile Include="src\Core\GameObject.cpp" />
     <ClCompile Include="src\Core\TransformComponent.cpp" />
     <ClCompile Include="src\Imgui\D3D11ImguiVertexBuffer.cpp" />
+    <ClCompile Include="src\Task\DebugTask.cpp" />
     <ClCompile Include="src\Task\ImguiBeginTask.cpp" />
     <ClCompile Include="src\Task\ImguiEndTask.cpp" />
     <ClCompile Include="src\Task\ControlsTask.cpp" />

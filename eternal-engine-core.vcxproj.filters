@@ -39,6 +39,9 @@
     <ClInclude Include="include\Task\ControlsTask.hpp">
       <Filter>Task</Filter>
     </ClInclude>
+    <ClInclude Include="include\Task\DebugTask.hpp">
+      <Filter>Task</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Game.cpp">
@@ -63,6 +66,9 @@
       <Filter>Imgui</Filter>
     </ClCompile>
     <ClCompile Include="src\Task\ControlsTask.cpp">
+      <Filter>Task</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task\DebugTask.cpp">
       <Filter>Task</Filter>
     </ClCompile>
   </ItemGroup>
