@@ -11,6 +11,9 @@ namespace Eternal
 	{
 		class Context;
 		class VertexBuffer;
+		class Shader;
+		class RenderTarget;
+		class Constant;
 	}
 	namespace Task
 	{
@@ -26,6 +29,9 @@ namespace Eternal
 			virtual void Reset() override;
 			virtual void Execute() override;
 
+			void SetRenderTarget(RenderTarget* RenderTargetObj);
+			void SetModelViewProjectionMatrix(const Matrix4x4& ModelViewProjectionMatrix);
+
 		private:
 			void _DrawGizmo();
 
@@ -33,6 +39,15 @@ namespace Eternal
 
 			VertexBuffer* _AxisGizmoVerticesBuffer = nullptr;
 			vector<Graphics::D3D11PosColorVertexBuffer::PosColorVertex> _AxisGizmoVertices;
+
+			Shader* _VS = nullptr;
+			Shader* _PS = nullptr;
+
+			Constant* _ModelViewProjectionMatrixConstant = nullptr;
+
+			RenderTarget* _RenderTarget = nullptr;
+
+			Matrix4x4 _ModelViewProjectionMatrix;
 		};
 	}
 }
