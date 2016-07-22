@@ -1,38 +1,38 @@
 #include "Core/Game.hpp"
 
-#include <cassert>
+#include "Macros/Macros.hpp"
 
 using namespace std;
 using namespace Eternal::Core;
 
 Game::Game(GameState* State)
-	: _current(State)
+	: _Current(State)
 {
-	assert(_current);
-	_current->Begin();
+	ETERNAL_ASSERT(_Current);
+	_Current->Begin();
 }
 
 void Game::Run()
 {
-	assert(_current);
+	ETERNAL_ASSERT(_Current);
 
 	for (;;)
 	{
-		_current->Update();
-		GameState* NextState = _current->NextState();
+		_Current->Update();
+		GameState* NextState = _Current->NextState();
 
 		if (!NextState)
 		{
-			_current->End();
+			_Current->End();
 			return;
 		}
 
-		if (_current != NextState)
+		if (_Current != NextState)
 		{
-			_current->End();
-			delete _current;
+			_Current->End();
+			delete _Current;
 			NextState->Begin();
-			_current = NextState;
+			_Current = NextState;
 		}
 	}
 }

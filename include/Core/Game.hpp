@@ -13,7 +13,7 @@ namespace Eternal
 			Game(GameState* State);
 			void Run();
 		private:
-			GameState* _current;
+			GameState* _Current;
 		};
 	}
 }
