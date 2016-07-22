@@ -30,7 +30,6 @@ void Game::Run()
 		if (_Current != NextState)
 		{
 			_Current->End();
-			delete _Current;
 			NextState->Begin();
 			_Current = NextState;
 		}
