@@ -10,6 +10,12 @@
     <Filter Include="Imgui">
       <UniqueIdentifier>{f339b2ac-a76d-4898-a14e-4afc92323b0f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Task\Graphics">
+      <UniqueIdentifier>{804f926b-aa6d-43e5-ac58-d4c332c5c027}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Task\Core">
+      <UniqueIdentifier>{9c2d13e2-a9b7-4257-9dcc-55e8788d765a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Game.hpp">
@@ -42,6 +48,18 @@
     <ClInclude Include="include\Task\DebugTask.hpp">
       <Filter>Task</Filter>
     </ClInclude>
+    <ClInclude Include="include\Task\Graphics\SolidGBufferTask.hpp">
+      <Filter>Task\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\MeshComponent.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Task\TimeTask.hpp">
+      <Filter>Task</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Task\Core\UpdateComponentTask.hpp">
+      <Filter>Task\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Game.cpp">
@@ -69,6 +87,12 @@
       <Filter>Task</Filter>
     </ClCompile>
     <ClCompile Include="src\Task\DebugTask.cpp">
+      <Filter>Task</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task\Graphics\SolidGBufferTask.cpp">
+      <Filter>Task\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task\TimeTask.cpp">
       <Filter>Task</Filter>
     </ClCompile>
   </ItemGroup>

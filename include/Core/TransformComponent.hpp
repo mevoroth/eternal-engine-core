@@ -4,7 +4,7 @@
 #include "Types/Types.hpp"
 #include "GameComponent.hpp"
 #include "Transform/Transform.hpp"
-#include "Resources/Pool.hpp"
+//#include "Resources/Pool.hpp"
 
 namespace Eternal
 {
@@ -12,7 +12,8 @@ namespace Eternal
 	{
 		using namespace Eternal;
 		using namespace Eternal::Types;
-		using namespace Eternal::Resources;
+		using namespace Eternal::Components;
+		//using namespace Eternal::Resources;
 
 		class TransformComponent : public GameComponent
 		{
@@ -25,7 +26,7 @@ namespace Eternal
 			virtual void Update(_In_ const TimeT& ElapsedMilliseconds) override;
 			virtual void End() override;
 
-			void AttachTo(_In_ TransformComponent* Child);
+			void AttachTo(_In_ TransformComponent* Parent);
 
 			const Matrix4x4& GetLocalToWorldTransform() const { return _LocalToWorldMatrix; }
 
@@ -38,7 +39,8 @@ namespace Eternal
 
 		private:
 			TransformComponent* _Parent = nullptr;
-			PoolHandle _TransformHandle = InvalidHandle;
+			//PoolHandle _TransformHandle = InvalidHandle;
+			Transform _Transform;
 			//Matrix4x4 _LocalToParentMatrix;
 			Matrix4x4 _LocalToWorldMatrix;
 			bool _Dirty = false;
