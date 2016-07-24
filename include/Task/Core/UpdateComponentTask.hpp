@@ -10,15 +10,17 @@ namespace Eternal
 	namespace Task
 	{
 		using namespace Eternal::Parallel;
-		using namespace Eternal::Time;
 
 		template<class Pool>
 		class UpdateComponentTask : public Task
 		{
 		public:
-			UpdateComponentTask(_In_ Pool* PoolObj)
-				: _Pool(PoolObj)
+			UpdateComponentTask(_In_ Eternal::Time::Time* TimeObj, _In_ Pool* PoolObj)
+				: _Time(TimeObj)
+				, _Pool(PoolObj)
 			{
+				ETERNAL_ASSERT(_Time);
+				ETERNAL_ASSERT(_Pool);
 			}
 
 			virtual void Setup() override
@@ -35,7 +37,7 @@ namespace Eternal
 			{
 				SetState(EXECUTING);
 
-				TimeT DeltaTime = Time::Time::Get()->GetDeltaTime();
+				Eternal::Time::TimeT DeltaTime = _Time->GetDeltaTime();
 
 				for (int ObjectIndex = 0; ObjectIndex < _Pool->GetSize(); ++ObjectIndex)
 				{
@@ -50,6 +52,7 @@ namespace Eternal
 
 		private:
 			Pool* _Pool = nullptr;
+			Eternal::Time::Time* _Time = nullptr;
 		};
 	}
 }

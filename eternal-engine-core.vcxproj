@@ -141,8 +141,11 @@
     <ClInclude Include="include\Core\GameState.hpp" />
     <ClInclude Include="include\Core\MeshComponent.hpp" />
     <ClInclude Include="include\Core\TransformComponent.hpp" />
+    <ClInclude Include="include\GameState\CoreState.hpp" />
     <ClInclude Include="include\Imgui\D3D11ImguiVertexBuffer.hpp" />
+    <ClInclude Include="include\Platform\WindowsProcess.hpp" />
     <ClInclude Include="include\Task\ControlsTask.hpp" />
+    <ClInclude Include="include\Task\Core\GameStateTask.hpp" />
     <ClInclude Include="include\Task\Core\UpdateComponentTask.hpp" />
     <ClInclude Include="include\Task\DebugTask.hpp" />
     <ClInclude Include="include\Task\Graphics\SolidGBufferTask.hpp" />
@@ -155,12 +158,15 @@
     <ClCompile Include="src\Core\GameComponent.cpp" />
     <ClCompile Include="src\Core\GameObject.cpp" />
     <ClCompile Include="src\Core\TransformComponent.cpp" />
+    <ClCompile Include="src\GameState\CoreState.cpp" />
     <ClCompile Include="src\Imgui\D3D11ImguiVertexBuffer.cpp" />
+    <ClCompile Include="src\Platform\WindowsProcess.cpp" />
     <ClCompile Include="src\Task\DebugTask.cpp" />
     <ClCompile Include="src\Task\Graphics\SolidGBufferTask.cpp" />
     <ClCompile Include="src\Task\ImguiBeginTask.cpp" />
     <ClCompile Include="src\Task\ImguiEndTask.cpp" />
     <ClCompile Include="src\Task\ControlsTask.cpp" />
+    <ClCompile Include="src\Task\Task\GameStateTask.cpp" />
     <ClCompile Include="src\Task\TimeTask.cpp" />
   </ItemGroup>
   <ItemGroup>

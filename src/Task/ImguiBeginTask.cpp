@@ -54,6 +54,7 @@ void ImguiBeginTask::Map(_In_ const Input::Input::Key& EternalKey, _In_ const Im
 
 void ImguiBeginTask::Setup()
 {
+	ETERNAL_ASSERT(GetState() == SCHEDULED);
 	SetState(Task::SETUP);
 }
 

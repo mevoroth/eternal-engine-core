@@ -57,6 +57,7 @@ ImguiEndTask::ImguiEndTask(Context& ContextObj)
 
 void ImguiEndTask::Setup()
 {
+	ETERNAL_ASSERT(GetState() == SCHEDULED);
 	SetState(Task::SETUP);
 }
 

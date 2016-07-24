@@ -11,7 +11,7 @@ namespace Eternal
 		{
 		public:
 			virtual void Begin() override;
-			virtual void Update(const TimeT& ElapsedMilliseconds) override;
+			virtual void Update(const TimeT& ElapsedMicroSeconds) override;
 			virtual void End() override;
 		};
 	}

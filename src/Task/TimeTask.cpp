@@ -1,5 +1,6 @@
 #include "Task/TimeTask.hpp"
 
+#include "Macros/Macros.hpp"
 #include "Time/Time.hpp"
 
 using namespace Eternal::Time;
@@ -12,6 +13,7 @@ TimeTask::TimeTask(_In_ Eternal::Time::Time* TimeObj)
 
 void TimeTask::Setup()
 {
+	ETERNAL_ASSERT(GetState() == SCHEDULED);
 	SetState(SETUP);
 }
 

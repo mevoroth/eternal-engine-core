@@ -23,7 +23,7 @@ namespace Eternal
 			TransformComponent();
 
 			virtual void Begin() override;
-			virtual void Update(_In_ const TimeT& ElapsedMilliseconds) override;
+			virtual void Update(_In_ const TimeT& ElapsedMicroSeconds) override;
 			virtual void End() override;
 
 			void AttachTo(_In_ TransformComponent* Parent);

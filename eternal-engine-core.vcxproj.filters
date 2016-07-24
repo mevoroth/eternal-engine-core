@@ -16,6 +16,12 @@
     <Filter Include="Task\Core">
       <UniqueIdentifier>{9c2d13e2-a9b7-4257-9dcc-55e8788d765a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameState">
+      <UniqueIdentifier>{dc703791-ea6a-4a92-bbb8-da28d5e39f97}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Platform">
+      <UniqueIdentifier>{5d92b6b9-10e0-4045-9082-0b76a0191344}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Game.hpp">
@@ -60,6 +66,15 @@
     <ClInclude Include="include\Task\Core\UpdateComponentTask.hpp">
       <Filter>Task\Core</Filter>
     </ClInclude>
+    <ClInclude Include="include\Task\Core\GameStateTask.hpp">
+      <Filter>Task\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameState\CoreState.hpp">
+      <Filter>GameState</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Platform\WindowsProcess.hpp">
+      <Filter>Platform</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Game.cpp">
@@ -94,6 +109,15 @@
     </ClCompile>
     <ClCompile Include="src\Task\TimeTask.cpp">
       <Filter>Task</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task\Task\GameStateTask.cpp">
+      <Filter>Task\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameState\CoreState.cpp">
+      <Filter>GameState</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Platform\WindowsProcess.cpp">
+      <Filter>Platform</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
