@@ -17,6 +17,12 @@ void TransformComponent::Init()
 	g_TransformComponentPool = new Pool<TransformComponent>();
 }
 
+void TransformComponent::Release()
+{
+	delete g_TransformComponentPool;
+	g_TransformComponentPool = nullptr;
+}
+
 TransformComponent::TransformComponent()
 	: _Transform(Components::Transform())
 	//, _LocalToParentMatrix(NewIdentity())

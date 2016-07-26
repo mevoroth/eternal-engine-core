@@ -1,5 +1,5 @@
-#ifndef _RESHIELD_CORE_STATE_HPP_
-#define _RESHIELD_CORE_STATE_HPP_
+#ifndef _CORE_STATE_HPP_
+#define _CORE_STATE_HPP_
 
 #include "Core/GameState.hpp"
 
@@ -50,14 +50,18 @@ namespace Eternal
 		class CoreState : public GameState
 		{
 		public:
-			CoreState(_In_ HINSTANCE hInstance, _In_ int nCmdShow);
+			CoreState(_In_ HINSTANCE hInstance, _In_ int nCmdShow, _In_ GameState* InitialGameState);
 
 			virtual void Begin() override;
 			virtual void Update() override;
 			virtual GameState* NextState() override;
 			virtual void End() override;
 
+			bool& GetQuit() { return _Quit; }
+
 		private:
+			bool _Quit = false;
+
 			Eternal::Time::Time* _Time = nullptr;
 
 			WindowsProcess* _WindowsProcess = nullptr;
@@ -75,6 +79,8 @@ namespace Eternal
 			Eternal::Input::Input* _KeyboardInput = nullptr;
 			Eternal::Input::Input* _PadInput = nullptr;
 
+			GameState* _InitialGameState = nullptr;
+
 			Task* _ControlsTask = nullptr;
 			Task* _ImguiBeginTask = nullptr;
 			Task* _ImguiEndTask = nullptr;
@@ -82,8 +88,10 @@ namespace Eternal
 			Task* _UpdateComponentTask = nullptr;
 			Task* _GameStateTask = nullptr;
 
-			void _CreatePools();
-			void _CreateTasks();
+			void _InitPools();
+			void _ReleasePools();
+			void _InitTasks();
+			void _ReleaseTasks();
 		};
 	}
 }

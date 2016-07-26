@@ -39,7 +39,7 @@ namespace Eternal
 
 				Eternal::Time::TimeT DeltaTime = _Time->GetDeltaTime();
 
-				for (int ObjectIndex = 0; ObjectIndex < _Pool->GetSize(); ++ObjectIndex)
+				for (uint32_t ObjectIndex = 0; ObjectIndex < _Pool->GetSize(); ++ObjectIndex)
 				{
 					if (_Pool->IsValid((PoolHandle)ObjectIndex))
 					{

@@ -31,10 +31,12 @@ namespace Eternal
 		using namespace Eternal::Task;
 		using namespace Eternal::Platform;
 
-		CoreState::CoreState(_In_ HINSTANCE hInstance, _In_ int nCmdShow)
+		CoreState::CoreState(_In_ HINSTANCE hInstance, _In_ int nCmdShow, _In_ GameState* InitialGameState)
 			: _hInstance(hInstance)
 			, _nCmdShow(nCmdShow)
+			, _InitialGameState(InitialGameState)
 		{
+			ETERNAL_ASSERT(_InitialGameState);
 		}
 
 		void CoreState::Begin()
@@ -54,8 +56,8 @@ namespace Eternal
 
 			_TaskManager = new TaskManager();
 
-			_CreatePools();
-			_CreateTasks();
+			_InitPools();
+			_InitTasks();
 
 			_TaskManager->GetTaskScheduler().PushTask(_ControlsTask);
 			_TaskManager->GetTaskScheduler().PushTask(_TimeTask);
@@ -73,10 +75,13 @@ namespace Eternal
 			}
 			_TaskManager->GetTaskScheduler().PushTask(_ImguiEndTask, _GameStateTask);
 		}
+		
 		void CoreState::Update()
 		{
 			for (;;)
 			{
+				if (GetQuit())
+					break;
 				WindowsProcess::ExecuteMessageLoop();
 
 				_TaskManager->Schedule();
@@ -84,21 +89,53 @@ namespace Eternal
 				_TaskManager->GetTaskScheduler().Reset();
 			}
 		}
+		
 		Core::GameState* CoreState::NextState()
 		{
 			return nullptr;
 		}
+
 		void CoreState::End()
 		{
+			_ReleaseTasks();
+			_ReleasePools();
 
+			delete _TaskManager;
+			_TaskManager = nullptr;
+
+			delete _ShaderFactory;
+			_ShaderFactory = nullptr;
+
+			delete _Renderer;
+			_Renderer = nullptr;
+
+			delete _Device;
+			_Device = nullptr;
+
+			delete _WindowsProcess;
+			_WindowsProcess = nullptr;
+
+			delete _PadInput;
+			_PadInput = nullptr;
+
+			delete _KeyboardInput;
+			_KeyboardInput = nullptr;
+
+			delete _Time;
+			_Time = nullptr;
 		}
 
-		void CoreState::_CreatePools()
+		void CoreState::_InitPools()
 		{
 			TransformComponent::Init();
 		}
 
-		void CoreState::_CreateTasks()
+		void CoreState::_ReleasePools()
+		{
+			TransformComponent::Release();
+		}
+
+		void CoreState::_InitTasks()
 		{
 			ControlsTask* ControlsTaskObj = new ControlsTask();
 			ControlsTaskObj->SetTaskName("Controls Task");
@@ -123,9 +160,30 @@ namespace Eternal
 			UpdateComponentTaskObj->SetTaskName("Update Transform Pool Task");
 			_UpdateComponentTask = UpdateComponentTaskObj;
 
-			GameStateTask* GameStateTaskObj = new GameStateTask(nullptr);
+			GameStateTask* GameStateTaskObj = new GameStateTask(_InitialGameState);
 			GameStateTaskObj->SetTaskName("Game State Task");
 			_GameStateTask = GameStateTaskObj;
+		}
+
+		void CoreState::_ReleaseTasks()
+		{
+			delete _GameStateTask;
+			_GameStateTask = nullptr;
+
+			delete _UpdateComponentTask;
+			_UpdateComponentTask = nullptr;
+
+			delete _TimeTask;
+			_TimeTask = nullptr;
+
+			delete _ImguiEndTask;
+			_ImguiEndTask = nullptr;
+
+			delete _ImguiBeginTask;
+			_ImguiBeginTask = nullptr;
+
+			delete _ControlsTask;
+			_ControlsTask = nullptr;
 		}
 	}
 }

@@ -9,13 +9,13 @@ Game::Game(GameState* State)
 	: _Current(State)
 {
 	ETERNAL_ASSERT(_Current);
-	_Current->Begin();
 }
 
 void Game::Run()
 {
 	ETERNAL_ASSERT(_Current);
 
+	_Current->Begin();
 	for (;;)
 	{
 		_Current->Update();

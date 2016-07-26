@@ -19,6 +19,7 @@ namespace Eternal
 		{
 		public:
 			static void Init();
+			static void Release();
 
 			TransformComponent();
 
