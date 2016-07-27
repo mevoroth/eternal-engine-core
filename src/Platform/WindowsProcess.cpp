@@ -90,7 +90,7 @@ namespace Eternal
 		{
 			for (uint32_t KeyIndex = 0; KeyIndex < Range; ++KeyIndex)
 			{
-				_KeyMapping[KeyIndex + KeyIndex] = (Eternal::Input::Input::Key)(KeyNameStart + KeyIndex);
+				_KeyMapping[WindowsKeyStart + KeyIndex] = (Eternal::Input::Input::Key)(KeyNameStart + KeyIndex);
 			}
 		}
 
