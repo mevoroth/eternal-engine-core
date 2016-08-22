@@ -1,5 +1,5 @@
-#ifndef _SOLIDGBUFFER_TASK_
-#define _SOLIDGBUFFER_TASK_
+#ifndef _SWAP_FRAME_TASK_HPP_
+#define _SWAP_FRAME_TASK_HPP_
 
 #include "Parallel/Task.hpp"
 
@@ -7,7 +7,7 @@ namespace Eternal
 {
 	namespace Graphics
 	{
-		class Context;
+		class Renderer;
 	}
 
 	namespace Task
@@ -15,19 +15,17 @@ namespace Eternal
 		using namespace Eternal::Parallel;
 		using namespace Eternal::Graphics;
 
-		class SolidGBufferData;
-
-		class SolidGBufferTask : public Task
+		class SwapFrameTask : public Task
 		{
 		public:
-			SolidGBufferTask(_In_ Context& ContextObj);
+			SwapFrameTask(_In_ Renderer& RendererObj);
 
 			virtual void Setup() override;
 			virtual void Reset() override;
 			virtual void Execute() override;
 
 		private:
-			SolidGBufferData* _SolidGBufferData = nullptr;
+			Renderer& _Renderer;
 		};
 	}
 }

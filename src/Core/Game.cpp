@@ -5,7 +5,7 @@
 using namespace std;
 using namespace Eternal::Core;
 
-Game::Game(GameState* State)
+Game::Game(_In_ GameState* State)
 	: _Current(State)
 {
 	ETERNAL_ASSERT(_Current);

@@ -18,7 +18,7 @@ namespace Eternal
 		class TransformComponent : public GameComponent
 		{
 		public:
-			static void Init();
+			static void Initialize();
 			static void Release();
 
 			TransformComponent();

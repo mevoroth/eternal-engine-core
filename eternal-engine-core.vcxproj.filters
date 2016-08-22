@@ -22,6 +22,9 @@
     <Filter Include="Platform">
       <UniqueIdentifier>{5d92b6b9-10e0-4045-9082-0b76a0191344}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameData">
+      <UniqueIdentifier>{0a4276f7-8c15-408b-b128-c977993d7bb9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Game.hpp">
@@ -75,15 +78,22 @@
     <ClInclude Include="include\Platform\WindowsProcess.hpp">
       <Filter>Platform</Filter>
     </ClInclude>
+    <ClInclude Include="include\GameData\TransformGameData.hpp">
+      <Filter>GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\CharacterGameObject.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GamePools.hpp" />
+    <ClInclude Include="include\Core\Level.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Task\Graphics\SwapFrameTask.hpp">
+      <Filter>Task\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Game.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\GameObject.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\GameComponent.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\TransformComponent.cpp">
@@ -118,6 +128,21 @@
     </ClCompile>
     <ClCompile Include="src\Platform\WindowsProcess.cpp">
       <Filter>Platform</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameData\TransformGameData.cpp">
+      <Filter>GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\MeshComponent.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\CharacterGameObject.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Level.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task\Graphics\SwapFrameTask.cpp">
+      <Filter>Task\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

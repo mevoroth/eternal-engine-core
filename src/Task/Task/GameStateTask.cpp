@@ -45,3 +45,8 @@ void GameStateTask::Reset()
 
 	SetState(IDLE);
 }
+
+bool GameStateTask::GetRemainingState()
+{
+	return _GameState != nullptr;
+}

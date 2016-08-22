@@ -24,6 +24,8 @@ namespace Eternal
 			virtual void Reset();
 			virtual void Execute();
 
+			bool GetRemainingState();
+
 		private:
 			Core::GameState* _GameState = nullptr;
 			Core::GameState* _ScheduledToBegin = nullptr;

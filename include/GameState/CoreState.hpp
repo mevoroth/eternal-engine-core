@@ -17,6 +17,7 @@ namespace Eternal
 		class Device;
 		class Renderer;
 		class ShaderFactory;
+		class Context;
 	}
 	namespace Input
 	{
@@ -35,34 +36,51 @@ namespace Eternal
 	{
 		class WindowsProcess;
 	}
+	namespace Log
+	{
+		class Log;
+	}
+	namespace Import
+	{
+		class ImportFbx;
+	}
 }
 
 namespace Eternal
 {
-
 	namespace GameState
 	{
 		using namespace Eternal::Core;
 		using namespace Eternal::Graphics;
 		using namespace Eternal::Parallel;
 		using namespace Eternal::Platform;
+		using namespace Eternal::Import;
 
 		class CoreState : public GameState
 		{
 		public:
-			CoreState(_In_ HINSTANCE hInstance, _In_ int nCmdShow, _In_ GameState* InitialGameState);
+			class CoreStateSettings
+			{
+			public:
+				const char* ShaderIncludePath = nullptr;
+				const char* FBXIncludePath = nullptr;
+			};
+
+			CoreState(_In_ const CoreStateSettings& Settings, _In_ HINSTANCE hInstance, _In_ int nCmdShow, _In_ GameState* InitialGameState);
 
 			virtual void Begin() override;
 			virtual void Update() override;
 			virtual GameState* NextState() override;
 			virtual void End() override;
 
-			bool& GetQuit() { return _Quit; }
-
 		private:
-			bool _Quit = false;
+			CoreStateSettings _Settings;
 
 			Eternal::Time::Time* _Time = nullptr;
+
+			Eternal::Log::Log* _FileLog = nullptr;
+			Eternal::Log::Log* _ConsoleLog = nullptr;
+			Eternal::Log::Log* _MultiChannelLog = nullptr;
 
 			WindowsProcess* _WindowsProcess = nullptr;
 
@@ -78,6 +96,7 @@ namespace Eternal
 
 			Eternal::Input::Input* _KeyboardInput = nullptr;
 			Eternal::Input::Input* _PadInput = nullptr;
+			Eternal::Input::Input* _MultiInput = nullptr;
 
 			GameState* _InitialGameState = nullptr;
 
@@ -87,11 +106,19 @@ namespace Eternal
 			Task* _TimeTask = nullptr;
 			Task* _UpdateComponentTask = nullptr;
 			Task* _GameStateTask = nullptr;
+			Task* _SolidGBufferTask = nullptr;
+			Task* _SwapFrameTask = nullptr;
 
-			void _InitPools();
+			ImportFbx* _ImportFbx = nullptr;
+
+			Context* _Contexts[4];
+
+			void _InitializePools();
 			void _ReleasePools();
-			void _InitTasks();
+			void _InitializeTasks();
 			void _ReleaseTasks();
+			void _InitializeGraphicContexts();
+			void _ReleaseGraphicContexts();
 		};
 	}
 }

@@ -66,7 +66,7 @@ void ImguiEndTask::Execute()
 	ETERNAL_ASSERT(GetState() == Task::SETUP);
 	SetState(Task::EXECUTING);
 
-	OutputDebugString("[ImguiEndTask::Execute]Begin ImguiEndTask\n");
+	//OutputDebugString("[ImguiEndTask::Execute]Begin ImguiEndTask\n");
 
 	ImGui::Render();
 
@@ -137,9 +137,7 @@ void ImguiEndTask::Execute()
 	_Context.UnbindSampler<Context::PIXEL>(0);
 	_Context.UnbindConstant<Context::VERTEX>(0);
 
-	static_cast<Graphics::D3D11Renderer*>(Graphics::Renderer::Get())->Flush();
-
-	OutputDebugString("[ImguiEndTask::Execute]End ImguiEndTask\n");
+	//OutputDebugString("[ImguiEndTask::Execute]End ImguiEndTask\n");
 
 	SetState(Task::DONE);
 }

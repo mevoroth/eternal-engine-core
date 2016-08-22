@@ -11,7 +11,7 @@ using namespace Eternal::Resources;
 //Pool<Transform>* g_TransformPool = nullptr;
 Pool<TransformComponent>* g_TransformComponentPool = nullptr;
 
-void TransformComponent::Init()
+void TransformComponent::Initialize()
 {
 	//g_TransformPool = new Pool<Transform>();
 	g_TransformComponentPool = new Pool<TransformComponent>();

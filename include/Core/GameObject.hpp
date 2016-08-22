@@ -13,7 +13,7 @@ namespace Eternal
 		{
 		public:
 			virtual void Begin() = 0;
-			virtual void Update(const TimeT& ElapsedMicroSeconds) = 0;
+			virtual void Update(_In_ const TimeT& ElapsedMicroSeconds) = 0;
 			virtual void End() = 0;
 		};
 	}

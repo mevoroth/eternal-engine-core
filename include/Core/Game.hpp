@@ -10,7 +10,7 @@ namespace Eternal
 		class Game
 		{
 		public:
-			Game(GameState* State);
+			Game(_In_ GameState* State);
 			void Run();
 		private:
 			GameState* _Current;
