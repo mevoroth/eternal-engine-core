@@ -81,14 +81,20 @@
     <ClInclude Include="include\GameData\TransformGameData.hpp">
       <Filter>GameData</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\CharacterGameObject.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="include\GamePools.hpp" />
     <ClInclude Include="include\Core\Level.hpp">
       <Filter>Core</Filter>
     </ClInclude>
     <ClInclude Include="include\Task\Graphics\SwapFrameTask.hpp">
+      <Filter>Task\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\GraphicGameObject.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Task\DebugSolidGBufferTask.hpp">
+      <Filter>Task</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Task\Graphics\PrepareSolidTask.hpp">
       <Filter>Task\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
@@ -135,13 +141,16 @@
     <ClCompile Include="src\Core\MeshComponent.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\CharacterGameObject.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\Level.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Task\Graphics\SwapFrameTask.cpp">
+      <Filter>Task\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\GraphicGameObject.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task\Graphics\PrepareSolidTask.cpp">
       <Filter>Task\Graphics</Filter>
     </ClCompile>
   </ItemGroup>

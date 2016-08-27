@@ -13,6 +13,7 @@
 #include "Graphics/Context.hpp"
 #include "Graphics/Resource.hpp"
 #include "Graphics/ShaderFactory.hpp"
+#include "Graphics/Format.hpp"
 #include "d3d11/D3D11Renderer.hpp"
 #include "d3d11/D3D11Constant.hpp"
 #include "d3d11/D3D11Texture.hpp"
@@ -46,7 +47,7 @@ ImguiEndTask::ImguiEndTask(Context& ContextObj)
 	int Width;
 
 	ImGui::GetIO().Fonts->GetTexDataAsRGBA32(&Pixels, &Width, &Height);
-	_Texture = new D3D11Texture(Texture::RGBA8888, D3D11Resource::DEFAULT, Resource::NONE, Width, Height, Pixels);
+	_Texture = new D3D11Texture(RGBA8888, D3D11Resource::DEFAULT, Resource::NONE, Width, Height, Pixels);
 	ImGui::GetIO().Fonts->TexID = ((D3D11Texture*)_Texture)->GetD3D11ShaderResourceView();
 
 	_Sampler = new D3D11Sampler(true, true, true, false, Sampler::WRAP, Sampler::WRAP, Sampler::WRAP);

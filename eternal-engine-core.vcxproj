@@ -137,7 +137,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="include\Core\CharacterGameObject.hpp" />
+    <ClInclude Include="include\Core\GraphicGameObject.hpp" />
     <ClInclude Include="include\Core\Game.hpp" />
     <ClInclude Include="include\Core\GameComponent.hpp" />
     <ClInclude Include="include\Core\GameObject.hpp" />
@@ -153,7 +153,9 @@
     <ClInclude Include="include\Task\ControlsTask.hpp" />
     <ClInclude Include="include\Task\Core\GameStateTask.hpp" />
     <ClInclude Include="include\Task\Core\UpdateComponentTask.hpp" />
+    <ClInclude Include="include\Task\DebugSolidGBufferTask.hpp" />
     <ClInclude Include="include\Task\DebugTask.hpp" />
+    <ClInclude Include="include\Task\Graphics\PrepareSolidTask.hpp" />
     <ClInclude Include="include\Task\Graphics\SolidGBufferTask.hpp" />
     <ClInclude Include="include\Task\Graphics\SwapFrameTask.hpp" />
     <ClInclude Include="include\Task\ImguiBeginTask.hpp" />
@@ -161,7 +163,7 @@
     <ClInclude Include="include\Task\TimeTask.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Core\CharacterGameObject.cpp" />
+    <ClCompile Include="src\Core\GraphicGameObject.cpp" />
     <ClCompile Include="src\Core\Game.cpp" />
     <ClCompile Include="src\Core\Level.cpp" />
     <ClCompile Include="src\Core\MeshComponent.cpp" />
@@ -171,6 +173,7 @@
     <ClCompile Include="src\Imgui\D3D11ImguiVertexBuffer.cpp" />
     <ClCompile Include="src\Platform\WindowsProcess.cpp" />
     <ClCompile Include="src\Task\DebugTask.cpp" />
+    <ClCompile Include="src\Task\Graphics\PrepareSolidTask.cpp" />
     <ClCompile Include="src\Task\Graphics\SolidGBufferTask.cpp" />
     <ClCompile Include="src\Task\Graphics\SwapFrameTask.cpp" />
     <ClCompile Include="src\Task\ImguiBeginTask.cpp" />

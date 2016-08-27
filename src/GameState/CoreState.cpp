@@ -5,6 +5,7 @@
 #include "Graphics/RendererFactory.hpp"
 #include "Graphics/Device.hpp"
 #include "Graphics/Renderer.hpp"
+#include "Graphics/ShaderFactory.hpp"
 #include "Graphics/ShaderFactoryFactory.hpp"
 #include "Input/InputFactory.hpp"
 #include "Time/TimeFactory.hpp"
@@ -16,12 +17,14 @@
 #include "Task/TimeTask.hpp"
 #include "Task/Core/UpdateComponentTask.hpp"
 #include "Task/Core/GameStateTask.hpp"
+#include "Task/Graphics/PrepareSolidTask.hpp"
 #include "Task/Graphics/SolidGBufferTask.hpp"
 #include "Task/Graphics/SwapFrameTask.hpp"
 #include "Resources/Pool.hpp"
 #include "Core/TransformComponent.hpp"
-
+#include "GraphicData/RenderTargetCollection.hpp"
 #include "Import/fbx/ImportFbx.hpp"
+#include "Graphics/Format.hpp"
 
 using namespace Eternal::Resources;
 using namespace Eternal::Core;
@@ -77,12 +80,14 @@ namespace Eternal
 			_InitializeGraphicContexts();
 
 			_ShaderFactory = CreateShaderFactory(SHADER_FACTORY_D3D11);
+			_ShaderFactory->RegisterShaderPath(_Settings.ShaderIncludePath);
 
 			_ImportFbx = new ImportFbx();
 			_ImportFbx->RegisterPath(_Settings.FBXIncludePath);
 
 			_TaskManager = new TaskManager();
 
+			_InitializeRenderTargets();
 			_InitializePools();
 			_InitializeTasks();
 
@@ -100,8 +105,9 @@ namespace Eternal
 				_TaskManager->GetTaskScheduler().PushTask(_GameStateTask, _UpdateComponentTask);
 				_TaskManager->GetTaskScheduler().PushTask(_GameStateTask, _ImguiBeginTask);
 			}
-			_TaskManager->GetTaskScheduler().PushTask(_SolidGBufferTask, _GameStateTask);
+			_TaskManager->GetTaskScheduler().PushTask(_PrepareSolidTask, _GameStateTask);
 			_TaskManager->GetTaskScheduler().PushTask(_ImguiEndTask, _GameStateTask);
+			_TaskManager->GetTaskScheduler().PushTask(_SolidGBufferTask, _PrepareSolidTask);
 			{
 				_TaskManager->GetTaskScheduler().PushTask(_SwapFrameTask, _SolidGBufferTask);
 				_TaskManager->GetTaskScheduler().PushTask(_SwapFrameTask, _ImguiEndTask);
@@ -206,9 +212,13 @@ namespace Eternal
 			GameStateTaskObj->SetTaskName("Game State Task");
 			_GameStateTask = GameStateTaskObj;
 
-			SolidGBufferTask* SolidGBufferTaskObj = new SolidGBufferTask(*_Contexts[0]);
+			SolidGBufferTask* SolidGBufferTaskObj = new SolidGBufferTask(*_Contexts[0], *_RenderTargetCollection);
 			SolidGBufferTaskObj->SetTaskName("Solid GBuffer Task");
 			_SolidGBufferTask = SolidGBufferTaskObj;
+
+			PrepareSolidTask* PrepareSolidTaskObj = new PrepareSolidTask(*SolidGBufferTaskObj);
+			PrepareSolidTaskObj->SetTaskName("Prepare Solid Task");
+			_PrepareSolidTask = PrepareSolidTaskObj;
 
 			SwapFrameTask* SwapFrameTaskObj = new SwapFrameTask(*_Renderer);
 			SwapFrameTaskObj->SetTaskName("Swap Frame Task");
@@ -247,6 +257,23 @@ namespace Eternal
 		void CoreState::_ReleaseGraphicContexts()
 		{
 
+		}
+
+		void CoreState::_InitializeRenderTargets()
+		{
+			Format RenderTargetsFormat[] = {
+				RGBA8888,
+				RGBA8888,
+				RGBA8888,
+				RGBA8888,
+			};
+			_RenderTargetCollection = new RenderTargetCollection(1600, 900, ETERNAL_ARRAYSIZE(RenderTargetsFormat), RenderTargetsFormat);
+		}
+
+		void CoreState::_ReleaseRenderTargets()
+		{
+			delete _RenderTargetCollection;
+			_RenderTargetCollection = nullptr;
 		}
 	}
 }

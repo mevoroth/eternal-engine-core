@@ -22,6 +22,9 @@ namespace Eternal
 			virtual void Update(_In_ const TimeT& ElapsedMicroSeconds) override;
 			virtual void End() override;
 
+			void SetMesh(_In_ Mesh* MeshObj);
+			Mesh* GetMesh();
+
 		private:
 			Mesh* _Mesh = nullptr;
 		};

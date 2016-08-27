@@ -16,3 +16,13 @@ void MeshComponent::End()
 {
 
 }
+
+void MeshComponent::SetMesh(_In_ Mesh* MeshObj)
+{
+	_Mesh = MeshObj;
+}
+
+Mesh* MeshComponent::GetMesh()
+{
+	return _Mesh;
+}

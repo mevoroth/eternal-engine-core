@@ -44,6 +44,10 @@ namespace Eternal
 	{
 		class ImportFbx;
 	}
+	namespace GraphicData
+	{
+		class RenderTargetCollection;
+	}
 }
 
 namespace Eternal
@@ -55,6 +59,7 @@ namespace Eternal
 		using namespace Eternal::Parallel;
 		using namespace Eternal::Platform;
 		using namespace Eternal::Import;
+		using namespace Eternal::GraphicData;
 
 		class CoreState : public GameState
 		{
@@ -106,12 +111,14 @@ namespace Eternal
 			Task* _TimeTask = nullptr;
 			Task* _UpdateComponentTask = nullptr;
 			Task* _GameStateTask = nullptr;
+			Task* _PrepareSolidTask = nullptr;
 			Task* _SolidGBufferTask = nullptr;
 			Task* _SwapFrameTask = nullptr;
 
 			ImportFbx* _ImportFbx = nullptr;
 
 			Context* _Contexts[4];
+			RenderTargetCollection* _RenderTargetCollection = nullptr;
 
 			void _InitializePools();
 			void _ReleasePools();
@@ -119,6 +126,8 @@ namespace Eternal
 			void _ReleaseTasks();
 			void _InitializeGraphicContexts();
 			void _ReleaseGraphicContexts();
+			void _InitializeRenderTargets();
+			void _ReleaseRenderTargets();
 		};
 	}
 }
