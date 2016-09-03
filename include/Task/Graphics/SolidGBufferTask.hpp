@@ -13,6 +13,9 @@ namespace Eternal
 	namespace Graphics
 	{
 		class Context;
+		class Constant;
+		class Viewport;
+		class Sampler;
 	}
 	
 	namespace GraphicData
@@ -36,6 +39,9 @@ namespace Eternal
 		public:
 			SolidGBufferTask(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargets);
 
+			Constant* GetCommonConstant();
+			Viewport* GetViewport();
+			Sampler* GetSampler();
 			void SetGraphicObjects(_In_ GraphicObjects& Objects);
 
 			virtual void Setup() override;

@@ -6,10 +6,16 @@
 
 namespace Eternal
 {
+	namespace Graphics
+	{
+		class Constant;
+	}
+
 	namespace Task
 	{
 		using namespace std;
 		using namespace Eternal::Parallel;
+		using namespace Eternal::Graphics;
 
 		class SolidGBufferTask;
 		class PrepareSolidTaskData;

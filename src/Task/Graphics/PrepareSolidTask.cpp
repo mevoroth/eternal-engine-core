@@ -8,6 +8,12 @@
 #include "GraphicData/GraphicObjects.hpp"
 #include "GraphicData/Material.hpp"
 #include "GraphicData/ShaderMaterialProperty.hpp"
+#include "GraphicData/CameraMaterialProperty.hpp"
+#include "GraphicData/TopologyMaterialProperty.hpp"
+#include "GraphicData/ViewportMaterialProperty.hpp"
+#include "GraphicData/SamplerMaterialProperty.hpp"
+
+#include "Camera/PerspectiveCamera.hpp"
 
 using namespace std;
 using namespace Eternal::GraphicData;
@@ -37,6 +43,16 @@ namespace Eternal
 				_PixelProperty.SetShader(_PixelShader);
 				_MaterialProperties.push_back((MaterialProperty*)&_PixelProperty);
 
+				_Camera = new PerspectiveCamera(0.001f, 5000.0f, 45.0f);
+				_CameraProperty.SetCamera(_Camera);
+				_MaterialProperties.push_back((MaterialProperty*)&_CameraProperty);
+
+				_MaterialProperties.push_back((MaterialProperty*)&_TopologyProperty);
+
+				_MaterialProperties.push_back((MaterialProperty*)&_ViewportProperty);
+
+				_MaterialProperties.push_back((MaterialProperty*)&_SamplerProperty);
+
 				_SolidMaterial.SetProperties(&_MaterialProperties);
 				_SolidMaterial.SetMaterialName("Opaque Material");
 
@@ -46,6 +62,21 @@ namespace Eternal
 			GraphicObjects& GetGraphicObjects()
 			{
 				return _GraphicObjects;
+			}
+
+			CameraMaterialProperty& GetCameraProperty()
+			{
+				return _CameraProperty;
+			}
+
+			ViewportMaterialProperty& GetViewportProperty()
+			{
+				return _ViewportProperty;
+			}
+
+			SamplerMaterialProperty& GetSamplerProperty()
+			{
+				return _SamplerProperty;
 			}
 
 		private:
@@ -59,6 +90,15 @@ namespace Eternal
 
 			Shader* _PixelShader = nullptr;
 			ShaderMaterialProperty<Context::PIXEL> _PixelProperty;
+
+			Camera* _Camera = nullptr;
+			CameraMaterialProperty _CameraProperty;
+
+			TopologyMaterialProperty _TopologyProperty;
+
+			ViewportMaterialProperty _ViewportProperty;
+
+			SamplerMaterialProperty _SamplerProperty;
 		};
 	}
 }
@@ -96,6 +136,9 @@ void PrepareSolidTask::Execute()
 	ETERNAL_ASSERT(GetState() == SETUP);
 	SetState(EXECUTING);
 
+	_SolidTaskData->GetCameraProperty().SetConstant(_SolidGBufferTask.GetCommonConstant());
+	_SolidTaskData->GetViewportProperty().SetViewport(_SolidGBufferTask.GetViewport());
+	_SolidTaskData->GetSamplerProperty().SetSampler(_SolidGBufferTask.GetSampler());
 	_SolidGBufferTask.SetGraphicObjects(_SolidTaskData->GetGraphicObjects());
 
 	SetState(DONE);

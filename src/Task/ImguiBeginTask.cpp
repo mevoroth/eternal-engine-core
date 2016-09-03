@@ -79,7 +79,7 @@ void ImguiBeginTask::Execute()
 	//io.AddInputCharacter
 
 	ImGui::NewFrame();
-	
+
 	SetState(Task::DONE);
 }
 

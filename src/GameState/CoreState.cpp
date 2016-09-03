@@ -57,7 +57,7 @@ namespace Eternal
 			_ConsoleLog = CreateLog(CONSOLE, "Eternal");
 			Eternal::Log::Log* Logs[] =
 			{
-				_FileLog,
+				//_FileLog,
 				_ConsoleLog
 			};
 			_MultiChannelLog = CreateMultiChannelLog(Logs, ETERNAL_ARRAYSIZE(Logs));
