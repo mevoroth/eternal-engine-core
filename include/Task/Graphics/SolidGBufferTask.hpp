@@ -22,6 +22,8 @@ namespace Eternal
 	{
 		class GraphicObjects;
 		class RenderTargetCollection;
+		class SamplerCollection;
+		class ViewportCollection;
 	}
 
 	namespace Task
@@ -37,7 +39,7 @@ namespace Eternal
 		class SolidGBufferTask : public Task
 		{
 		public:
-			SolidGBufferTask(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargets);
+			SolidGBufferTask(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports);
 
 			Constant* GetCommonConstant();
 			Viewport* GetViewport();

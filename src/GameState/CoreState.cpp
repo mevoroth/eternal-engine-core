@@ -19,10 +19,13 @@
 #include "Task/Core/GameStateTask.hpp"
 #include "Task/Graphics/PrepareSolidTask.hpp"
 #include "Task/Graphics/SolidGBufferTask.hpp"
+#include "Task/Graphics/CompositingTask.hpp"
 #include "Task/Graphics/SwapFrameTask.hpp"
 #include "Resources/Pool.hpp"
 #include "Core/TransformComponent.hpp"
 #include "GraphicData/RenderTargetCollection.hpp"
+#include "GraphicData/SamplerCollection.hpp"
+#include "GraphicData/ViewportCollection.hpp"
 #include "Import/fbx/ImportFbx.hpp"
 #include "Graphics/Format.hpp"
 
@@ -87,6 +90,8 @@ namespace Eternal
 
 			_TaskManager = new TaskManager();
 
+			_InitializeViewports();
+			_InitializeSamplers();
 			_InitializeRenderTargets();
 			_InitializePools();
 			_InitializeTasks();
@@ -109,9 +114,10 @@ namespace Eternal
 			_TaskManager->GetTaskScheduler().PushTask(_ImguiEndTask, _GameStateTask);
 			_TaskManager->GetTaskScheduler().PushTask(_SolidGBufferTask, _PrepareSolidTask);
 			{
-				_TaskManager->GetTaskScheduler().PushTask(_SwapFrameTask, _SolidGBufferTask);
-				_TaskManager->GetTaskScheduler().PushTask(_SwapFrameTask, _ImguiEndTask);
+				_TaskManager->GetTaskScheduler().PushTask(_CompositingTask, _SolidGBufferTask);
+				_TaskManager->GetTaskScheduler().PushTask(_CompositingTask, _ImguiEndTask);
 			}
+			_TaskManager->GetTaskScheduler().PushTask(_SwapFrameTask, _CompositingTask);
 		}
 		
 		void CoreState::Update()
@@ -135,6 +141,9 @@ namespace Eternal
 		{
 			_ReleaseTasks();
 			_ReleasePools();
+			_ReleaseRenderTargets();
+			_ReleaseSamplers();
+			_ReleaseViewports();
 
 			delete _TaskManager;
 			_TaskManager = nullptr;
@@ -212,13 +221,17 @@ namespace Eternal
 			GameStateTaskObj->SetTaskName("Game State Task");
 			_GameStateTask = GameStateTaskObj;
 
-			SolidGBufferTask* SolidGBufferTaskObj = new SolidGBufferTask(*_Contexts[0], *_RenderTargetCollection);
+			SolidGBufferTask* SolidGBufferTaskObj = new SolidGBufferTask(*_Contexts[0], *_RenderTargetCollection, *_SamplerCollection, *_ViewportCollection);
 			SolidGBufferTaskObj->SetTaskName("Solid GBuffer Task");
 			_SolidGBufferTask = SolidGBufferTaskObj;
 
 			PrepareSolidTask* PrepareSolidTaskObj = new PrepareSolidTask(*SolidGBufferTaskObj);
 			PrepareSolidTaskObj->SetTaskName("Prepare Solid Task");
 			_PrepareSolidTask = PrepareSolidTaskObj;
+
+			CompositingTask* CompositingTaskObj = new CompositingTask(*_Renderer->GetMainContext(), _Contexts, ETERNAL_ARRAYSIZE(_Contexts), *_RenderTargetCollection, *_SamplerCollection, *_ViewportCollection);
+			CompositingTaskObj->SetTaskName("Compositing Task");
+			_CompositingTask = CompositingTaskObj;
 
 			SwapFrameTask* SwapFrameTaskObj = new SwapFrameTask(*_Renderer);
 			SwapFrameTaskObj->SetTaskName("Swap Frame Task");
@@ -227,6 +240,18 @@ namespace Eternal
 
 		void CoreState::_ReleaseTasks()
 		{
+			delete _SwapFrameTask;
+			_SwapFrameTask = nullptr;
+
+			delete _CompositingTask;
+			_CompositingTask = nullptr;
+
+			delete _PrepareSolidTask;
+			_PrepareSolidTask = nullptr;
+
+			delete _SolidGBufferTask;
+			_SolidGBufferTask = nullptr;
+
 			delete _GameStateTask;
 			_GameStateTask = nullptr;
 
@@ -256,7 +281,10 @@ namespace Eternal
 
 		void CoreState::_ReleaseGraphicContexts()
 		{
-
+			for (int GraphicContextIndex = 0; GraphicContextIndex < 4; ++GraphicContextIndex)
+			{
+				delete _Contexts[GraphicContextIndex];
+			}
 		}
 
 		void CoreState::_InitializeRenderTargets()
@@ -267,13 +295,35 @@ namespace Eternal
 				RGBA8888,
 				RGBA8888,
 			};
-			_RenderTargetCollection = new RenderTargetCollection(1600, 900, ETERNAL_ARRAYSIZE(RenderTargetsFormat), RenderTargetsFormat);
+			_RenderTargetCollection = new RenderTargetCollection(1600, 900, ETERNAL_ARRAYSIZE(RenderTargetsFormat), RenderTargetsFormat, true);
 		}
 
 		void CoreState::_ReleaseRenderTargets()
 		{
 			delete _RenderTargetCollection;
 			_RenderTargetCollection = nullptr;
+		}
+
+		void CoreState::_InitializeSamplers()
+		{
+			_SamplerCollection = new SamplerCollection();
+		}
+
+		void CoreState::_ReleaseSamplers()
+		{
+			delete _SamplerCollection;
+			_SamplerCollection = nullptr;
+		}
+
+		void CoreState::_InitializeViewports()
+		{
+			_ViewportCollection = new ViewportCollection();
+		}
+
+		void CoreState::_ReleaseViewports()
+		{
+			delete _ViewportCollection;
+			_ViewportCollection = nullptr;
 		}
 	}
 }

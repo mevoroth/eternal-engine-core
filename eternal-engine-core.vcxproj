@@ -155,6 +155,7 @@
     <ClInclude Include="include\Task\Core\UpdateComponentTask.hpp" />
     <ClInclude Include="include\Task\DebugSolidGBufferTask.hpp" />
     <ClInclude Include="include\Task\DebugTask.hpp" />
+    <ClInclude Include="include\Task\Graphics\CompositingTask.hpp" />
     <ClInclude Include="include\Task\Graphics\PrepareSolidTask.hpp" />
     <ClInclude Include="include\Task\Graphics\SolidGBufferTask.hpp" />
     <ClInclude Include="include\Task\Graphics\SwapFrameTask.hpp" />
@@ -173,6 +174,7 @@
     <ClCompile Include="src\Imgui\D3D11ImguiVertexBuffer.cpp" />
     <ClCompile Include="src\Platform\WindowsProcess.cpp" />
     <ClCompile Include="src\Task\DebugTask.cpp" />
+    <ClCompile Include="src\Task\Graphics\CompositingTask.cpp" />
     <ClCompile Include="src\Task\Graphics\PrepareSolidTask.cpp" />
     <ClCompile Include="src\Task\Graphics\SolidGBufferTask.cpp" />
     <ClCompile Include="src\Task\Graphics\SwapFrameTask.cpp" />

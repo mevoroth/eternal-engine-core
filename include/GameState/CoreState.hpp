@@ -47,6 +47,8 @@ namespace Eternal
 	namespace GraphicData
 	{
 		class RenderTargetCollection;
+		class SamplerCollection;
+		class ViewportCollection;
 	}
 }
 
@@ -113,12 +115,15 @@ namespace Eternal
 			Task* _GameStateTask = nullptr;
 			Task* _PrepareSolidTask = nullptr;
 			Task* _SolidGBufferTask = nullptr;
+			Task* _CompositingTask = nullptr;
 			Task* _SwapFrameTask = nullptr;
 
 			ImportFbx* _ImportFbx = nullptr;
 
 			Context* _Contexts[4];
+			SamplerCollection* _SamplerCollection = nullptr;
 			RenderTargetCollection* _RenderTargetCollection = nullptr;
+			ViewportCollection* _ViewportCollection = nullptr;
 
 			void _InitializePools();
 			void _ReleasePools();
@@ -128,6 +133,10 @@ namespace Eternal
 			void _ReleaseGraphicContexts();
 			void _InitializeRenderTargets();
 			void _ReleaseRenderTargets();
+			void _InitializeSamplers();
+			void _ReleaseSamplers();
+			void _InitializeViewports();
+			void _ReleaseViewports();
 		};
 	}
 }

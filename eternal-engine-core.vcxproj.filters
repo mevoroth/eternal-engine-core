@@ -97,6 +97,9 @@
     <ClInclude Include="include\Task\Graphics\PrepareSolidTask.hpp">
       <Filter>Task\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\Task\Graphics\CompositingTask.hpp">
+      <Filter>Task\Graphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Game.cpp">
@@ -151,6 +154,9 @@
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Task\Graphics\PrepareSolidTask.cpp">
+      <Filter>Task\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task\Graphics\CompositingTask.cpp">
       <Filter>Task\Graphics</Filter>
     </ClCompile>
   </ItemGroup>

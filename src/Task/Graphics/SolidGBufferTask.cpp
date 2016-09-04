@@ -10,6 +10,8 @@
 #include "GraphicData/Material.hpp"
 #include "GraphicData/CameraMaterialProperty.hpp"
 #include "GraphicData/RenderTargetCollection.hpp"
+#include "GraphicData/SamplerCollection.hpp"
+#include "GraphicData/ViewportCollection.hpp"
 #include "Core/MeshComponent.hpp"
 #include "Mesh/Mesh.hpp"
 
@@ -24,13 +26,13 @@ namespace Eternal
 		class SolidGBufferData
 		{
 		public:
-			SolidGBufferData(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargetCollectionObj)
+			SolidGBufferData(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargetCollectionObj, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports)
 				: _Context(ContextObj)
 				, _RenderTargetCollection(RenderTargetCollectionObj)
 			{
 				_Constant = CreateConstant(sizeof(CameraMaterialProperty::CommonConstants), Resource::DYNAMIC, Resource::WRITE);
-				_Viewport = CreateViewport(0, 0, 1600, 900);
-				_Sampler = CreateSampler(true, true, false, false, Sampler::WRAP, Sampler::WRAP, Sampler::WRAP);
+				_Viewport = Viewports.GetViewport(ViewportCollection::FULLSCREEN);;
+				_Sampler = Samplers.GetSampler(SamplerCollection::BILINEAR);
 			}
 
 			void SetGraphicObjects(_In_ GraphicObjects& Objects)
@@ -87,9 +89,9 @@ using namespace Eternal::Task;
 
 #include <d3d11.h>
 
-SolidGBufferTask::SolidGBufferTask(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargets)
+SolidGBufferTask::SolidGBufferTask(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports)
 {
-	_SolidGBufferData = new SolidGBufferData(ContextObj, RenderTargets);
+	_SolidGBufferData = new SolidGBufferData(ContextObj, RenderTargets, Samplers, Viewports);
 }
 
 void SolidGBufferTask::Setup()
@@ -103,15 +105,6 @@ void SolidGBufferTask::Execute()
 	ETERNAL_ASSERT(GetState() == Task::SETUP);
 	SetState(EXECUTING);
 
-	ID3D11CommandList* CmdList = nullptr;
-
-	//if (CmdList)
-	//{
-
-	//	SetState(DONE);
-	//	return;
-	//}
-
 	vector<GraphicGameObject*>& GameObjects = _SolidGBufferData->GetGraphicObjects().GetGraphicGameObjects();
 	Material* MaterialObj = _SolidGBufferData->GetGraphicObjects().GetMaterial();
 	RenderTargetCollection& RenderTargetCollectionObj = _SolidGBufferData->GetRenderTargetCollection();
@@ -120,7 +113,10 @@ void SolidGBufferTask::Execute()
 
 	Context& ContextObj = _SolidGBufferData->GetContext();
 
+	ContextObj.Begin();
+
 	MaterialObj->Apply(ContextObj);
+	ContextObj.SetDepthBuffer(RenderTargetCollectionObj.GetDepthStencilRenderTarget());
 	ContextObj.SetRenderTargets(RenderTargetCollectionObj.GetRenderTargets(), RenderTargetCollectionObj.GetRenderTargetsCount());
 
 	for (int GameObjectIndex = 0; GameObjectIndex < GameObjects.size(); ++GameObjectIndex)
@@ -133,12 +129,11 @@ void SolidGBufferTask::Execute()
 	ContextObj.UnbindShader<Context::VERTEX>();
 	ContextObj.UnbindShader<Context::PIXEL>();
 
-	ContextObj.SetRenderTargets(NullRenderTargets, ETERNAL_ARRAYSIZE(NullRenderTargets)); // REMOVE THIS
+	ContextObj.SetRenderTargets(NullRenderTargets, ETERNAL_ARRAYSIZE(NullRenderTargets));	// REMOVE THIS
+	ContextObj.SetDepthBuffer(nullptr);														// REMOVE THIS
 	MaterialObj->Reset(ContextObj);
 
-	((D3D11Context&)ContextObj).GetD3D11Context()->FinishCommandList(FALSE, &CmdList);
-	((D3D11Context&)_SolidGBufferData->GetContext()).GetD3D11Context()->ExecuteCommandList(CmdList, FALSE);
-	CmdList->Release();
+	ContextObj.End();
 
 	SetState(DONE);
 }
