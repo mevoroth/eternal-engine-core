@@ -24,6 +24,7 @@ namespace Eternal
 		class RenderTargetCollection;
 		class SamplerCollection;
 		class ViewportCollection;
+		class BlendStateCollection;
 	}
 
 	namespace Task
@@ -39,7 +40,7 @@ namespace Eternal
 		class SolidGBufferTask : public Task
 		{
 		public:
-			SolidGBufferTask(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports);
+			SolidGBufferTask(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates);
 
 			Constant* GetCommonConstant();
 			Viewport* GetViewport();

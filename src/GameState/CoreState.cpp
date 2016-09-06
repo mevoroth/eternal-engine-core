@@ -26,6 +26,7 @@
 #include "GraphicData/RenderTargetCollection.hpp"
 #include "GraphicData/SamplerCollection.hpp"
 #include "GraphicData/ViewportCollection.hpp"
+#include "GraphicData/BlendStateCollection.hpp"
 #include "Import/fbx/ImportFbx.hpp"
 #include "Graphics/Format.hpp"
 
@@ -91,6 +92,7 @@ namespace Eternal
 			_TaskManager = new TaskManager();
 
 			_InitializeViewports();
+			_InitializeBlendStates();
 			_InitializeSamplers();
 			_InitializeRenderTargets();
 			_InitializePools();
@@ -143,6 +145,7 @@ namespace Eternal
 			_ReleasePools();
 			_ReleaseRenderTargets();
 			_ReleaseSamplers();
+			_ReleaseBlendStates();
 			_ReleaseViewports();
 
 			delete _TaskManager;
@@ -221,7 +224,7 @@ namespace Eternal
 			GameStateTaskObj->SetTaskName("Game State Task");
 			_GameStateTask = GameStateTaskObj;
 
-			SolidGBufferTask* SolidGBufferTaskObj = new SolidGBufferTask(*_Contexts[0], *_RenderTargetCollection, *_SamplerCollection, *_ViewportCollection);
+			SolidGBufferTask* SolidGBufferTaskObj = new SolidGBufferTask(*_Contexts[0], *_RenderTargetCollection, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection);
 			SolidGBufferTaskObj->SetTaskName("Solid GBuffer Task");
 			_SolidGBufferTask = SolidGBufferTaskObj;
 
@@ -229,7 +232,7 @@ namespace Eternal
 			PrepareSolidTaskObj->SetTaskName("Prepare Solid Task");
 			_PrepareSolidTask = PrepareSolidTaskObj;
 
-			CompositingTask* CompositingTaskObj = new CompositingTask(*_Renderer->GetMainContext(), _Contexts, ETERNAL_ARRAYSIZE(_Contexts), *_RenderTargetCollection, *_SamplerCollection, *_ViewportCollection);
+			CompositingTask* CompositingTaskObj = new CompositingTask(*_Renderer->GetMainContext(), _Contexts, ETERNAL_ARRAYSIZE(_Contexts), *_RenderTargetCollection, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection);
 			CompositingTaskObj->SetTaskName("Compositing Task");
 			_CompositingTask = CompositingTaskObj;
 
@@ -324,6 +327,17 @@ namespace Eternal
 		{
 			delete _ViewportCollection;
 			_ViewportCollection = nullptr;
+		}
+
+		void CoreState::_InitializeBlendStates()
+		{
+			_BlendStateCollection = new BlendStateCollection();
+		}
+
+		void CoreState::_ReleaseBlendStates()
+		{
+			delete _BlendStateCollection;
+			_BlendStateCollection = nullptr;
 		}
 	}
 }

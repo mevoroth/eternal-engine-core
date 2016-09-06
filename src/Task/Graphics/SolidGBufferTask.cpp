@@ -5,6 +5,10 @@
 #include "Graphics/ConstantFactory.hpp"
 #include "Graphics/ViewportFactory.hpp"
 #include "Graphics/SamplerFactory.hpp"
+#include "Graphics/DepthStencilFactory.hpp"
+#include "Graphics/DepthTest.hpp"
+#include "Graphics/StencilTest.hpp"
+#include "Graphics/DepthStencil.hpp"
 #include "Core/GraphicGameObject.hpp"
 #include "GraphicData/GraphicObjects.hpp"
 #include "GraphicData/Material.hpp"
@@ -12,6 +16,7 @@
 #include "GraphicData/RenderTargetCollection.hpp"
 #include "GraphicData/SamplerCollection.hpp"
 #include "GraphicData/ViewportCollection.hpp"
+#include "GraphicData/BlendStateCollection.hpp"
 #include "Core/MeshComponent.hpp"
 #include "Mesh/Mesh.hpp"
 
@@ -22,17 +27,20 @@ namespace Eternal
 	namespace Task
 	{
 		using namespace Eternal::GraphicData;
+		using namespace Eternal::Graphics;
 
 		class SolidGBufferData
 		{
 		public:
-			SolidGBufferData(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargetCollectionObj, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports)
+			SolidGBufferData(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargetCollectionObj, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates)
 				: _Context(ContextObj)
 				, _RenderTargetCollection(RenderTargetCollectionObj)
 			{
 				_Constant = CreateConstant(sizeof(CameraMaterialProperty::CommonConstants), Resource::DYNAMIC, Resource::WRITE);
+				_DepthStencil = CreateDepthStencil(DepthTest(DepthTest::ALL, LESS), StencilTest());
 				_Viewport = Viewports.GetViewport(ViewportCollection::FULLSCREEN);;
 				_Sampler = Samplers.GetSampler(SamplerCollection::BILINEAR);
+				_BlendState = BlendStates.GetBlendState(BlendStateCollection::ALPHA);
 			}
 
 			void SetGraphicObjects(_In_ GraphicObjects& Objects)
@@ -74,6 +82,18 @@ namespace Eternal
 				return _Sampler;
 			}
 
+			DepthStencil* GetDepthStencil()
+			{
+				ETERNAL_ASSERT(_Sampler);
+				return _DepthStencil;
+			}
+
+			BlendState* GetBlendState()
+			{
+				ETERNAL_ASSERT(_BlendState);
+				return _BlendState;
+			}
+
 		private:
 			Context& _Context;
 			RenderTargetCollection& _RenderTargetCollection;
@@ -81,6 +101,8 @@ namespace Eternal
 			Constant* _Constant = nullptr;
 			Viewport* _Viewport = nullptr;
 			Sampler* _Sampler = nullptr;
+			BlendState* _BlendState = nullptr;
+			DepthStencil* _DepthStencil = nullptr;
 		};
 	}
 }
@@ -89,9 +111,9 @@ using namespace Eternal::Task;
 
 #include <d3d11.h>
 
-SolidGBufferTask::SolidGBufferTask(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports)
+SolidGBufferTask::SolidGBufferTask(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates)
 {
-	_SolidGBufferData = new SolidGBufferData(ContextObj, RenderTargets, Samplers, Viewports);
+	_SolidGBufferData = new SolidGBufferData(ContextObj, RenderTargets, Samplers, Viewports, BlendStates);
 }
 
 void SolidGBufferTask::Setup()
@@ -114,9 +136,11 @@ void SolidGBufferTask::Execute()
 	Context& ContextObj = _SolidGBufferData->GetContext();
 
 	ContextObj.Begin();
-
+	
 	MaterialObj->Apply(ContextObj);
+	ContextObj.SetBlendMode(_SolidGBufferData->GetBlendState());
 	ContextObj.SetDepthBuffer(RenderTargetCollectionObj.GetDepthStencilRenderTarget());
+	ContextObj.BindDepthStencilState(_SolidGBufferData->GetDepthStencil());
 	ContextObj.SetRenderTargets(RenderTargetCollectionObj.GetRenderTargets(), RenderTargetCollectionObj.GetRenderTargetsCount());
 
 	for (int GameObjectIndex = 0; GameObjectIndex < GameObjects.size(); ++GameObjectIndex)
@@ -130,6 +154,7 @@ void SolidGBufferTask::Execute()
 	ContextObj.UnbindShader<Context::PIXEL>();
 
 	ContextObj.SetRenderTargets(NullRenderTargets, ETERNAL_ARRAYSIZE(NullRenderTargets));	// REMOVE THIS
+	ContextObj.UnbindDepthStencilState();
 	ContextObj.SetDepthBuffer(nullptr);														// REMOVE THIS
 	MaterialObj->Reset(ContextObj);
 

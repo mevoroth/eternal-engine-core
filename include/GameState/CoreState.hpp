@@ -49,6 +49,7 @@ namespace Eternal
 		class RenderTargetCollection;
 		class SamplerCollection;
 		class ViewportCollection;
+		class BlendStateCollection;
 	}
 }
 
@@ -124,6 +125,7 @@ namespace Eternal
 			SamplerCollection* _SamplerCollection = nullptr;
 			RenderTargetCollection* _RenderTargetCollection = nullptr;
 			ViewportCollection* _ViewportCollection = nullptr;
+			BlendStateCollection* _BlendStateCollection = nullptr;
 
 			void _InitializePools();
 			void _ReleasePools();
@@ -137,6 +139,8 @@ namespace Eternal
 			void _ReleaseSamplers();
 			void _InitializeViewports();
 			void _ReleaseViewports();
+			void _InitializeBlendStates();
+			void _ReleaseBlendStates();
 		};
 	}
 }

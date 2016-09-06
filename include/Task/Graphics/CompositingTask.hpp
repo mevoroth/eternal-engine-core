@@ -16,6 +16,7 @@ namespace Eternal
 		class RenderTargetCollection;
 		class SamplerCollection;
 		class ViewportCollection;
+		class BlendStateCollection;
 	}
 
 	namespace Task
@@ -27,7 +28,7 @@ namespace Eternal
 		class CompositingTask : public Task
 		{
 		public:
-			CompositingTask(_In_ Context& MainContext, _In_ Context** DeferredContexts, _In_ int DeferredContextCount, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports);
+			CompositingTask(_In_ Context& MainContext, _In_ Context** DeferredContexts, _In_ int DeferredContextCount, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates);
 
 			virtual void Setup() override;
 			virtual void Reset() override;
@@ -40,6 +41,7 @@ namespace Eternal
 			RenderTargetCollection& _RenderTargets;
 			SamplerCollection& _Samplers;
 			ViewportCollection& _Viewports;
+			BlendStateCollection& _BlendStates;
 			Shader* _VS = nullptr;
 			Shader* _PS = nullptr;
 		};

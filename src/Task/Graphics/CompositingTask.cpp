@@ -8,17 +8,19 @@
 #include "GraphicData/RenderTargetCollection.hpp"
 #include "GraphicData/SamplerCollection.hpp"
 #include "GraphicData/ViewportCollection.hpp"
+#include "GraphicData/BlendStateCollection.hpp"
 
 using namespace Eternal::Task;
 using namespace Eternal::Graphics;
 
-CompositingTask::CompositingTask(_In_ Context& MainContext, _In_ Context** DeferredContexts, _In_ int DeferredContextCount, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports)
+CompositingTask::CompositingTask(_In_ Context& MainContext, _In_ Context** DeferredContexts, _In_ int DeferredContextCount, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates)
 	: _MainContext(MainContext)
 	, _DeferredContexts(DeferredContexts)
 	, _DeferredContextsCount(DeferredContextCount)
 	, _RenderTargets(RenderTargets)
 	, _Samplers(Samplers)
 	, _Viewports(Viewports)
+	, _BlendStates(BlendStates)
 {
 	_VS = ShaderFactory::Get()->CreateVertexShader("Compositing", "compositing.vs.hlsl");
 	_PS = ShaderFactory::Get()->CreatePixelShader("Compositing", "compositing.ps.hlsl");
@@ -39,15 +41,23 @@ void CompositingTask::Execute()
 	ETERNAL_ASSERT(GetState() == SETUP);
 	SetState(EXECUTING);
 
+	RenderTarget* BackBuffer = Renderer::Get()->GetBackBuffer();
+	RenderTarget* NullRenderTarget = nullptr;
+
+	BackBuffer->Clear(&_MainContext);
+	_RenderTargets.GetDepthStencilRenderTarget()->Clear(&_MainContext);
+	for (int BufferIndex = 0; BufferIndex < _RenderTargets.GetRenderTargetsCount(); ++BufferIndex)
+	{
+		_RenderTargets.GetRenderTargets()[BufferIndex]->Clear(&_MainContext);
+	}
+
 	for (int DeferredContextIndex = 0; DeferredContextIndex < _DeferredContextsCount; ++DeferredContextIndex)
 	{
 		_DeferredContexts[DeferredContextIndex]->Flush(_MainContext);
 	}
 
-	RenderTarget* BackBuffer = Renderer::Get()->GetBackBuffer();
-	RenderTarget* NullRenderTarget = nullptr;
-
 	_MainContext.SetTopology(Context::TRIANGLELIST);
+	_MainContext.SetBlendMode(_BlendStates.GetBlendState(BlendStateCollection::SOURCE));
 	_MainContext.SetViewport(_Viewports.GetViewport(ViewportCollection::FULLSCREEN));
 	_MainContext.BindShader<Context::VERTEX>(_VS);
 	_MainContext.BindShader<Context::PIXEL>(_PS);
