@@ -8,6 +8,7 @@ namespace Eternal
 	namespace Core
 	{
 		class GameState;
+		class StateSharedData;
 	}
 
 	namespace Task
@@ -18,7 +19,7 @@ namespace Eternal
 		class GameStateTask : public Task
 		{
 		public:
-			GameStateTask(_In_ Core::GameState* GameStateObj);
+			GameStateTask(_In_ Core::GameState* GameStateObj, _In_ StateSharedData* SharedData);
 
 			virtual void Setup();
 			virtual void Reset();
@@ -29,6 +30,7 @@ namespace Eternal
 		private:
 			Core::GameState* _GameState = nullptr;
 			Core::GameState* _ScheduledToBegin = nullptr;
+			StateSharedData* _SharedData = nullptr;
 		};
 	}
 }

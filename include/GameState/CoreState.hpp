@@ -44,12 +44,25 @@ namespace Eternal
 	{
 		class ImportFbx;
 	}
+	namespace SaveSystem
+	{
+		class SaveSystem;
+	}
 	namespace GraphicData
 	{
 		class RenderTargetCollection;
 		class SamplerCollection;
 		class ViewportCollection;
 		class BlendStateCollection;
+		class RenderingListCollection;
+	}
+	namespace GameData
+	{
+		class GameDatas;
+	}
+	namespace Core
+	{
+		class StateSharedData;
 	}
 }
 
@@ -62,7 +75,9 @@ namespace Eternal
 		using namespace Eternal::Parallel;
 		using namespace Eternal::Platform;
 		using namespace Eternal::Import;
+		using namespace Eternal::SaveSystem;
 		using namespace Eternal::GraphicData;
+		using namespace Eternal::GameData;
 
 		class CoreState : public GameState
 		{
@@ -72,6 +87,7 @@ namespace Eternal
 			public:
 				const char* ShaderIncludePath = nullptr;
 				const char* FBXIncludePath = nullptr;
+				const char* SavePath = nullptr;
 			};
 
 			CoreState(_In_ const CoreStateSettings& Settings, _In_ HINSTANCE hInstance, _In_ int nCmdShow, _In_ GameState* InitialGameState);
@@ -114,18 +130,22 @@ namespace Eternal
 			Task* _TimeTask = nullptr;
 			Task* _UpdateComponentTask = nullptr;
 			Task* _GameStateTask = nullptr;
-			Task* _PrepareSolidTask = nullptr;
-			Task* _SolidGBufferTask = nullptr;
+			Task* _PrepareOpaqueTask = nullptr;
+			Task* _OpaqueTask = nullptr;
 			Task* _CompositingTask = nullptr;
 			Task* _SwapFrameTask = nullptr;
 
 			ImportFbx* _ImportFbx = nullptr;
+			Eternal::SaveSystem::SaveSystem* _SaveSystem = nullptr;
+			GameDatas* _GameDatas = nullptr;
 
 			Context* _Contexts[4];
 			SamplerCollection* _SamplerCollection = nullptr;
-			RenderTargetCollection* _RenderTargetCollection = nullptr;
+			RenderTargetCollection* _OpaqueRenderTargets = nullptr;
+			RenderTargetCollection* _LightRenderTargets = nullptr;
 			ViewportCollection* _ViewportCollection = nullptr;
 			BlendStateCollection* _BlendStateCollection = nullptr;
+			RenderingListCollection* _RenderingListCollection = nullptr;
 
 			void _InitializePools();
 			void _ReleasePools();
@@ -141,6 +161,8 @@ namespace Eternal
 			void _ReleaseViewports();
 			void _InitializeBlendStates();
 			void _ReleaseBlendStates();
+			void _InitializeRenderingLists();
+			void _ReleaseRenderingLists();
 		};
 	}
 }

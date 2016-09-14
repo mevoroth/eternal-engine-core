@@ -57,9 +57,6 @@
     <ClInclude Include="include\Task\DebugTask.hpp">
       <Filter>Task</Filter>
     </ClInclude>
-    <ClInclude Include="include\Task\Graphics\SolidGBufferTask.hpp">
-      <Filter>Task\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\MeshComponent.hpp">
       <Filter>Core</Filter>
     </ClInclude>
@@ -91,14 +88,38 @@
     <ClInclude Include="include\Core\GraphicGameObject.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="include\Task\DebugSolidGBufferTask.hpp">
-      <Filter>Task</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Task\Graphics\PrepareSolidTask.hpp">
-      <Filter>Task\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="include\Task\Graphics\CompositingTask.hpp">
       <Filter>Task\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\MaterialComponent.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\LightComponent.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Task\Graphics\OpaqueTask.hpp">
+      <Filter>Task\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Task\Graphics\PrepareOpaqueTask.hpp">
+      <Filter>Task\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\CameraGameObject.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\CameraComponent.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameData\GraphicGameObjectGameData.hpp">
+      <Filter>GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameData\MeshGameData.hpp">
+      <Filter>GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameData\GameDatas.hpp">
+      <Filter>GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameData\MaterialGameData.hpp">
+      <Filter>GameData</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -122,9 +143,6 @@
     </ClCompile>
     <ClCompile Include="src\Task\DebugTask.cpp">
       <Filter>Task</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Task\Graphics\SolidGBufferTask.cpp">
-      <Filter>Task\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\Task\TimeTask.cpp">
       <Filter>Task</Filter>
@@ -153,11 +171,38 @@
     <ClCompile Include="src\Core\GraphicGameObject.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Task\Graphics\PrepareSolidTask.cpp">
-      <Filter>Task\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="src\Task\Graphics\CompositingTask.cpp">
       <Filter>Task\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\MaterialComponent.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\LightComponent.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task\Graphics\OpaqueTask.cpp">
+      <Filter>Task\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task\Graphics\PrepareOpaqueTask.cpp">
+      <Filter>Task\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\CameraGameObject.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\CameraComponent.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameData\GraphicGameObjectGameData.cpp">
+      <Filter>GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameData\MeshGameData.cpp">
+      <Filter>GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameData\GameDatas.cpp">
+      <Filter>GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameData\MaterialGameData.cpp">
+      <Filter>GameData</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

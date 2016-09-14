@@ -137,14 +137,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\Core\CameraComponent.hpp" />
+    <ClInclude Include="include\Core\CameraGameObject.hpp" />
     <ClInclude Include="include\Core\GraphicGameObject.hpp" />
     <ClInclude Include="include\Core\Game.hpp" />
     <ClInclude Include="include\Core\GameComponent.hpp" />
     <ClInclude Include="include\Core\GameObject.hpp" />
     <ClInclude Include="include\Core\GameState.hpp" />
-    <ClInclude Include="include\Core\Level.hpp" />
+    <ClInclude Include="include\Core\LightComponent.hpp" />
+    <ClInclude Include="include\Core\MaterialComponent.hpp" />
     <ClInclude Include="include\Core\MeshComponent.hpp" />
+    <ClInclude Include="include\Core\StateSharedData.hpp" />
     <ClInclude Include="include\Core\TransformComponent.hpp" />
+    <ClInclude Include="include\GameData\GameDatas.hpp" />
+    <ClInclude Include="include\GameData\GraphicGameObjectGameData.hpp" />
+    <ClInclude Include="include\GameData\MaterialGameData.hpp" />
+    <ClInclude Include="include\GameData\MeshGameData.hpp" />
     <ClInclude Include="include\GameData\TransformGameData.hpp" />
     <ClInclude Include="include\GameState\CoreState.hpp" />
     <ClInclude Include="include\Imgui\D3D11ImguiVertexBuffer.hpp" />
@@ -153,30 +161,37 @@
     <ClInclude Include="include\Task\ControlsTask.hpp" />
     <ClInclude Include="include\Task\Core\GameStateTask.hpp" />
     <ClInclude Include="include\Task\Core\UpdateComponentTask.hpp" />
-    <ClInclude Include="include\Task\DebugSolidGBufferTask.hpp" />
     <ClInclude Include="include\Task\DebugTask.hpp" />
     <ClInclude Include="include\Task\Graphics\CompositingTask.hpp" />
-    <ClInclude Include="include\Task\Graphics\PrepareSolidTask.hpp" />
-    <ClInclude Include="include\Task\Graphics\SolidGBufferTask.hpp" />
+    <ClInclude Include="include\Task\Graphics\OpaqueTask.hpp" />
+    <ClInclude Include="include\Task\Graphics\PrepareOpaqueTask.hpp" />
     <ClInclude Include="include\Task\Graphics\SwapFrameTask.hpp" />
     <ClInclude Include="include\Task\ImguiBeginTask.hpp" />
     <ClInclude Include="include\Task\ImguiEndTask.hpp" />
     <ClInclude Include="include\Task\TimeTask.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Core\CameraComponent.cpp" />
+    <ClCompile Include="src\Core\CameraGameObject.cpp" />
+    <ClCompile Include="src\Core\GameState.cpp" />
     <ClCompile Include="src\Core\GraphicGameObject.cpp" />
     <ClCompile Include="src\Core\Game.cpp" />
-    <ClCompile Include="src\Core\Level.cpp" />
+    <ClCompile Include="src\Core\LightComponent.cpp" />
+    <ClCompile Include="src\Core\MaterialComponent.cpp" />
     <ClCompile Include="src\Core\MeshComponent.cpp" />
     <ClCompile Include="src\Core\TransformComponent.cpp" />
+    <ClCompile Include="src\GameData\GameDatas.cpp" />
+    <ClCompile Include="src\GameData\GraphicGameObjectGameData.cpp" />
+    <ClCompile Include="src\GameData\MaterialGameData.cpp" />
+    <ClCompile Include="src\GameData\MeshGameData.cpp" />
     <ClCompile Include="src\GameData\TransformGameData.cpp" />
     <ClCompile Include="src\GameState\CoreState.cpp" />
     <ClCompile Include="src\Imgui\D3D11ImguiVertexBuffer.cpp" />
     <ClCompile Include="src\Platform\WindowsProcess.cpp" />
     <ClCompile Include="src\Task\DebugTask.cpp" />
     <ClCompile Include="src\Task\Graphics\CompositingTask.cpp" />
-    <ClCompile Include="src\Task\Graphics\PrepareSolidTask.cpp" />
-    <ClCompile Include="src\Task\Graphics\SolidGBufferTask.cpp" />
+    <ClCompile Include="src\Task\Graphics\PrepareOpaqueTask.cpp" />
+    <ClCompile Include="src\Task\Graphics\OpaqueTask.cpp" />
     <ClCompile Include="src\Task\Graphics\SwapFrameTask.cpp" />
     <ClCompile Include="src\Task\ImguiBeginTask.cpp" />
     <ClCompile Include="src\Task\ImguiEndTask.cpp" />

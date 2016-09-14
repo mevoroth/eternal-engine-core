@@ -2,12 +2,14 @@
 
 #include "Macros/Macros.hpp"
 #include "Core/GameState.hpp"
+#include "Core/StateSharedData.hpp"
 
 using namespace Eternal::Task;
 
-GameStateTask::GameStateTask(_In_ GameState* GameStateObj)
+GameStateTask::GameStateTask(_In_ GameState* GameStateObj, _In_ StateSharedData* SharedData)
 	: _GameState(GameStateObj)
 	, _ScheduledToBegin(GameStateObj)
+	, _SharedData(SharedData)
 {
 	ETERNAL_ASSERT(GameStateObj);
 }
@@ -18,6 +20,7 @@ void GameStateTask::Setup()
 	SetState(SETTINGUP);
 	if (_ScheduledToBegin)
 	{
+		_ScheduledToBegin->SetSharedData(_SharedData);
 		_ScheduledToBegin->Begin();
 		_ScheduledToBegin = nullptr;
 	}

@@ -5,6 +5,8 @@ namespace Eternal
 {
 	namespace Core
 	{
+		class StateSharedData;
+
 		class GameState
 		{
 		public:
@@ -12,6 +14,11 @@ namespace Eternal
 			virtual void Update() = 0;
 			virtual GameState* NextState() = 0;
 			virtual void End() = 0;
+			void SetSharedData(_In_ StateSharedData* SharedData);
+			StateSharedData* GetSharedData();
+
+		private:
+			StateSharedData* _StateSharedData = nullptr;
 		};
 	}
 }

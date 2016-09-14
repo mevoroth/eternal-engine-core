@@ -1,5 +1,5 @@
-#ifndef _SOLIDGBUFFER_TASK_
-#define _SOLIDGBUFFER_TASK_
+#ifndef _OPAQUE_TASK_
+#define _OPAQUE_TASK_
 
 #include "Parallel/Task.hpp"
 
@@ -35,12 +35,12 @@ namespace Eternal
 		using namespace Eternal::GraphicData;
 		using namespace std;
 
-		class SolidGBufferData;
+		class OpaqueTaskData;
 
-		class SolidGBufferTask : public Task
+		class OpaqueTask : public Task
 		{
 		public:
-			SolidGBufferTask(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates);
+			OpaqueTask(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates);
 
 			Constant* GetCommonConstant();
 			Viewport* GetViewport();
@@ -52,7 +52,7 @@ namespace Eternal
 			virtual void Execute() override;
 
 		private:
-			SolidGBufferData* _SolidGBufferData = nullptr;
+			OpaqueTaskData* _OpaqueTaskData = nullptr;
 
 			void _Draw(_In_ Mesh& MeshObj);
 		};

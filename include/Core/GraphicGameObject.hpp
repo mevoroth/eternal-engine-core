@@ -5,28 +5,25 @@
 
 namespace Eternal
 {
-	namespace GraphicData
-	{
-		class Material;
-	}
-
 	namespace Core
 	{
-		using namespace Eternal::GraphicData;
-
 		class GraphicGameObjectData;
 		class TransformComponent;
 		class MeshComponent;
+		class MaterialComponent;
 
 		class GraphicGameObject : public GameObject
 		{
 		public:
 			GraphicGameObject();
 
+			void CopyTransformComponent(_In_ TransformComponent* MeshComponentObj);
 			void SetMeshComponent(_In_ MeshComponent* MeshComponentObj);
+			void SetMaterialComponent(_In_ MaterialComponent* MaterialComponentObj);
 
 			TransformComponent* GetTransformComponent();
 			MeshComponent* GetMeshComponent();
+			MaterialComponent* GetMaterialComponent();
 
 			virtual void Begin() override;
 			virtual void Update(_In_ const TimeT& ElapsedMicroSeconds) override;

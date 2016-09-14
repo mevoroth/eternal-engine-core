@@ -93,3 +93,25 @@ size_t TransformGameData::GetSize() const
 	Json::FastWriter JsonWriter;
 	return JsonWriter.write(_Cache->Value).size();
 }
+
+bool TransformGameData::CanLoad(_In_ const void* SerializedData) const
+{
+	return false;
+}
+
+void* TransformGameData::Load(_In_ const void* SerializedData)
+{
+	Json::Value& TransformComponentNode = *(Json::Value*)SerializedData;
+
+	TransformComponent* TransformComponentObj = new TransformComponent();
+
+	Json::Value& Translation = TransformComponentNode["Translation"];
+	Json::Value& Rotation = TransformComponentNode["Rotation"];
+	Json::Value& Scaling = TransformComponentNode["Scaling"];
+	
+	TransformComponentObj->GetTransform().SetTranslation(Vector3(Translation[0].asFloat(), Translation[1].asFloat(), Translation[2].asFloat()));
+	TransformComponentObj->GetTransform().SetRotation(Vector4(Rotation[0].asFloat(), Rotation[1].asFloat(), Rotation[2].asFloat(), Rotation[3].asFloat()));
+	TransformComponentObj->GetTransform().SetScaling(Vector3(Scaling[0].asFloat(), Scaling[1].asFloat(), Scaling[2].asFloat()));
+	
+	return TransformComponentObj;
+}

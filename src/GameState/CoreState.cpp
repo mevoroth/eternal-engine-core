@@ -17,8 +17,8 @@
 #include "Task/TimeTask.hpp"
 #include "Task/Core/UpdateComponentTask.hpp"
 #include "Task/Core/GameStateTask.hpp"
-#include "Task/Graphics/PrepareSolidTask.hpp"
-#include "Task/Graphics/SolidGBufferTask.hpp"
+#include "Task/Graphics/PrepareOpaqueTask.hpp"
+#include "Task/Graphics/OpaqueTask.hpp"
 #include "Task/Graphics/CompositingTask.hpp"
 #include "Task/Graphics/SwapFrameTask.hpp"
 #include "Resources/Pool.hpp"
@@ -27,7 +27,10 @@
 #include "GraphicData/SamplerCollection.hpp"
 #include "GraphicData/ViewportCollection.hpp"
 #include "GraphicData/BlendStateCollection.hpp"
+#include "GraphicData/RenderingListCollection.hpp"
 #include "Import/fbx/ImportFbx.hpp"
+#include "SaveSystem/SaveSystem.hpp"
+#include "GameData/GameDatas.hpp"
 #include "Graphics/Format.hpp"
 
 using namespace Eternal::Resources;
@@ -43,6 +46,8 @@ namespace Eternal
 		using namespace Eternal::Task;
 		using namespace Eternal::Platform;
 		using namespace Eternal::Log;
+		using namespace Eternal::SaveSystem;
+		using namespace Eternal::GameData;
 
 		CoreState::CoreState(_In_ const CoreStateSettings& Settings, _In_ HINSTANCE hInstance, _In_ int nCmdShow, _In_ GameState* InitialGameState)
 			: _Settings(Settings)
@@ -89,6 +94,9 @@ namespace Eternal
 			_ImportFbx = new ImportFbx();
 			_ImportFbx->RegisterPath(_Settings.FBXIncludePath);
 
+			_SaveSystem = new Eternal::SaveSystem::SaveSystem();
+			_SaveSystem->RegisterSavePath(_Settings.SavePath);
+
 			_TaskManager = new TaskManager();
 
 			_InitializeViewports();
@@ -96,7 +104,11 @@ namespace Eternal
 			_InitializeSamplers();
 			_InitializeRenderTargets();
 			_InitializePools();
+			_InitializeRenderingLists();
 			_InitializeTasks();
+
+			_GameDatas = new GameDatas();
+			_SaveSystem->SetGameDataLoader(_GameDatas);
 
 			_TaskManager->GetTaskScheduler().PushTask(_ControlsTask);
 			_TaskManager->GetTaskScheduler().PushTask(_TimeTask);
@@ -112,11 +124,11 @@ namespace Eternal
 				_TaskManager->GetTaskScheduler().PushTask(_GameStateTask, _UpdateComponentTask);
 				_TaskManager->GetTaskScheduler().PushTask(_GameStateTask, _ImguiBeginTask);
 			}
-			_TaskManager->GetTaskScheduler().PushTask(_PrepareSolidTask, _GameStateTask);
+			_TaskManager->GetTaskScheduler().PushTask(_PrepareOpaqueTask, _GameStateTask);
 			_TaskManager->GetTaskScheduler().PushTask(_ImguiEndTask, _GameStateTask);
-			_TaskManager->GetTaskScheduler().PushTask(_SolidGBufferTask, _PrepareSolidTask);
+			_TaskManager->GetTaskScheduler().PushTask(_OpaqueTask, _PrepareOpaqueTask);
 			{
-				_TaskManager->GetTaskScheduler().PushTask(_CompositingTask, _SolidGBufferTask);
+				_TaskManager->GetTaskScheduler().PushTask(_CompositingTask, _OpaqueTask);
 				_TaskManager->GetTaskScheduler().PushTask(_CompositingTask, _ImguiEndTask);
 			}
 			_TaskManager->GetTaskScheduler().PushTask(_SwapFrameTask, _CompositingTask);
@@ -142,6 +154,7 @@ namespace Eternal
 		void CoreState::End()
 		{
 			_ReleaseTasks();
+			_ReleaseRenderingLists();
 			_ReleasePools();
 			_ReleaseRenderTargets();
 			_ReleaseSamplers();
@@ -220,19 +233,19 @@ namespace Eternal
 			UpdateComponentTaskObj->SetTaskName("Update Transform Pool Task");
 			_UpdateComponentTask = UpdateComponentTaskObj;
 
-			GameStateTask* GameStateTaskObj = new GameStateTask(_InitialGameState);
+			GameStateTask* GameStateTaskObj = new GameStateTask(_InitialGameState, GetSharedData());
 			GameStateTaskObj->SetTaskName("Game State Task");
 			_GameStateTask = GameStateTaskObj;
 
-			SolidGBufferTask* SolidGBufferTaskObj = new SolidGBufferTask(*_Contexts[0], *_RenderTargetCollection, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection);
-			SolidGBufferTaskObj->SetTaskName("Solid GBuffer Task");
-			_SolidGBufferTask = SolidGBufferTaskObj;
+			OpaqueTask* OpaqueTaskObj = new OpaqueTask(*_Contexts[0], *_OpaqueRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection);
+			OpaqueTaskObj->SetTaskName("Opaque Task");
+			_OpaqueTask = OpaqueTaskObj;
 
-			PrepareSolidTask* PrepareSolidTaskObj = new PrepareSolidTask(*SolidGBufferTaskObj);
-			PrepareSolidTaskObj->SetTaskName("Prepare Solid Task");
-			_PrepareSolidTask = PrepareSolidTaskObj;
+			PrepareOpaqueTask* PrepareOpaqueTaskObj = new PrepareOpaqueTask(*OpaqueTaskObj);
+			PrepareOpaqueTaskObj->SetTaskName("Prepare Opaque Task");
+			_PrepareOpaqueTask = PrepareOpaqueTaskObj;
 
-			CompositingTask* CompositingTaskObj = new CompositingTask(*_Renderer->GetMainContext(), _Contexts, ETERNAL_ARRAYSIZE(_Contexts), *_RenderTargetCollection, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection);
+			CompositingTask* CompositingTaskObj = new CompositingTask(*_Renderer->GetMainContext(), _Contexts, ETERNAL_ARRAYSIZE(_Contexts), *_OpaqueRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection);
 			CompositingTaskObj->SetTaskName("Compositing Task");
 			_CompositingTask = CompositingTaskObj;
 
@@ -249,11 +262,11 @@ namespace Eternal
 			delete _CompositingTask;
 			_CompositingTask = nullptr;
 
-			delete _PrepareSolidTask;
-			_PrepareSolidTask = nullptr;
+			delete _PrepareOpaqueTask;
+			_PrepareOpaqueTask = nullptr;
 
-			delete _SolidGBufferTask;
-			_SolidGBufferTask = nullptr;
+			delete _OpaqueTask;
+			_OpaqueTask = nullptr;
 
 			delete _GameStateTask;
 			_GameStateTask = nullptr;
@@ -292,19 +305,25 @@ namespace Eternal
 
 		void CoreState::_InitializeRenderTargets()
 		{
-			Format RenderTargetsFormat[] = {
+			Format OpaqueFormat[] = {
 				RGBA8888,
 				RGBA8888,
 				RGBA8888,
 				RGBA8888,
 			};
-			_RenderTargetCollection = new RenderTargetCollection(1600, 900, ETERNAL_ARRAYSIZE(RenderTargetsFormat), RenderTargetsFormat, true);
+			_OpaqueRenderTargets = new RenderTargetCollection(1600, 900, ETERNAL_ARRAYSIZE(OpaqueFormat), OpaqueFormat, true);
+			Format LightFormat[] = {
+				RGBA8888
+			};
+			_LightRenderTargets = new RenderTargetCollection(1600, 900, ETERNAL_ARRAYSIZE(LightFormat), LightFormat);
 		}
 
 		void CoreState::_ReleaseRenderTargets()
 		{
-			delete _RenderTargetCollection;
-			_RenderTargetCollection = nullptr;
+			delete _OpaqueRenderTargets;
+			_OpaqueRenderTargets = nullptr;
+			delete _LightRenderTargets;
+			_LightRenderTargets = nullptr;
 		}
 
 		void CoreState::_InitializeSamplers()
@@ -338,6 +357,17 @@ namespace Eternal
 		{
 			delete _BlendStateCollection;
 			_BlendStateCollection = nullptr;
+		}
+
+		void CoreState::_InitializeRenderingLists()
+		{
+			_RenderingListCollection = new RenderingListCollection();
+		}
+
+		void CoreState::_ReleaseRenderingLists()
+		{
+			delete _RenderingListCollection;
+			_RenderingListCollection = nullptr;
 		}
 	}
 }
