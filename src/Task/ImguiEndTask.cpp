@@ -14,8 +14,11 @@
 #include "Graphics/Resource.hpp"
 #include "Graphics/ShaderFactory.hpp"
 #include "Graphics/Format.hpp"
+#include "GraphicData/SamplerCollection.hpp"
+#include "GraphicData/ViewportCollection.hpp"
 #include "d3d11/D3D11Renderer.hpp"
-#include "d3d11/D3D11Constant.hpp"
+#include "Graphics/ConstantFactory.hpp"
+#include "Graphics/Constant.hpp"
 #include "d3d11/D3D11Texture.hpp"
 #include "d3d11/D3D11Sampler.hpp"
 #include "d3d11/D3D11BlendState.hpp"
@@ -26,7 +29,7 @@ using namespace Eternal::Imgui;
 using namespace Eternal::Graphics;
 using namespace Eternal::Types;
 
-ImguiEndTask::ImguiEndTask(Context& ContextObj)
+ImguiEndTask::ImguiEndTask(Context& ContextObj, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports)
 	: _Context(ContextObj)
 {
 	InputLayout::VertexDataType VerticesDataType[] = {
@@ -40,7 +43,7 @@ ImguiEndTask::ImguiEndTask(Context& ContextObj)
 	_VS = ShaderFactory::Get()->CreateVertexShader("Imgui", "imgui.vs.hlsl", VerticesDataType, ETERNAL_ARRAYSIZE(VerticesDataType));
 	_PS = ShaderFactory::Get()->CreatePixelShader("Imgui", "imgui.ps.hlsl");
 
-	_ViewProjectionMatrixConstant = new D3D11Constant(sizeof(Matrix4x4), D3D11Resource::DYNAMIC, Resource::WRITE);
+	_ViewProjectionMatrixConstant = CreateConstant(sizeof(Matrix4x4), D3D11Resource::DYNAMIC, Resource::WRITE);
 
 	uint8_t* Pixels;
 	int Height;
@@ -50,10 +53,12 @@ ImguiEndTask::ImguiEndTask(Context& ContextObj)
 	_Texture = new D3D11Texture(RGBA8888, D3D11Resource::DEFAULT, Resource::NONE, Width, Height, Pixels);
 	ImGui::GetIO().Fonts->TexID = ((D3D11Texture*)_Texture)->GetD3D11ShaderResourceView();
 
-	_Sampler = new D3D11Sampler(true, true, true, false, Sampler::WRAP, Sampler::WRAP, Sampler::WRAP);
+	_Sampler = Samplers.GetSampler(SamplerCollection::BILINEAR);
 
 	_BlendState = new D3D11BlendState(BlendState::SRC_ALPHA, BlendState::INV_SRC_ALPHA, BlendState::OP_ADD,
 		BlendState::SRC_ALPHA, BlendState::INV_SRC_ALPHA, BlendState::OP_ADD);
+
+	_Viewport = Viewports.GetViewport(ViewportCollection::FULLSCREEN);
 }
 
 void ImguiEndTask::Setup()
@@ -74,6 +79,8 @@ void ImguiEndTask::Execute()
 	ImDrawData* ImguiDrawData = ImGui::GetDrawData();
 	ETERNAL_ASSERT(ImguiDrawData->Valid);
 	
+	_Context.Begin();
+
 	float L = 0.0f;
 	float R = ImGui::GetIO().DisplaySize.x;
 	float B = ImGui::GetIO().DisplaySize.y;
@@ -85,18 +92,21 @@ void ImguiEndTask::Execute()
 		0.0f,				0.0f,				0.5f, 0.0f,
 		(R + L) / (L - R),	(T + B) / (B - T),	0.5f, 1.0f
 	);
-	Resource::LockedResource LockedResourceObj = ((D3D11Constant*)_ViewProjectionMatrixConstant)->Lock(_Context, Resource::LOCK_WRITE_DISCARD);
+	Resource* ViewProjConstant = _ViewProjectionMatrixConstant->GetAsResource();
+	Resource::LockedResource LockedResourceObj = ViewProjConstant->Lock(_Context, Resource::LOCK_WRITE_DISCARD);
 	memcpy(LockedResourceObj.Data, &ViewProjMatrix, sizeof(Matrix4x4));
-	((D3D11Constant*)_ViewProjectionMatrixConstant)->Unlock(_Context);
+	ViewProjConstant->Unlock(_Context);
 
+	_Context.SetTopology(Context::TRIANGLELIST);
 	_Context.SetBlendMode(_BlendState);
-
+	
 	_Context.BindShader<Context::VERTEX>(_VS);
 	_Context.BindShader<Context::PIXEL>(_PS);
 
 	_Context.BindConstant<Context::VERTEX>(0, _ViewProjectionMatrixConstant);
 	_Context.BindSampler<Context::PIXEL>(0, _Sampler);
 
+	_Context.SetViewport(_Viewport);
 	_Context.SetRenderTargets(&_RenderTarget, 1);
 
 	int ElementOffset = 0;
@@ -138,6 +148,7 @@ void ImguiEndTask::Execute()
 	_Context.UnbindSampler<Context::PIXEL>(0);
 	_Context.UnbindConstant<Context::VERTEX>(0);
 
+	_Context.End();
 	//OutputDebugString("[ImguiEndTask::Execute]End ImguiEndTask\n");
 
 	SetState(Task::DONE);

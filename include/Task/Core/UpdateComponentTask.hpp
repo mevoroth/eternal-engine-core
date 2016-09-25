@@ -37,13 +37,13 @@ namespace Eternal
 			{
 				SetState(EXECUTING);
 
-				Eternal::Time::TimeT DeltaTime = _Time->GetDeltaTime();
+				Eternal::Time::TimeSecondsT DeltaTimeSeconds = _Time->GetDeltaTimeSeconds();
 
 				for (uint32_t ObjectIndex = 0; ObjectIndex < _Pool->GetSize(); ++ObjectIndex)
 				{
 					if (_Pool->IsValid((PoolHandle)ObjectIndex))
 					{
-						_Pool->Get((PoolHandle)ObjectIndex)->Update(DeltaTime);
+						_Pool->Get((PoolHandle)ObjectIndex)->Update(DeltaTimeSeconds);
 					}
 				}
 

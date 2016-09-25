@@ -57,7 +57,7 @@ void GraphicGameObject::Begin()
 {
 }
 
-void GraphicGameObject::Update(_In_ const TimeT& ElapsedMicroSeconds)
+void GraphicGameObject::Update(_In_ const TimeSecondsT& ElapsedSeconds)
 {
 }
 

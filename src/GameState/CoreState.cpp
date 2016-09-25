@@ -23,6 +23,7 @@
 #include "Task/Graphics/SwapFrameTask.hpp"
 #include "Resources/Pool.hpp"
 #include "Core/TransformComponent.hpp"
+#include "Core/CameraComponent.hpp"
 #include "GraphicData/RenderTargetCollection.hpp"
 #include "GraphicData/SamplerCollection.hpp"
 #include "GraphicData/ViewportCollection.hpp"
@@ -37,6 +38,7 @@ using namespace Eternal::Resources;
 using namespace Eternal::Core;
 
 extern Pool<TransformComponent>* g_TransformComponentPool;
+extern Pool<CameraComponent, 4>* g_CameraComponentPool;
 
 namespace Eternal
 {
@@ -113,20 +115,20 @@ namespace Eternal
 			_TaskManager->GetTaskScheduler().PushTask(_ControlsTask);
 			_TaskManager->GetTaskScheduler().PushTask(_TimeTask);
 			{
-				_TaskManager->GetTaskScheduler().PushTask(_UpdateComponentTask, _ControlsTask);
-				_TaskManager->GetTaskScheduler().PushTask(_UpdateComponentTask, _TimeTask);
+				_TaskManager->GetTaskScheduler().PushTask(_UpdateTransformComponentTask, _ControlsTask);
+				_TaskManager->GetTaskScheduler().PushTask(_UpdateTransformComponentTask, _TimeTask);
 			}
+			_TaskManager->GetTaskScheduler().PushTask(_UpdateCameraComponentTask, _UpdateTransformComponentTask);
 			{
 				_TaskManager->GetTaskScheduler().PushTask(_ImguiBeginTask, _ControlsTask);
 				_TaskManager->GetTaskScheduler().PushTask(_ImguiBeginTask, _TimeTask);
 			}
 			{
-				_TaskManager->GetTaskScheduler().PushTask(_GameStateTask, _UpdateComponentTask);
+				_TaskManager->GetTaskScheduler().PushTask(_GameStateTask, _UpdateCameraComponentTask);
 				_TaskManager->GetTaskScheduler().PushTask(_GameStateTask, _ImguiBeginTask);
 			}
-			_TaskManager->GetTaskScheduler().PushTask(_PrepareOpaqueTask, _GameStateTask);
+			_TaskManager->GetTaskScheduler().PushTask(_OpaqueTask, _GameStateTask);
 			_TaskManager->GetTaskScheduler().PushTask(_ImguiEndTask, _GameStateTask);
-			_TaskManager->GetTaskScheduler().PushTask(_OpaqueTask, _PrepareOpaqueTask);
 			{
 				_TaskManager->GetTaskScheduler().PushTask(_CompositingTask, _OpaqueTask);
 				_TaskManager->GetTaskScheduler().PushTask(_CompositingTask, _ImguiEndTask);
@@ -201,11 +203,13 @@ namespace Eternal
 		void CoreState::_InitializePools()
 		{
 			TransformComponent::Initialize();
+			CameraComponent::Initialize();
 		}
 
 		void CoreState::_ReleasePools()
 		{
 			TransformComponent::Release();
+			CameraComponent::Release();
 		}
 
 		void CoreState::_InitializeTasks()
@@ -221,29 +225,30 @@ namespace Eternal
 			ImguiBeginTaskObj->SetupKeyboard(_KeyboardInput);
 			_ImguiBeginTask = ImguiBeginTaskObj;
 
-			ImguiEndTask* ImguiEndTaskObj = new ImguiEndTask(*_Renderer->GetMainContext());
+			ImguiEndTask* ImguiEndTaskObj = new ImguiEndTask(*_Contexts[2], *_SamplerCollection, *_ViewportCollection);
 			ImguiEndTaskObj->SetTaskName("Imgui End Task");
+			ImguiEndTaskObj->SetRenderTarget(_Renderer->GetBackBuffer());
 			_ImguiEndTask = ImguiEndTaskObj;
 
 			TimeTask* TimeTaskObj = new TimeTask(_Time);
 			TimeTaskObj->SetTaskName("Time Task");
 			_TimeTask = TimeTaskObj;
 
-			UpdateComponentTask< Pool<TransformComponent> >* UpdateComponentTaskObj = new UpdateComponentTask< Pool<TransformComponent> >(_Time, g_TransformComponentPool);
-			UpdateComponentTaskObj->SetTaskName("Update Transform Pool Task");
-			_UpdateComponentTask = UpdateComponentTaskObj;
+			UpdateComponentTask< Pool<TransformComponent> >* UpdateTransformComponentTaskObj = new UpdateComponentTask< Pool<TransformComponent> >(_Time, g_TransformComponentPool);
+			UpdateTransformComponentTaskObj->SetTaskName("Update Transform Pool Task");
+			_UpdateTransformComponentTask = UpdateTransformComponentTaskObj;
+
+			UpdateComponentTask< Pool<CameraComponent, 4> >* UpdateCameraComponentObj = new UpdateComponentTask< Pool<CameraComponent, 4> >(_Time, g_CameraComponentPool);
+			UpdateCameraComponentObj->SetTaskName("Update Camera Pool Task");
+			_UpdateCameraComponentTask = UpdateCameraComponentObj;
 
 			GameStateTask* GameStateTaskObj = new GameStateTask(_InitialGameState, GetSharedData());
 			GameStateTaskObj->SetTaskName("Game State Task");
 			_GameStateTask = GameStateTaskObj;
 
-			OpaqueTask* OpaqueTaskObj = new OpaqueTask(*_Contexts[0], *_OpaqueRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection);
+			OpaqueTask* OpaqueTaskObj = new OpaqueTask(*_Contexts[0], *_OpaqueRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection, GetSharedData());
 			OpaqueTaskObj->SetTaskName("Opaque Task");
 			_OpaqueTask = OpaqueTaskObj;
-
-			PrepareOpaqueTask* PrepareOpaqueTaskObj = new PrepareOpaqueTask(*OpaqueTaskObj);
-			PrepareOpaqueTaskObj->SetTaskName("Prepare Opaque Task");
-			_PrepareOpaqueTask = PrepareOpaqueTaskObj;
 
 			CompositingTask* CompositingTaskObj = new CompositingTask(*_Renderer->GetMainContext(), _Contexts, ETERNAL_ARRAYSIZE(_Contexts), *_OpaqueRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection);
 			CompositingTaskObj->SetTaskName("Compositing Task");
@@ -262,17 +267,17 @@ namespace Eternal
 			delete _CompositingTask;
 			_CompositingTask = nullptr;
 
-			delete _PrepareOpaqueTask;
-			_PrepareOpaqueTask = nullptr;
-
 			delete _OpaqueTask;
 			_OpaqueTask = nullptr;
 
 			delete _GameStateTask;
 			_GameStateTask = nullptr;
 
-			delete _UpdateComponentTask;
-			_UpdateComponentTask = nullptr;
+			delete _UpdateCameraComponentTask;
+			_UpdateCameraComponentTask = nullptr;
+
+			delete _UpdateTransformComponentTask;
+			_UpdateTransformComponentTask = nullptr;
 
 			delete _TimeTask;
 			_TimeTask = nullptr;

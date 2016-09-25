@@ -26,7 +26,7 @@ namespace Eternal
 			MaterialComponent* GetMaterialComponent();
 
 			virtual void Begin() override;
-			virtual void Update(_In_ const TimeT& ElapsedMicroSeconds) override;
+			virtual void Update(_In_ const TimeSecondsT& ElapsedSeconds) override;
 			virtual void End() override;
 
 		private:

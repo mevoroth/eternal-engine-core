@@ -9,12 +9,14 @@ namespace Eternal
 	{
 		using namespace std;
 
-		class GameObject;
+		class GraphicGameObject;
+		class CameraGameObject;
 
 		class StateSharedData
 		{
 		public:
-			vector<GameObject*>* GameObjects = nullptr;
+			vector<GraphicGameObject*>* GraphicGameObjects = nullptr;
+			CameraGameObject* Camera = nullptr;
 		};
 	}
 }

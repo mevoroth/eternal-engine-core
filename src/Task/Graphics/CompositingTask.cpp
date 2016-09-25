@@ -51,34 +51,64 @@ void CompositingTask::Execute()
 		_RenderTargets.GetRenderTargets()[BufferIndex]->Clear(&_MainContext);
 	}
 
+	//_MainContext.SetTopology(Context::TRIANGLELIST);
+	//_MainContext.SetBlendMode(_BlendStates.GetBlendState(BlendStateCollection::SOURCE));
+	//_MainContext.SetViewport(_Viewports.GetViewport(ViewportCollection::FULLSCREEN));
+	//_MainContext.BindShader<Context::VERTEX>(_VS);
+	//_MainContext.BindShader<Context::PIXEL>(_PS);
+	//_MainContext.BindBuffer<Context::PIXEL>(0, _RenderTargets.GetDepthStencilRenderTarget()->GetAsResource());
+	//for (int BufferIndex = 0; BufferIndex < _RenderTargets.GetRenderTargetsCount(); ++BufferIndex)
+	//{
+	//	_MainContext.BindBuffer<Context::PIXEL>(BufferIndex + 1, _RenderTargets.GetRenderTargets()[BufferIndex]->GetAsResource());
+	//}
+	//_MainContext.BindSampler<Context::PIXEL>(0, _Samplers.GetSampler(SamplerCollection::BILINEAR));
+
+	//_MainContext.SetRenderTargets(&BackBuffer, 1);
+	//_MainContext.DrawPrimitive(6);
+	//_MainContext.SetRenderTargets(&NullRenderTarget, 1);
+
+	//_MainContext.UnbindSampler<Context::PIXEL>(0);
+	//for (int BufferIndex = 0; BufferIndex < _RenderTargets.GetRenderTargetsCount(); ++BufferIndex)
+	//{
+	//	_MainContext.UnbindBuffer<Context::PIXEL>(BufferIndex);
+	//}
+	//_MainContext.UnbindShader<Context::PIXEL>();
+	//_MainContext.UnbindShader<Context::VERTEX>();
+
+	Context& CompositingContext = *_DeferredContexts[1];
+
+	CompositingContext.Begin();
+
+	CompositingContext.SetTopology(Context::TRIANGLELIST);
+	CompositingContext.SetBlendMode(_BlendStates.GetBlendState(BlendStateCollection::SOURCE));
+	CompositingContext.SetViewport(_Viewports.GetViewport(ViewportCollection::FULLSCREEN));
+	CompositingContext.BindShader<Context::VERTEX>(_VS);
+	CompositingContext.BindShader<Context::PIXEL>(_PS);
+	CompositingContext.BindBuffer<Context::PIXEL>(0, _RenderTargets.GetDepthStencilRenderTarget()->GetAsResource());
+	for (int BufferIndex = 0; BufferIndex < _RenderTargets.GetRenderTargetsCount(); ++BufferIndex)
+	{
+		CompositingContext.BindBuffer<Context::PIXEL>(BufferIndex + 1, _RenderTargets.GetRenderTargets()[BufferIndex]->GetAsResource());
+	}
+	CompositingContext.BindSampler<Context::PIXEL>(0, _Samplers.GetSampler(SamplerCollection::BILINEAR));
+
+	CompositingContext.SetRenderTargets(&BackBuffer, 1);
+	CompositingContext.DrawPrimitive(6);
+	CompositingContext.SetRenderTargets(&NullRenderTarget, 1);
+
+	CompositingContext.UnbindSampler<Context::PIXEL>(0);
+	for (int BufferIndex = 0; BufferIndex < _RenderTargets.GetRenderTargetsCount(); ++BufferIndex)
+	{
+		CompositingContext.UnbindBuffer<Context::PIXEL>(BufferIndex);
+	}
+	CompositingContext.UnbindShader<Context::PIXEL>();
+	CompositingContext.UnbindShader<Context::VERTEX>();
+
+	CompositingContext.End();
+
 	for (int DeferredContextIndex = 0; DeferredContextIndex < _DeferredContextsCount; ++DeferredContextIndex)
 	{
 		_DeferredContexts[DeferredContextIndex]->Flush(_MainContext);
 	}
-
-	_MainContext.SetTopology(Context::TRIANGLELIST);
-	_MainContext.SetBlendMode(_BlendStates.GetBlendState(BlendStateCollection::SOURCE));
-	_MainContext.SetViewport(_Viewports.GetViewport(ViewportCollection::FULLSCREEN));
-	_MainContext.BindShader<Context::VERTEX>(_VS);
-	_MainContext.BindShader<Context::PIXEL>(_PS);
-	_MainContext.BindBuffer<Context::PIXEL>(0, _RenderTargets.GetDepthStencilRenderTarget()->GetAsResource());
-	for (int BufferIndex = 0; BufferIndex < _RenderTargets.GetRenderTargetsCount(); ++BufferIndex)
-	{
-		_MainContext.BindBuffer<Context::PIXEL>(BufferIndex + 1, _RenderTargets.GetRenderTargets()[BufferIndex]->GetAsResource());
-	}
-	_MainContext.BindSampler<Context::PIXEL>(0, _Samplers.GetSampler(SamplerCollection::BILINEAR));
-
-	_MainContext.SetRenderTargets(&BackBuffer, 1);
-	_MainContext.DrawPrimitive(6);
-	_MainContext.SetRenderTargets(&NullRenderTarget, 1);
-
-	_MainContext.UnbindSampler<Context::PIXEL>(0);
-	for (int BufferIndex = 0; BufferIndex < _RenderTargets.GetRenderTargetsCount(); ++BufferIndex)
-	{
-		_MainContext.UnbindBuffer<Context::PIXEL>(BufferIndex);
-	}
-	_MainContext.UnbindShader<Context::PIXEL>();
-	_MainContext.UnbindShader<Context::VERTEX>();
 
 	SetState(DONE);
 }

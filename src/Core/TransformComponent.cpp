@@ -35,7 +35,7 @@ void TransformComponent::Begin()
 {
 }
 
-void TransformComponent::Update(_In_ const TimeT& ElapsedMilliseconds)
+void TransformComponent::Update(_In_ const TimeSecondsT& ElapsedSeconds)
 {
 	bool Dirty = false;
 	_UpdateCache(Dirty);

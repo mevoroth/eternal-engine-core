@@ -1,5 +1,6 @@
 #include "Task/Graphics/OpaqueTask.hpp"
 
+#include "Types/Types.hpp"
 #include "Graphics/Context.hpp"
 #include "Graphics/Constant.hpp"
 #include "Graphics/ConstantFactory.hpp"
@@ -11,16 +12,20 @@
 #include "Graphics/DepthStencil.hpp"
 #include "Graphics/ShaderFactory.hpp"
 #include "Graphics/InputLayout.hpp"
+#include "Core/StateSharedData.hpp"
 #include "Core/GraphicGameObject.hpp"
 #include "GraphicData/GraphicObjects.hpp"
 #include "GraphicData/Material.hpp"
-#include "GraphicData/CameraMaterialProperty.hpp"
 #include "GraphicData/RenderTargetCollection.hpp"
 #include "GraphicData/SamplerCollection.hpp"
 #include "GraphicData/ViewportCollection.hpp"
 #include "GraphicData/BlendStateCollection.hpp"
 #include "Core/MeshComponent.hpp"
 #include "Core/MaterialComponent.hpp"
+#include "Core/CameraComponent.hpp"
+#include "Core/StateSharedData.hpp"
+#include "Core/CameraGameObject.hpp"
+#include "Camera/Camera.hpp"
 #include "Mesh/Mesh.hpp"
 
 namespace Eternal
@@ -33,10 +38,23 @@ namespace Eternal
 		class OpaqueTaskData
 		{
 		public:
-			OpaqueTaskData(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargetCollectionObj, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates)
+			struct CommonConstants
+			{
+				Matrix4x4 ViewProjection;
+			};
+
+			struct ObjectConstants
+			{
+				Matrix4x4 Model;
+			};
+
+			OpaqueTaskData(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargetCollectionObj, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates, _In_ StateSharedData* SharedData)
 				: _Context(ContextObj)
 				, _RenderTargetCollection(RenderTargetCollectionObj)
+				, _SharedData(SharedData)
 			{
+				ETERNAL_ASSERT(_SharedData);
+
 				InputLayout::VertexDataType DataTypes[] = {
 					InputLayout::POSITION_T,
 					InputLayout::NORMAL_T,
@@ -46,22 +64,20 @@ namespace Eternal
 				_VS = ShaderFactory::Get()->CreateVertexShader("Opaque", "opaque.vs.hlsl", DataTypes, ETERNAL_ARRAYSIZE(DataTypes));
 				_PS = ShaderFactory::Get()->CreatePixelShader("Opaque", "opaque.ps.hlsl");
 
-				_Constant = CreateConstant(sizeof(CameraMaterialProperty::CommonConstants), Resource::DYNAMIC, Resource::WRITE);
+				//InputLayout::VertexDataType DataTypes[] = {
+				//	InputLayout::POSITION_T,
+				//	InputLayout::COLOR_T
+				//};
+
+				//_VS = ShaderFactory::Get()->CreateVertexShader("VertexColor", "vertexcolor.vs.hlsl", DataTypes, ETERNAL_ARRAYSIZE(DataTypes));
+				//_PS = ShaderFactory::Get()->CreatePixelShader("VertexColor", "vertexcolor.ps.hlsl");
+
+				_CommonConstant = CreateConstant(sizeof(CommonConstants), Resource::DYNAMIC, Resource::WRITE);
+				_ObjectConstant = CreateConstant(sizeof(ObjectConstants), Resource::DYNAMIC, Resource::WRITE);
 				_DepthStencil = CreateDepthStencil(DepthTest(DepthTest::ALL, LESS), StencilTest());
 				_Viewport = Viewports.GetViewport(ViewportCollection::FULLSCREEN);;
 				_Sampler = Samplers.GetSampler(SamplerCollection::BILINEAR);
 				_BlendState = BlendStates.GetBlendState(BlendStateCollection::ALPHA);
-			}
-
-			void SetGraphicObjects(_In_ GraphicObjects& Objects)
-			{
-				_Objects = &Objects;
-			}
-
-			GraphicObjects& GetGraphicObjects()
-			{
-				ETERNAL_ASSERT(_Objects);
-				return *_Objects;
 			}
 
 			Context& GetContext()
@@ -74,10 +90,16 @@ namespace Eternal
 				return _RenderTargetCollection;
 			}
 
-			Constant* GetConstant()
+			Constant* GetCommonConstant()
 			{
-				ETERNAL_ASSERT(_Constant);
-				return _Constant;
+				ETERNAL_ASSERT(_CommonConstant);
+				return _CommonConstant;
+			}
+
+			Constant* GetObjectConstant()
+			{
+				ETERNAL_ASSERT(_ObjectConstant);
+				return _ObjectConstant;
 			}
 
 			Viewport* GetViewport()
@@ -116,13 +138,20 @@ namespace Eternal
 				return _PS;
 			}
 
+			StateSharedData* GetSharedData()
+			{
+				return _SharedData;
+			}
+
 		private:
+			StateSharedData* _SharedData = nullptr;
 			Context& _Context;
 			RenderTargetCollection& _RenderTargetCollection;
 			GraphicObjects* _Objects = nullptr;
 			Shader* _VS = nullptr;
 			Shader* _PS = nullptr;
-			Constant* _Constant = nullptr;
+			Constant* _CommonConstant = nullptr;
+			Constant* _ObjectConstant = nullptr;
 			Viewport* _Viewport = nullptr;
 			Sampler* _Sampler = nullptr;
 			BlendState* _BlendState = nullptr;
@@ -133,11 +162,15 @@ namespace Eternal
 
 using namespace Eternal::Task;
 
-#include <d3d11.h>
-
-OpaqueTask::OpaqueTask(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates)
+OpaqueTask::OpaqueTask(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates, _In_ StateSharedData* SharedData)
 {
-	_OpaqueTaskData = new OpaqueTaskData(ContextObj, RenderTargets, Samplers, Viewports, BlendStates);
+	_OpaqueTaskData = new OpaqueTaskData(ContextObj, RenderTargets, Samplers, Viewports, BlendStates, SharedData);
+}
+
+OpaqueTask::~OpaqueTask()
+{
+	delete _OpaqueTaskData;
+	_OpaqueTaskData = nullptr;
 }
 
 void OpaqueTask::Setup()
@@ -150,19 +183,24 @@ void OpaqueTask::Execute()
 {
 	ETERNAL_ASSERT(GetState() == Task::SETUP);
 	SetState(EXECUTING);
-	SetState(DONE);
-	return;
-	vector<GraphicGameObject*>& GameObjects = _OpaqueTaskData->GetGraphicObjects().GetGraphicGameObjects();
-	Material* MaterialObj = _OpaqueTaskData->GetGraphicObjects().GetMaterial();
+
+	if (!(_OpaqueTaskData->GetSharedData()->GraphicGameObjects && _OpaqueTaskData->GetSharedData()->GraphicGameObjects->size()))
+	{
+		SetState(DONE);
+		return;
+	}
+
+	vector<GraphicGameObject*>& GameObjects = *_OpaqueTaskData->GetSharedData()->GraphicGameObjects;
+	
 	RenderTargetCollection& RenderTargetCollectionObj = _OpaqueTaskData->GetRenderTargetCollection();
-
+	
 	RenderTarget* NullRenderTargets[] = { nullptr, nullptr, nullptr, nullptr }; // REMOVE THIS
-
+	
 	Context& ContextObj = _OpaqueTaskData->GetContext();
 
 	ContextObj.Begin();
 	
-	//MaterialObj->Apply(ContextObj);
+	_SetupCommonConstants(ContextObj);
 
 	ContextObj.SetTopology(Context::TRIANGLELIST);
 	ContextObj.SetViewport(_OpaqueTaskData->GetViewport());
@@ -174,15 +212,20 @@ void OpaqueTask::Execute()
 	ContextObj.BindShader<Context::VERTEX>(_OpaqueTaskData->GetVS());
 	ContextObj.BindShader<Context::PIXEL>(_OpaqueTaskData->GetPS());
 
+	ContextObj.BindConstant<Context::VERTEX>(0, _OpaqueTaskData->GetCommonConstant());
+
 	for (int GameObjectIndex = 0; GameObjectIndex < GameObjects.size(); ++GameObjectIndex)
 	{
 		Mesh* CurrentMesh = GameObjects[GameObjectIndex]->GetMeshComponent()->GetMesh();
 		Material* CurrentMaterial = GameObjects[GameObjectIndex]->GetMaterialComponent()->GetMaterial();
 		CurrentMaterial->Apply(ContextObj);
 		//GameObjects[GameObjectIndex]->GetTransformComponent()->GetLocalToWorldTransform()
+		//_Draw(*CurrentMesh->GetBBMesh());
 		_Draw(*CurrentMesh);
 		CurrentMaterial->Reset(ContextObj);
 	}
+
+	ContextObj.UnbindConstant<Context::VERTEX>(0);
 
 	ContextObj.UnbindShader<Context::VERTEX>();
 	ContextObj.UnbindShader<Context::PIXEL>();
@@ -191,8 +234,6 @@ void OpaqueTask::Execute()
 	ContextObj.SetRenderTargets(NullRenderTargets, ETERNAL_ARRAYSIZE(NullRenderTargets));	// REMOVE THIS
 	ContextObj.UnbindDepthStencilState();
 	ContextObj.SetDepthBuffer(nullptr);														// REMOVE THIS
-
-	//MaterialObj->Reset(ContextObj);
 
 	ContextObj.End();
 
@@ -205,19 +246,35 @@ void OpaqueTask::Reset()
 	SetState(IDLE);
 }
 
-void OpaqueTask::SetGraphicObjects(_In_ GraphicObjects& Objects)
+void OpaqueTask::_SetupCommonConstants(_In_ Context& ContextObj)
 {
-	_OpaqueTaskData->SetGraphicObjects(Objects);
+	Camera* CameraObj = _OpaqueTaskData->GetSharedData()->Camera->GetCameraComponent()->GetCamera();
+	Resource* ConstantResource = _OpaqueTaskData->GetCommonConstant()->GetAsResource();
+	Resource::LockedResource CommonConstant = ConstantResource->Lock(ContextObj, Resource::LOCK_WRITE_DISCARD);
+	CameraObj->GetViewProjectionMatrixTransposed(((OpaqueTaskData::CommonConstants*)CommonConstant.Data)->ViewProjection);
+	ConstantResource->Unlock(ContextObj);
+}
+
+void OpaqueTask::_SetupObjectConstants(_In_ Context& ContextObj, _In_ Mesh& MeshObj)
+{
+	Matrix4x4 ModelMatrix = MeshObj.GetTransform().GetModelMatrix();
+	Resource* ConstantResource = _OpaqueTaskData->GetObjectConstant()->GetAsResource();
+	Resource::LockedResource ObjectConstant = ConstantResource->Lock(ContextObj, Resource::LOCK_WRITE_DISCARD);
+	memcpy(ObjectConstant.Data, &ModelMatrix, sizeof(OpaqueTaskData::ObjectConstants));
+	ConstantResource->Unlock(ContextObj);
 }
 
 void OpaqueTask::_Draw(_In_ Mesh& MeshObj)
 {
 	if (MeshObj.IsValidNode())
 	{
-		MeshObj.InitializeBuffers();
+		MeshObj.InitializeBuffers(); // REMOVE THIS
 		Context& ContextObj = _OpaqueTaskData->GetContext();
 		
+		_SetupObjectConstants(ContextObj, MeshObj); // CODE IS WRONG
+		ContextObj.BindConstant<Context::VERTEX>(1, _OpaqueTaskData->GetObjectConstant());
 		ContextObj.DrawIndexed(MeshObj.GetVertexBuffer(), MeshObj.GetIndexBuffer());
+		ContextObj.UnbindConstant<Context::VERTEX>(1);
 	}
 
 	for (int SubMeshIndex = 0; SubMeshIndex < MeshObj.GetSubMeshesCount(); ++SubMeshIndex)
@@ -229,7 +286,7 @@ void OpaqueTask::_Draw(_In_ Mesh& MeshObj)
 
 Constant* OpaqueTask::GetCommonConstant()
 {
-	return _OpaqueTaskData->GetConstant();
+	return _OpaqueTaskData->GetCommonConstant();
 }
 
 Viewport* OpaqueTask::GetViewport()

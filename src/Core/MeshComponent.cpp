@@ -7,7 +7,7 @@ void MeshComponent::Begin()
 
 }
 
-void MeshComponent::Update(_In_ const TimeT& ElapsedMicroSeconds)
+void MeshComponent::Update(_In_ const TimeSecondsT& ElapsedSeconds)
 {
 
 }

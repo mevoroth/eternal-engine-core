@@ -128,9 +128,9 @@ namespace Eternal
 			Task* _ImguiBeginTask = nullptr;
 			Task* _ImguiEndTask = nullptr;
 			Task* _TimeTask = nullptr;
-			Task* _UpdateComponentTask = nullptr;
+			Task* _UpdateTransformComponentTask = nullptr;
+			Task* _UpdateCameraComponentTask = nullptr;
 			Task* _GameStateTask = nullptr;
-			Task* _PrepareOpaqueTask = nullptr;
 			Task* _OpaqueTask = nullptr;
 			Task* _CompositingTask = nullptr;
 			Task* _SwapFrameTask = nullptr;

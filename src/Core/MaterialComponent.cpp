@@ -7,7 +7,7 @@ void MaterialComponent::Begin()
 
 }
 
-void MaterialComponent::Update(_In_ const TimeT& ElapsedMicroSeconds)
+void MaterialComponent::Update(_In_ const TimeSecondsT& ElapsedSeconds)
 {
 
 }

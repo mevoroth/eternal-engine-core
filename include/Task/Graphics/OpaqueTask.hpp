@@ -27,12 +27,18 @@ namespace Eternal
 		class BlendStateCollection;
 	}
 
+	namespace Core
+	{
+		class StateSharedData;
+	}
+
 	namespace Task
 	{
 		using namespace Eternal::Parallel;
 		using namespace Eternal::Components;
 		using namespace Eternal::Graphics;
 		using namespace Eternal::GraphicData;
+		using namespace Eternal::Core;
 		using namespace std;
 
 		class OpaqueTaskData;
@@ -40,12 +46,12 @@ namespace Eternal
 		class OpaqueTask : public Task
 		{
 		public:
-			OpaqueTask(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates);
+			OpaqueTask(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates, _In_ StateSharedData* SharedData);
+			~OpaqueTask();
 
 			Constant* GetCommonConstant();
 			Viewport* GetViewport();
 			Sampler* GetSampler();
-			void SetGraphicObjects(_In_ GraphicObjects& Objects);
 
 			virtual void Setup() override;
 			virtual void Reset() override;
@@ -54,6 +60,8 @@ namespace Eternal
 		private:
 			OpaqueTaskData* _OpaqueTaskData = nullptr;
 
+			void _SetupCommonConstants(_In_ Context& ContextObj);
+			void _SetupObjectConstants(_In_ Context& ContextObj, _In_ Mesh& MeshObj);
 			void _Draw(_In_ Mesh& MeshObj);
 		};
 	}

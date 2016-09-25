@@ -29,7 +29,7 @@ namespace Eternal
 		public:
 			PrepareOpaqueTaskData()
 			{
-				_Camera = new PerspectiveCamera(0.001f, 5000.0f, 45.0f);
+				//_Camera = new PerspectiveCamera(0.001f, 5000.0f, 45.0f);
 				_CameraProperty.SetCamera(_Camera);
 				_MaterialProperties.push_back((MaterialProperty*)&_CameraProperty);
 
@@ -119,7 +119,6 @@ void PrepareOpaqueTask::Execute()
 	_PrepareOpaqueTaskData->GetCameraProperty().SetConstant(_OpaqueTask.GetCommonConstant());
 	_PrepareOpaqueTaskData->GetViewportProperty().SetViewport(_OpaqueTask.GetViewport());
 	_PrepareOpaqueTaskData->GetSamplerProperty().SetSampler(_OpaqueTask.GetSampler());
-	_OpaqueTask.SetGraphicObjects(_PrepareOpaqueTaskData->GetGraphicObjects());
 
 	SetState(DONE);
 }
