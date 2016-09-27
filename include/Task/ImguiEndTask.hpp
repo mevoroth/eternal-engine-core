@@ -18,6 +18,7 @@ namespace Eternal
 	}
 	namespace GraphicData
 	{
+		class ContextCollection;
 		class SamplerCollection;
 		class ViewportCollection;
 	}
@@ -30,7 +31,7 @@ namespace Eternal
 		class ImguiEndTask : public Task
 		{
 		public:
-			ImguiEndTask(_In_ Context& ContextObj, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports);
+			ImguiEndTask(_In_ ContextCollection& Contexts, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports);
 
 			virtual void Setup() override;
 			virtual void Execute() override;
@@ -42,7 +43,7 @@ namespace Eternal
 			}
 
 		private:
-			Context& _Context;
+			ContextCollection& _Contexts;
 
 			Shader* _VS = nullptr;
 			Shader* _PS = nullptr;

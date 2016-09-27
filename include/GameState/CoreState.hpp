@@ -50,6 +50,7 @@ namespace Eternal
 	}
 	namespace GraphicData
 	{
+		class ContextCollection;
 		class RenderTargetCollection;
 		class SamplerCollection;
 		class ViewportCollection;
@@ -132,6 +133,7 @@ namespace Eternal
 			Task* _UpdateCameraComponentTask = nullptr;
 			Task* _GameStateTask = nullptr;
 			Task* _OpaqueTask = nullptr;
+			Task* _LightingTask = nullptr;
 			Task* _CompositingTask = nullptr;
 			Task* _SwapFrameTask = nullptr;
 
@@ -139,7 +141,7 @@ namespace Eternal
 			Eternal::SaveSystem::SaveSystem* _SaveSystem = nullptr;
 			GameDatas* _GameDatas = nullptr;
 
-			Context* _Contexts[4];
+			ContextCollection* _ContextCollection = nullptr;
 			SamplerCollection* _SamplerCollection = nullptr;
 			RenderTargetCollection* _OpaqueRenderTargets = nullptr;
 			RenderTargetCollection* _LightRenderTargets = nullptr;

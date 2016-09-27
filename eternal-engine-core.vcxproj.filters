@@ -79,9 +79,6 @@
       <Filter>GameData</Filter>
     </ClInclude>
     <ClInclude Include="include\GamePools.hpp" />
-    <ClInclude Include="include\Core\Level.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="include\Task\Graphics\SwapFrameTask.hpp">
       <Filter>Task\Graphics</Filter>
     </ClInclude>
@@ -120,6 +117,13 @@
     </ClInclude>
     <ClInclude Include="include\GameData\MaterialGameData.hpp">
       <Filter>GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\StateSharedData.hpp" />
+    <ClInclude Include="include\Core\LightGameObject.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Task\Graphics\LightingTask.hpp">
+      <Filter>Task\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -162,9 +166,6 @@
     <ClCompile Include="src\Core\MeshComponent.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\Level.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\Task\Graphics\SwapFrameTask.cpp">
       <Filter>Task\Graphics</Filter>
     </ClCompile>
@@ -203,6 +204,10 @@
     </ClCompile>
     <ClCompile Include="src\GameData\MaterialGameData.cpp">
       <Filter>GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\GameState.cpp" />
+    <ClCompile Include="src\Task\Graphics\LightingTask.cpp">
+      <Filter>Task\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

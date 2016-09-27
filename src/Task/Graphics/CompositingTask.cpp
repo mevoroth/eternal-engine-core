@@ -5,6 +5,7 @@
 #include "Graphics/Context.hpp"
 #include "Graphics/RenderTarget.hpp"
 #include "Graphics/ShaderFactory.hpp"
+#include "GraphicData/ContextCollection.hpp"
 #include "GraphicData/RenderTargetCollection.hpp"
 #include "GraphicData/SamplerCollection.hpp"
 #include "GraphicData/ViewportCollection.hpp"
@@ -13,10 +14,9 @@
 using namespace Eternal::Task;
 using namespace Eternal::Graphics;
 
-CompositingTask::CompositingTask(_In_ Context& MainContext, _In_ Context** DeferredContexts, _In_ int DeferredContextCount, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates)
+CompositingTask::CompositingTask(_In_ Context& MainContext, _In_ ContextCollection& DeferredContexts, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates)
 	: _MainContext(MainContext)
 	, _DeferredContexts(DeferredContexts)
-	, _DeferredContextsCount(DeferredContextCount)
 	, _RenderTargets(RenderTargets)
 	, _Samplers(Samplers)
 	, _Viewports(Viewports)
@@ -75,8 +75,7 @@ void CompositingTask::Execute()
 	//_MainContext.UnbindShader<Context::PIXEL>();
 	//_MainContext.UnbindShader<Context::VERTEX>();
 
-	Context& CompositingContext = *_DeferredContexts[1];
-
+	Context& CompositingContext = _DeferredContexts.Get();
 	CompositingContext.Begin();
 
 	CompositingContext.SetTopology(Context::TRIANGLELIST);
@@ -104,11 +103,13 @@ void CompositingTask::Execute()
 	CompositingContext.UnbindShader<Context::VERTEX>();
 
 	CompositingContext.End();
+	_DeferredContexts.Release(CompositingContext);
 
-	for (int DeferredContextIndex = 0; DeferredContextIndex < _DeferredContextsCount; ++DeferredContextIndex)
-	{
-		_DeferredContexts[DeferredContextIndex]->Flush(_MainContext);
-	}
+#error "IMPLEMENT FLUSH"
+	//for (int DeferredContextIndex = 0; DeferredContextIndex < _DeferredContextsCount; ++DeferredContextIndex)
+	//{
+	//	_DeferredContexts[DeferredContextIndex]->Flush(_MainContext);
+	//}
 
 	SetState(DONE);
 }

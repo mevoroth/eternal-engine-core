@@ -116,9 +116,9 @@ void PrepareOpaqueTask::Execute()
 	ETERNAL_ASSERT(GetState() == SETUP);
 	SetState(EXECUTING);
 
-	_PrepareOpaqueTaskData->GetCameraProperty().SetConstant(_OpaqueTask.GetCommonConstant());
-	_PrepareOpaqueTaskData->GetViewportProperty().SetViewport(_OpaqueTask.GetViewport());
-	_PrepareOpaqueTaskData->GetSamplerProperty().SetSampler(_OpaqueTask.GetSampler());
+	//_PrepareOpaqueTaskData->GetCameraProperty().SetConstant(_OpaqueTask.GetCommonConstant());
+	//_PrepareOpaqueTaskData->GetViewportProperty().SetViewport(_OpaqueTask.GetViewport());
+	//_PrepareOpaqueTaskData->GetSamplerProperty().SetSampler(_OpaqueTask.GetSampler());
 
 	SetState(DONE);
 }

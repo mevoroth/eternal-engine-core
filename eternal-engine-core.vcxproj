@@ -71,7 +71,7 @@
     <LibraryPath>$(SolutionDir)\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(VCInstallDir)PlatformSDK\include;$(ProjectDir);$(SolutionDir)eternal-engine-utils\include;$(SolutionDir)eternal-engine-components\include;$(ProjectDir)include;$(SolutionDir)eternal-engine-extern\imgui;$(SolutionDir)eternal-engine-graphics\include;$(SolutionDir)eternal-engine-extern\json;$(IncludePath)</IncludePath>
+    <IncludePath>$(VCInstallDir)PlatformSDK\include;$(ProjectDir);$(SolutionDir)eternal-engine-utils\include;$(SolutionDir)eternal-engine-components\include;$(ProjectDir)include;$(SolutionDir)eternal-engine-extern\imgui;$(SolutionDir)eternal-engine-graphics\include;$(SolutionDir)eternal-engine-extern\json;$(SolutionDir)eternal-engine-shaders;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -145,6 +145,7 @@
     <ClInclude Include="include\Core\GameObject.hpp" />
     <ClInclude Include="include\Core\GameState.hpp" />
     <ClInclude Include="include\Core\LightComponent.hpp" />
+    <ClInclude Include="include\Core\LightGameObject.hpp" />
     <ClInclude Include="include\Core\MaterialComponent.hpp" />
     <ClInclude Include="include\Core\MeshComponent.hpp" />
     <ClInclude Include="include\Core\StateSharedData.hpp" />
@@ -163,6 +164,7 @@
     <ClInclude Include="include\Task\Core\UpdateComponentTask.hpp" />
     <ClInclude Include="include\Task\DebugTask.hpp" />
     <ClInclude Include="include\Task\Graphics\CompositingTask.hpp" />
+    <ClInclude Include="include\Task\Graphics\LightingTask.hpp" />
     <ClInclude Include="include\Task\Graphics\OpaqueTask.hpp" />
     <ClInclude Include="include\Task\Graphics\PrepareOpaqueTask.hpp" />
     <ClInclude Include="include\Task\Graphics\SwapFrameTask.hpp" />
@@ -192,6 +194,7 @@
     <ClCompile Include="src\Task\Graphics\CompositingTask.cpp" />
     <ClCompile Include="src\Task\Graphics\PrepareOpaqueTask.cpp" />
     <ClCompile Include="src\Task\Graphics\OpaqueTask.cpp" />
+    <ClCompile Include="src\Task\Graphics\LightingTask.cpp" />
     <ClCompile Include="src\Task\Graphics\SwapFrameTask.cpp" />
     <ClCompile Include="src\Task\ImguiBeginTask.cpp" />
     <ClCompile Include="src\Task\ImguiEndTask.cpp" />

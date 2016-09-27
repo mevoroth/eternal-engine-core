@@ -10,6 +10,7 @@
 #include "Input/InputFactory.hpp"
 #include "Time/TimeFactory.hpp"
 #include "Log/LogFactory.hpp"
+#include "Parallel/CpuCoreCount.hpp"
 #include "Parallel/TaskManager.hpp"
 #include "Task/ControlsTask.hpp"
 #include "Task/ImguiBeginTask.hpp"
@@ -19,11 +20,13 @@
 #include "Task/Core/GameStateTask.hpp"
 #include "Task/Graphics/PrepareOpaqueTask.hpp"
 #include "Task/Graphics/OpaqueTask.hpp"
+#include "Task/Graphics/LightingTask.hpp"
 #include "Task/Graphics/CompositingTask.hpp"
 #include "Task/Graphics/SwapFrameTask.hpp"
 #include "Resources/Pool.hpp"
 #include "Core/TransformComponent.hpp"
 #include "Core/CameraComponent.hpp"
+#include "GraphicData/ContextCollection.hpp"
 #include "GraphicData/RenderTargetCollection.hpp"
 #include "GraphicData/SamplerCollection.hpp"
 #include "GraphicData/ViewportCollection.hpp"
@@ -50,6 +53,7 @@ namespace Eternal
 		using namespace Eternal::Log;
 		using namespace Eternal::SaveSystem;
 		using namespace Eternal::GameData;
+		using namespace Eternal::Parallel;
 
 		CoreState::CoreState(_In_ const CoreStateSettings& Settings, _In_ HINSTANCE hInstance, _In_ int nCmdShow, _In_ GameState* InitialGameState)
 			: _Settings(Settings)
@@ -225,7 +229,7 @@ namespace Eternal
 			ImguiBeginTaskObj->SetupKeyboard(_KeyboardInput);
 			_ImguiBeginTask = ImguiBeginTaskObj;
 
-			ImguiEndTask* ImguiEndTaskObj = new ImguiEndTask(*_Contexts[2], *_SamplerCollection, *_ViewportCollection);
+			ImguiEndTask* ImguiEndTaskObj = new ImguiEndTask(*_ContextCollection, *_SamplerCollection, *_ViewportCollection);
 			ImguiEndTaskObj->SetTaskName("Imgui End Task");
 			ImguiEndTaskObj->SetRenderTarget(_Renderer->GetBackBuffer());
 			_ImguiEndTask = ImguiEndTaskObj;
@@ -246,11 +250,13 @@ namespace Eternal
 			GameStateTaskObj->SetTaskName("Game State Task");
 			_GameStateTask = GameStateTaskObj;
 
-			OpaqueTask* OpaqueTaskObj = new OpaqueTask(*_Contexts[0], *_OpaqueRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection, GetSharedData());
+			OpaqueTask* OpaqueTaskObj = new OpaqueTask(*_ContextCollection, *_OpaqueRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection, GetSharedData());
 			OpaqueTaskObj->SetTaskName("Opaque Task");
 			_OpaqueTask = OpaqueTaskObj;
 
-			CompositingTask* CompositingTaskObj = new CompositingTask(*_Renderer->GetMainContext(), _Contexts, ETERNAL_ARRAYSIZE(_Contexts), *_OpaqueRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection);
+			LightingTask* LightingTaskObj = new LightingTask(*_ContextCollection, *_OpaqueRenderTargets, *_LightRenderTargets, *_SamplerCollection, *_ViewportCollection, GetSharedData());
+
+			CompositingTask* CompositingTaskObj = new CompositingTask(*_Renderer->GetMainContext(), *_ContextCollection, *_OpaqueRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection);
 			CompositingTaskObj->SetTaskName("Compositing Task");
 			_CompositingTask = CompositingTaskObj;
 
@@ -294,18 +300,13 @@ namespace Eternal
 
 		void CoreState::_InitializeGraphicContexts()
 		{
-			for (int GraphicContextIndex = 0; GraphicContextIndex < 4; ++GraphicContextIndex)
-			{
-				_Contexts[GraphicContextIndex] = _Renderer->CreateDeferredContext();
-			}
+			_ContextCollection = new ContextCollection(*_Renderer, (int)CpuCoreCount());
 		}
 
 		void CoreState::_ReleaseGraphicContexts()
 		{
-			for (int GraphicContextIndex = 0; GraphicContextIndex < 4; ++GraphicContextIndex)
-			{
-				delete _Contexts[GraphicContextIndex];
-			}
+			delete _ContextCollection;
+			_ContextCollection = nullptr;
 		}
 
 		void CoreState::_InitializeRenderTargets()

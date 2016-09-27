@@ -21,6 +21,7 @@ namespace Eternal
 	namespace GraphicData
 	{
 		class GraphicObjects;
+		class ContextCollection;
 		class RenderTargetCollection;
 		class SamplerCollection;
 		class ViewportCollection;
@@ -46,12 +47,8 @@ namespace Eternal
 		class OpaqueTask : public Task
 		{
 		public:
-			OpaqueTask(_In_ Context& ContextObj, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates, _In_ StateSharedData* SharedData);
+			OpaqueTask(_In_ ContextCollection& Contexts, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates, _In_ StateSharedData* SharedData);
 			~OpaqueTask();
-
-			Constant* GetCommonConstant();
-			Viewport* GetViewport();
-			Sampler* GetSampler();
 
 			virtual void Setup() override;
 			virtual void Reset() override;
@@ -60,9 +57,9 @@ namespace Eternal
 		private:
 			OpaqueTaskData* _OpaqueTaskData = nullptr;
 
-			void _SetupCommonConstants(_In_ Context& ContextObj);
+			void _SetupFrameConstants(_In_ Context& ContextObj);
 			void _SetupObjectConstants(_In_ Context& ContextObj, _In_ Mesh& MeshObj);
-			void _Draw(_In_ Mesh& MeshObj);
+			void _Draw(_In_ Context& ContextObj, _In_ Mesh& MeshObj);
 		};
 	}
 }

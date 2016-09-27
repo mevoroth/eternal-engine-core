@@ -13,6 +13,7 @@ namespace Eternal
 
 	namespace GraphicData
 	{
+		class ContextCollection;
 		class RenderTargetCollection;
 		class SamplerCollection;
 		class ViewportCollection;
@@ -28,7 +29,7 @@ namespace Eternal
 		class CompositingTask : public Task
 		{
 		public:
-			CompositingTask(_In_ Context& MainContext, _In_ Context** DeferredContexts, _In_ int DeferredContextCount, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates);
+			CompositingTask(_In_ Context& MainContext, _In_ ContextCollection& DeferredContexts, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates);
 
 			virtual void Setup() override;
 			virtual void Reset() override;
@@ -36,8 +37,7 @@ namespace Eternal
 
 		private:
 			Context& _MainContext;
-			Context** _DeferredContexts;
-			int _DeferredContextsCount = 0;
+			ContextCollection& _DeferredContexts;
 			RenderTargetCollection& _RenderTargets;
 			SamplerCollection& _Samplers;
 			ViewportCollection& _Viewports;
