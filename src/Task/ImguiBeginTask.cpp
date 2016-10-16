@@ -5,7 +5,6 @@
 #define WIN32_EXTRA_LEAN
 #include <Windows.h>
 #include "Macros/Macros.hpp"
-#include "imgui.h"
 #include "Input/Input.hpp"
 
 using namespace Eternal::Task;
@@ -75,12 +74,35 @@ void ImguiBeginTask::Execute()
 	io.MousePos.x = _KeyboardInput->GetAxis(Input::Input::MOUSE_X);
 	io.MousePos.y = _KeyboardInput->GetAxis(Input::Input::MOUSE_Y);
 
-	// TODO IMPLEMENT INPUT CHAR
-	//io.AddInputCharacter
+	//io.AddInputCharacter(Input::Input::A)
+	_ProcessInputCharacterRange((ImWchar)'a', Input::Input::A, 26);
+	_ProcessInputCharacterRange((ImWchar)'0', Input::Input::KP0, 10);
+	_ProcessInputCharacter('.', Input::Input::KPPERIOD);
+	_ProcessInputCharacter('+', Input::Input::KPPLUS);
+	_ProcessInputCharacter('-', Input::Input::KPMINUS);
+	_ProcessInputCharacter('*', Input::Input::KPMUL);
+	_ProcessInputCharacter('/', Input::Input::KPDIV);
 
 	ImGui::NewFrame();
 
 	SetState(Task::DONE);
+}
+
+void ImguiBeginTask::_ProcessInputCharacter(_In_ const ImWchar& ImguiKey, _In_ const Input::Input::Key& KeyName)
+{
+	ImGuiIO& io = ImGui::GetIO();
+	if (Input::Input::Get()->IsPressed(KeyName))
+		io.AddInputCharacter(ImguiKey);
+}
+
+void ImguiBeginTask::_ProcessInputCharacterRange(_In_ const ImWchar& ImguiKeyStart, _In_ const Input::Input::Key& KeyNameStart, _In_ uint32_t Range)
+{
+	ImGuiIO& io = ImGui::GetIO();
+	for (uint32_t KeyIndex = 0; KeyIndex < Range; ++KeyIndex)
+	{
+		if (Input::Input::Get()->IsPressed((Input::Input::Key)(KeyNameStart + KeyIndex)))
+			io.AddInputCharacter(ImguiKeyStart + (ImWchar)KeyIndex);
+	}
 }
 
 void ImguiBeginTask::Reset()

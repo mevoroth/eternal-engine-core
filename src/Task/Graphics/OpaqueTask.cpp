@@ -2,6 +2,7 @@
 
 #include "Types/Types.hpp"
 #include "Graphics/Context.hpp"
+#include "Graphics/Texture.hpp"
 #include "Graphics/Constant.hpp"
 #include "Graphics/ConstantFactory.hpp"
 #include "Graphics/ViewportFactory.hpp"
@@ -59,6 +60,8 @@ namespace Eternal
 				InputLayout::VertexDataType DataTypes[] = {
 					InputLayout::POSITION_T,
 					InputLayout::NORMAL_T,
+					InputLayout::TANGENT_T,
+					InputLayout::BINORMAL_T,
 					InputLayout::UV_T
 				};
 
@@ -78,7 +81,7 @@ namespace Eternal
 				_DepthStencil = CreateDepthStencil(DepthTest(DepthTest::ALL, LESS), StencilTest());
 				_Viewport = Viewports.GetViewport(ViewportCollection::FULLSCREEN);;
 				_Sampler = Samplers.GetSampler(SamplerCollection::BILINEAR);
-				_BlendState = BlendStates.GetBlendState(BlendStateCollection::ALPHA);
+				_BlendState = BlendStates.GetBlendState(BlendStateCollection::SOURCE);
 			}
 
 			ContextCollection& GetContexts()
@@ -200,7 +203,8 @@ void OpaqueTask::Execute()
 	TransformStack& TransformStackObj = _OpaqueTaskData->GetTransformStack();
 	RenderTargetCollection& RenderTargetCollectionObj = _OpaqueTaskData->GetRenderTargetCollection();
 	
-	RenderTarget* NullRenderTargets[] = { nullptr, nullptr, nullptr, nullptr }; // REMOVE THIS
+	//RenderTarget* NullRenderTargets[] = { nullptr, nullptr, nullptr, nullptr }; // REMOVE THIS
+	RenderTarget* NullRenderTargets[] = { nullptr, nullptr, nullptr, nullptr, nullptr }; // REMOVE THIS
 	
 	Context& ContextObj = _OpaqueTaskData->GetContexts().Get();
 
@@ -280,10 +284,23 @@ void OpaqueTask::_Draw(_In_ Context& ContextObj, _In_ Mesh& MeshObj)
 	if (MeshObj.IsValidNode())
 	{
 		MeshObj.InitializeBuffers(); // REMOVE THIS
-		_SetupObjectConstants(ContextObj, MeshObj); // CODE IS WRONG
+		_SetupObjectConstants(ContextObj, MeshObj);
+
+		ContextObj.BindConstant<Context::PIXEL>(1, _OpaqueTaskData->GetObjectConstants());
 		ContextObj.BindConstant<Context::VERTEX>(1, _OpaqueTaskData->GetObjectConstants());
+
+		ContextObj.BindBuffer<Context::PIXEL>(0, MeshObj._Diffuse->GetAsResource());
+		ContextObj.BindBuffer<Context::PIXEL>(1, MeshObj._Specular->GetAsResource());
+		ContextObj.BindBuffer<Context::PIXEL>(3, MeshObj._Normal->GetAsResource());
+		
 		ContextObj.DrawIndexed(MeshObj.GetVertexBuffer(), MeshObj.GetIndexBuffer());
+
+		ContextObj.UnbindConstant<Context::PIXEL>(1);
 		ContextObj.UnbindConstant<Context::VERTEX>(1);
+		
+		ContextObj.UnbindBuffer<Context::PIXEL>(0);
+		ContextObj.UnbindBuffer<Context::PIXEL>(1);
+		ContextObj.UnbindBuffer<Context::PIXEL>(3);
 	}
 
 	for (int SubMeshIndex = 0; SubMeshIndex < MeshObj.GetSubMeshesCount(); ++SubMeshIndex)

@@ -20,10 +20,15 @@
 #include "GraphicData/ViewportCollection.hpp"
 #include "ShadersStructs/CB0FrameConstants.hpp"
 #include "ShadersStructs/CB1LightConstants.hpp"
-#include "Camera/Camera.hpp"
 #include "Core/CameraGameObject.hpp"
 #include "Core/CameraComponent.hpp"
+#include "Core/LightGameObject.hpp"
+#include "Core/LightComponent.hpp"
+#include "Core/TransformComponent.hpp"
 #include "Core/StateSharedData.hpp"
+#include "Camera/Camera.hpp"
+#include "Light/Light.hpp"
+#include "Transform/Transform.hpp"
 
 using namespace Eternal::Task;
 using namespace Eternal::GraphicData;
@@ -189,9 +194,16 @@ void LightingTask::Execute()
 	ETERNAL_ASSERT(GetState() == SETUP);
 	SetState(EXECUTING);
 
+	if (!_LightingTaskData->GetSharedData()->Camera)
+	{
+		SetState(DONE);
+		return;
+	}
+
 	RenderTargetCollection& RenderTargets = _LightingTaskData->GetRenderTargets();
 	RenderTargetCollection& OpaqueRenderTargets = _LightingTaskData->GetOpaqueRenderTargets();
-	RenderTarget* NullRenderTarget = nullptr;
+	//RenderTarget* NullRenderTarget[] = { nullptr };
+	RenderTarget* NullRenderTarget[] = { nullptr, nullptr };
 
 	Context& ContextObj = _LightingTaskData->GetContexts().Get();
 	ContextObj.Begin();
@@ -201,28 +213,40 @@ void LightingTask::Execute()
 
 	ContextObj.SetTopology(Context::TRIANGLELIST);
 	ContextObj.SetViewport(_LightingTaskData->GetViewport());
-	
+
+	ContextObj.BindDepthStencilState(_LightingTaskData->GetDepthStencil());
+
 	ContextObj.BindConstant<Context::PIXEL>(0, _LightingTaskData->GetFrameConstants());
 	ContextObj.BindConstant<Context::PIXEL>(1, _LightingTaskData->GetLightConstants());
 	ContextObj.BindSampler<Context::PIXEL>(0, _LightingTaskData->GetSampler());
 
-	ContextObj.BindBuffer<Context::PIXEL>(0, RenderTargets.GetDepthStencilRenderTarget()->GetAsResource());
+	ContextObj.BindBuffer<Context::PIXEL>(0, OpaqueRenderTargets.GetDepthStencilRenderTarget()->GetAsResource());
+	ContextObj.BindBuffer<Context::PIXEL>(1, OpaqueRenderTargets.GetRenderTargets()[0]->GetAsResource());
+	ContextObj.BindBuffer<Context::PIXEL>(2, OpaqueRenderTargets.GetRenderTargets()[1]->GetAsResource());
+	ContextObj.BindBuffer<Context::PIXEL>(3, OpaqueRenderTargets.GetRenderTargets()[3]->GetAsResource());
+	ContextObj.BindBuffer<Context::PIXEL>(10, OpaqueRenderTargets.GetRenderTargets()[4]->GetAsResource());
 
 	ContextObj.BindShader<Context::VERTEX>(_LightingTaskData->GetVS());
 	ContextObj.BindShader<Context::PIXEL>(_LightingTaskData->GetPS());
 
 	ContextObj.SetRenderTargets(RenderTargets.GetRenderTargets(), RenderTargets.GetRenderTargetsCount()); // REMOVE THIS
 	ContextObj.DrawPrimitive(6);
-	ContextObj.SetRenderTargets(&NullRenderTarget, 1); // REMOVE THIS
+	ContextObj.SetRenderTargets(NullRenderTarget, ETERNAL_ARRAYSIZE(NullRenderTarget)); // REMOVE THIS
 
 	ContextObj.UnbindShader<Context::VERTEX>();
 	ContextObj.UnbindShader<Context::PIXEL>();
 
 	ContextObj.UnbindBuffer<Context::PIXEL>(0);
+	ContextObj.UnbindBuffer<Context::PIXEL>(1);
+	ContextObj.UnbindBuffer<Context::PIXEL>(2);
+	ContextObj.UnbindBuffer<Context::PIXEL>(3);
+	ContextObj.UnbindBuffer<Context::PIXEL>(10);
 
 	ContextObj.UnbindSampler<Context::PIXEL>(0);
 	ContextObj.UnbindConstant<Context::PIXEL>(0);
 	ContextObj.UnbindConstant<Context::PIXEL>(1);
+
+	ContextObj.UnbindDepthStencilState();
 
 	ContextObj.End();
 	_LightingTaskData->GetContexts().Release(ContextObj);
@@ -239,23 +263,36 @@ void LightingTask::Reset()
 void LightingTask::_SetupFrameConstants(_In_ Context& ContextObj)
 {
 	Camera* CameraObj = _LightingTaskData->GetSharedData()->Camera->GetCameraComponent()->GetCamera();
+	const Vector3& CameraPosition = CameraObj->GetPosition();
 	Resource* ConstantResource = _LightingTaskData->GetFrameConstants()->GetAsResource();
-	Resource::LockedResource FrameConstants = ConstantResource->Lock(ContextObj, Resource::LOCK_WRITE_DISCARD);
-	CameraObj->GetViewProjectionMatrixTransposed(((CB0FrameConstants*)FrameConstants.Data)->ViewProjection);
+	Resource::LockedResource FrameConstantsRaw = ConstantResource->Lock(ContextObj, Resource::LOCK_WRITE_DISCARD);
+	CB0FrameConstants& FrameConstants = *(CB0FrameConstants*)FrameConstantsRaw.Data;
+	CameraObj->GetViewProjectionMatrixTransposed(FrameConstants.ViewProjection);
+	CameraObj->GetViewProjectionMatrixInverseTransposed(FrameConstants.ViewProjectionInverse);
+	FrameConstants.CameraPosition.x = CameraPosition.x;
+	FrameConstants.CameraPosition.y = CameraPosition.y;
+	FrameConstants.CameraPosition.z = CameraPosition.z;
+	FrameConstants.CameraPosition.w = 1.f;
 	ConstantResource->Unlock(ContextObj);
 }
 
 void LightingTask::_SetupLightConstants(_In_ Context& ContextObj)
 {
+	Light* PointLight = _LightingTaskData->GetSharedData()->Lights->GetLightComponent()->GetLight();
+	const Transform& TransformObj = _LightingTaskData->GetSharedData()->Lights->GetTransformComponent()->GetTransform();
+
 	Resource* ConstantObj = _LightingTaskData->GetLightConstants()->GetAsResource();
 	Resource::LockedResource LightConstantsRaw = ConstantObj->Lock(ContextObj, Resource::LOCK_WRITE_DISCARD);
-	CB1LightConstants LightConstants = *(CB1LightConstants*)LightConstantsRaw.Data;
+	CB1LightConstants& LightConstants = *(CB1LightConstants*)LightConstantsRaw.Data;
 	
+	const Vector3& Color = PointLight->GetColor();
+	const Vector3& Position = TransformObj.GetTranslation();
+
 	// TODO: MAKE IT GENERIC
-	LightConstants.Lights[0].Position = Vector4(210.0f, 5.0f, 600.0f, 1.0f);
-	LightConstants.Lights[0].Color = Vector4(1.0f, 0.5f, 80.0f / 255.0f, 1.0);
-	LightConstants.Lights[0].Intensity = 10.0f;
-	LightConstants.Lights[0].Distance = 100.0f;
+	LightConstants.Lights[0].Position = Vector4(Position.x, Position.y, Position.z, 1.0f);
+	LightConstants.Lights[0].Color = Vector4(Color.x, Color.y, Color.z, 1.0f);
+	LightConstants.Lights[0].Intensity = PointLight->GetIntensity();
+	LightConstants.Lights[0].Distance = PointLight->GetDistance();
 
 	LightConstants.LightsCount = 1;
 

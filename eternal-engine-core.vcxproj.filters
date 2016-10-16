@@ -25,6 +25,9 @@
     <Filter Include="GameData">
       <UniqueIdentifier>{0a4276f7-8c15-408b-b128-c977993d7bb9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Task\Tools">
+      <UniqueIdentifier>{85b89528-88a3-4b05-b7db-c22923bc8480}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Game.hpp">
@@ -125,6 +128,12 @@
     <ClInclude Include="include\Task\Graphics\LightingTask.hpp">
       <Filter>Task\Graphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\Task\Graphics\InitFrameTask.hpp">
+      <Filter>Task\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Task\Tools\AutoRecompileShaderTask.hpp">
+      <Filter>Task\Tools</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Game.cpp">
@@ -138,9 +147,6 @@
     </ClCompile>
     <ClCompile Include="src\Task\ImguiEndTask.cpp">
       <Filter>Task</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Imgui\D3D11ImguiVertexBuffer.cpp">
-      <Filter>Imgui</Filter>
     </ClCompile>
     <ClCompile Include="src\Task\ControlsTask.cpp">
       <Filter>Task</Filter>
@@ -208,6 +214,15 @@
     <ClCompile Include="src\Core\GameState.cpp" />
     <ClCompile Include="src\Task\Graphics\LightingTask.cpp">
       <Filter>Task\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task\Graphics\InitFrameTask.cpp">
+      <Filter>Task\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\LightGameObject.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task\Tools\AutoRecompileShaderTask.cpp">
+      <Filter>Task\Tools</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

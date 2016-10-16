@@ -14,10 +14,10 @@
 using namespace Eternal::Task;
 using namespace Eternal::Graphics;
 
-CompositingTask::CompositingTask(_In_ Context& MainContext, _In_ ContextCollection& DeferredContexts, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates)
-	: _MainContext(MainContext)
-	, _DeferredContexts(DeferredContexts)
-	, _RenderTargets(RenderTargets)
+CompositingTask::CompositingTask(_In_ ContextCollection& DeferredContexts, _In_ RenderTargetCollection& OpaqueRenderTargets, _In_ RenderTargetCollection& LightingRenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates)
+	: _Contexts(DeferredContexts)
+	, _OpaqueRenderTargets(OpaqueRenderTargets)
+	, _LightingRenderTargets(LightingRenderTargets)
 	, _Samplers(Samplers)
 	, _Viewports(Viewports)
 	, _BlendStates(BlendStates)
@@ -44,38 +44,7 @@ void CompositingTask::Execute()
 	RenderTarget* BackBuffer = Renderer::Get()->GetBackBuffer();
 	RenderTarget* NullRenderTarget = nullptr;
 
-	BackBuffer->Clear(&_MainContext);
-	_RenderTargets.GetDepthStencilRenderTarget()->Clear(&_MainContext);
-	for (int BufferIndex = 0; BufferIndex < _RenderTargets.GetRenderTargetsCount(); ++BufferIndex)
-	{
-		_RenderTargets.GetRenderTargets()[BufferIndex]->Clear(&_MainContext);
-	}
-
-	//_MainContext.SetTopology(Context::TRIANGLELIST);
-	//_MainContext.SetBlendMode(_BlendStates.GetBlendState(BlendStateCollection::SOURCE));
-	//_MainContext.SetViewport(_Viewports.GetViewport(ViewportCollection::FULLSCREEN));
-	//_MainContext.BindShader<Context::VERTEX>(_VS);
-	//_MainContext.BindShader<Context::PIXEL>(_PS);
-	//_MainContext.BindBuffer<Context::PIXEL>(0, _RenderTargets.GetDepthStencilRenderTarget()->GetAsResource());
-	//for (int BufferIndex = 0; BufferIndex < _RenderTargets.GetRenderTargetsCount(); ++BufferIndex)
-	//{
-	//	_MainContext.BindBuffer<Context::PIXEL>(BufferIndex + 1, _RenderTargets.GetRenderTargets()[BufferIndex]->GetAsResource());
-	//}
-	//_MainContext.BindSampler<Context::PIXEL>(0, _Samplers.GetSampler(SamplerCollection::BILINEAR));
-
-	//_MainContext.SetRenderTargets(&BackBuffer, 1);
-	//_MainContext.DrawPrimitive(6);
-	//_MainContext.SetRenderTargets(&NullRenderTarget, 1);
-
-	//_MainContext.UnbindSampler<Context::PIXEL>(0);
-	//for (int BufferIndex = 0; BufferIndex < _RenderTargets.GetRenderTargetsCount(); ++BufferIndex)
-	//{
-	//	_MainContext.UnbindBuffer<Context::PIXEL>(BufferIndex);
-	//}
-	//_MainContext.UnbindShader<Context::PIXEL>();
-	//_MainContext.UnbindShader<Context::VERTEX>();
-
-	Context& CompositingContext = _DeferredContexts.Get();
+	Context& CompositingContext = _Contexts.Get();
 	CompositingContext.Begin();
 
 	CompositingContext.SetTopology(Context::TRIANGLELIST);
@@ -83,10 +52,15 @@ void CompositingTask::Execute()
 	CompositingContext.SetViewport(_Viewports.GetViewport(ViewportCollection::FULLSCREEN));
 	CompositingContext.BindShader<Context::VERTEX>(_VS);
 	CompositingContext.BindShader<Context::PIXEL>(_PS);
-	CompositingContext.BindBuffer<Context::PIXEL>(0, _RenderTargets.GetDepthStencilRenderTarget()->GetAsResource());
-	for (int BufferIndex = 0; BufferIndex < _RenderTargets.GetRenderTargetsCount(); ++BufferIndex)
+	CompositingContext.BindBuffer<Context::PIXEL>(0, _OpaqueRenderTargets.GetDepthStencilRenderTarget()->GetAsResource());
+	for (int BufferIndex = 0; BufferIndex < _OpaqueRenderTargets.GetRenderTargetsCount() - 1; ++BufferIndex)
 	{
-		CompositingContext.BindBuffer<Context::PIXEL>(BufferIndex + 1, _RenderTargets.GetRenderTargets()[BufferIndex]->GetAsResource());
+		CompositingContext.BindBuffer<Context::PIXEL>(BufferIndex + 1, _OpaqueRenderTargets.GetRenderTargets()[BufferIndex]->GetAsResource());
+	}
+	const int SlotOffset = _OpaqueRenderTargets.GetRenderTargetsCount() + 1 - 1;
+	for (int BufferIndex = 0; BufferIndex < _LightingRenderTargets.GetRenderTargetsCount(); ++BufferIndex)
+	{
+		CompositingContext.BindBuffer<Context::PIXEL>(BufferIndex + SlotOffset, _LightingRenderTargets.GetRenderTargets()[BufferIndex]->GetAsResource());
 	}
 	CompositingContext.BindSampler<Context::PIXEL>(0, _Samplers.GetSampler(SamplerCollection::BILINEAR));
 
@@ -95,7 +69,7 @@ void CompositingTask::Execute()
 	CompositingContext.SetRenderTargets(&NullRenderTarget, 1);
 
 	CompositingContext.UnbindSampler<Context::PIXEL>(0);
-	for (int BufferIndex = 0; BufferIndex < _RenderTargets.GetRenderTargetsCount(); ++BufferIndex)
+	for (int BufferIndex = 0; BufferIndex < _OpaqueRenderTargets.GetRenderTargetsCount(); ++BufferIndex)
 	{
 		CompositingContext.UnbindBuffer<Context::PIXEL>(BufferIndex);
 	}
@@ -103,13 +77,7 @@ void CompositingTask::Execute()
 	CompositingContext.UnbindShader<Context::VERTEX>();
 
 	CompositingContext.End();
-	_DeferredContexts.Release(CompositingContext);
-
-#error "IMPLEMENT FLUSH"
-	//for (int DeferredContextIndex = 0; DeferredContextIndex < _DeferredContextsCount; ++DeferredContextIndex)
-	//{
-	//	_DeferredContexts[DeferredContextIndex]->Flush(_MainContext);
-	//}
+	_Contexts.Release(CompositingContext);
 
 	SetState(DONE);
 }

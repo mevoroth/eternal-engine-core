@@ -55,8 +55,8 @@ void CameraComponent::Update(_In_ const TimeSecondsT& ElapsedSeconds)
 	Vector3 TempUp3 = Vector3(0.f, 0.f, 0.f);
 	
 	// Compute rotation
-	Vector4 Forward = TempTransform.GetModelMatrix() * Vector4(0.f, 1.f, 0.f, 1.f);
-	Vector4 Up = TempTransform.GetModelMatrix() * Vector4(0.f, 0.f, 1.f, 1.f);
+	Vector4 Forward = TempTransform.GetModelMatrix() * Vector4(0.f, 0.f, 1.f, 1.f);
+	Vector4 Up = TempTransform.GetModelMatrix() * Vector4(0.f, 1.f, 0.f, 1.f);
 
 	TempForward3.x = Forward.x;
 	TempForward3.y = Forward.y;
@@ -68,8 +68,8 @@ void CameraComponent::Update(_In_ const TimeSecondsT& ElapsedSeconds)
 
 	_Camera->UpdateViewMatrix(
 		Position,
-		TempUp3,
-		TempForward3
+		TempForward3,
+		TempUp3
 	);
 
 	//static Vector3 debugPos(0, 0, 0);

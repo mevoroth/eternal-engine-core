@@ -11,12 +11,14 @@ namespace Eternal
 
 		class GraphicGameObject;
 		class CameraGameObject;
+		class LightGameObject;
 
 		class StateSharedData
 		{
 		public:
 			vector<GraphicGameObject*>* GraphicGameObjects = nullptr;
 			CameraGameObject* Camera = nullptr;
+			LightGameObject* Lights = nullptr;
 		};
 	}
 }

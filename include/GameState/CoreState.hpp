@@ -43,6 +43,7 @@ namespace Eternal
 	namespace Import
 	{
 		class ImportFbx;
+		class ImportTga;
 	}
 	namespace SaveSystem
 	{
@@ -65,6 +66,10 @@ namespace Eternal
 	{
 		class StateSharedData;
 	}
+	namespace Resources
+	{
+		class TextureFactory;
+	}
 }
 
 namespace Eternal
@@ -79,6 +84,7 @@ namespace Eternal
 		using namespace Eternal::SaveSystem;
 		using namespace Eternal::GraphicData;
 		using namespace Eternal::GameData;
+		using namespace Eternal::Resources;
 
 		class CoreState : public GameState
 		{
@@ -87,7 +93,8 @@ namespace Eternal
 			{
 			public:
 				const char* ShaderIncludePath = nullptr;
-				const char* FBXIncludePath = nullptr;
+				const char* FBXPath = nullptr;
+				const char* TexturePath = nullptr;
 				const char* SavePath = nullptr;
 			};
 
@@ -132,12 +139,18 @@ namespace Eternal
 			Task* _UpdateTransformComponentTask = nullptr;
 			Task* _UpdateCameraComponentTask = nullptr;
 			Task* _GameStateTask = nullptr;
+			Task* _InitFrameTask = nullptr;
 			Task* _OpaqueTask = nullptr;
 			Task* _LightingTask = nullptr;
 			Task* _CompositingTask = nullptr;
 			Task* _SwapFrameTask = nullptr;
+#ifdef ETERNAL_DEBUG
+			Task* _AutoRecompileShaderTask = nullptr;
+#endif
 
 			ImportFbx* _ImportFbx = nullptr;
+			ImportTga* _ImportTga = nullptr;
+			TextureFactory* _TextureFactory = nullptr;
 			Eternal::SaveSystem::SaveSystem* _SaveSystem = nullptr;
 			GameDatas* _GameDatas = nullptr;
 

@@ -14,19 +14,7 @@ namespace Eternal
 		using namespace Eternal::Graphics;
 		using namespace std;
 
-		class D3D11ImguiVertexBuffer : public D3D11VertexBuffer
-		{
-		public:
-			D3D11ImguiVertexBuffer(_In_ vector<ImDrawVert>& Vertex);
-
-			virtual size_t GetSize() const override;
-			virtual size_t GetVerticesCount() const override;
-
-		private:
-			static size_t _Size;
-
-			vector<ImDrawVert>& _Vertex;
-		};
+		typedef D3D11VertexBuffer<ImDrawVert> D3D11ImguiVertexBuffer;
 	}
 }
 

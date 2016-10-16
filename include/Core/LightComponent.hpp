@@ -15,6 +15,10 @@ namespace Eternal
 		class LightComponent
 		{
 		public:
+			static void Initialize();
+			static void Release();
+
+			void SetLight(_In_ Light* LightObj);
 			Light* GetLight();
 
 		private:

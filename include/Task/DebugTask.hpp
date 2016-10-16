@@ -2,8 +2,8 @@
 #define _DEBUG_TASK_HPP_
 
 #include <vector>
-#include "d3d11/D3D11PosColorVertexBuffer.hpp"
 #include "Parallel/Task.hpp"
+#include "Types/Types.hpp"
 
 namespace Eternal
 {
@@ -19,6 +19,7 @@ namespace Eternal
 	{
 		using namespace Eternal::Graphics;
 		using namespace Eternal::Parallel;
+		using namespace Eternal::Types;
 
 		class DebugTask : public Task
 		{
@@ -38,7 +39,7 @@ namespace Eternal
 			Context& _Context;
 
 			VertexBuffer* _AxisGizmoVerticesBuffer = nullptr;
-			vector<Graphics::D3D11PosColorVertexBuffer::PosColorVertex> _AxisGizmoVertices;
+			//vector<Graphics::D3D11PosColorVertexBuffer::PosColorVertex> _AxisGizmoVertices;
 
 			Shader* _VS = nullptr;
 			Shader* _PS = nullptr;

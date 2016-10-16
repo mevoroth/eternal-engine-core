@@ -12,24 +12,24 @@ using namespace Eternal::Task;
 DebugTask::DebugTask(Context& ContextObj)
 	: _Context(ContextObj)
 {
-	D3D11PosColorVertexBuffer::PosColorVertex AxisVertices[] = {
-		// Axis X
-		{ Vector4(1000.f, 0.f, 0.f, 1.f), 0xFF0000FF },
-		{ Vector4(-1000.f, 0.f, 0.f, 1.f), 0xFFFFFF00 },
+	//D3D11PosColorVertexBuffer::PosColorVertex AxisVertices[] = {
+	//	// Axis X
+	//	{ Vector4(1000.f, 0.f, 0.f, 1.f), 0xFF0000FF },
+	//	{ Vector4(-1000.f, 0.f, 0.f, 1.f), 0xFFFFFF00 },
 
-		// Axis Y
-		{ Vector4(0.f, 1000.f, 0.f, 1.f), 0xFF00FF00 },
-		{ Vector4(0.f, -1000.f, 0.f, 1.f), 0xFFFF00FF },
+	//	// Axis Y
+	//	{ Vector4(0.f, 1000.f, 0.f, 1.f), 0xFF00FF00 },
+	//	{ Vector4(0.f, -1000.f, 0.f, 1.f), 0xFFFF00FF },
 
-		// Axis Z
-		{ Vector4(0.f, 0.f, 1000.f, 1.f), 0xFFFF0000 },
-		{ Vector4(0.f, 0.f, -1000.f, 1.f), 0xFF00FFFF },
-	};
+	//	// Axis Z
+	//	{ Vector4(0.f, 0.f, 1000.f, 1.f), 0xFFFF0000 },
+	//	{ Vector4(0.f, 0.f, -1000.f, 1.f), 0xFF00FFFF },
+	//};
 
-	for (int AxisIndex = 0; AxisIndex < ETERNAL_ARRAYSIZE(AxisVertices); ++AxisIndex)
-		_AxisGizmoVertices.push_back(AxisVertices[AxisIndex]);
+	//for (int AxisIndex = 0; AxisIndex < ETERNAL_ARRAYSIZE(AxisVertices); ++AxisIndex)
+	//	_AxisGizmoVertices.push_back(AxisVertices[AxisIndex]);
 
-	_AxisGizmoVerticesBuffer = new D3D11PosColorVertexBuffer(_AxisGizmoVertices);
+	//_AxisGizmoVerticesBuffer = new D3D11PosColorVertexBuffer(_AxisGizmoVertices);
 	
 	InputLayout::VertexDataType AxisGizmoVertexType[] = {
 		InputLayout::POSITION_T,

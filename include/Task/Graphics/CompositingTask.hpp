@@ -29,16 +29,16 @@ namespace Eternal
 		class CompositingTask : public Task
 		{
 		public:
-			CompositingTask(_In_ Context& MainContext, _In_ ContextCollection& DeferredContexts, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates);
+			CompositingTask(_In_ ContextCollection& DeferredContexts, _In_ RenderTargetCollection& OpaqueRenderTargets, _In_ RenderTargetCollection& LightingRenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates);
 
 			virtual void Setup() override;
 			virtual void Reset() override;
 			virtual void Execute() override;
 
 		private:
-			Context& _MainContext;
-			ContextCollection& _DeferredContexts;
-			RenderTargetCollection& _RenderTargets;
+			ContextCollection& _Contexts;
+			RenderTargetCollection& _OpaqueRenderTargets;
+			RenderTargetCollection& _LightingRenderTargets;
 			SamplerCollection& _Samplers;
 			ViewportCollection& _Viewports;
 			BlendStateCollection& _BlendStates;

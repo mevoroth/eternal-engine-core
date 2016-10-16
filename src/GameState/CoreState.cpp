@@ -18,14 +18,20 @@
 #include "Task/TimeTask.hpp"
 #include "Task/Core/UpdateComponentTask.hpp"
 #include "Task/Core/GameStateTask.hpp"
+#include "Task/Graphics/InitFrameTask.hpp"
 #include "Task/Graphics/PrepareOpaqueTask.hpp"
 #include "Task/Graphics/OpaqueTask.hpp"
 #include "Task/Graphics/LightingTask.hpp"
 #include "Task/Graphics/CompositingTask.hpp"
 #include "Task/Graphics/SwapFrameTask.hpp"
+#ifdef ETERNAL_DEBUG
+#include "Task/Tools/AutoRecompileShaderTask.hpp"
+#endif
 #include "Resources/Pool.hpp"
+#include "Resources/TextureFactory.hpp"
 #include "Core/TransformComponent.hpp"
 #include "Core/CameraComponent.hpp"
+#include "Core/LightComponent.hpp"
 #include "GraphicData/ContextCollection.hpp"
 #include "GraphicData/RenderTargetCollection.hpp"
 #include "GraphicData/SamplerCollection.hpp"
@@ -33,6 +39,7 @@
 #include "GraphicData/BlendStateCollection.hpp"
 #include "GraphicData/RenderingListCollection.hpp"
 #include "Import/fbx/ImportFbx.hpp"
+#include "Import/tga/ImportTga.hpp"
 #include "SaveSystem/SaveSystem.hpp"
 #include "GameData/GameDatas.hpp"
 #include "Graphics/Format.hpp"
@@ -98,7 +105,12 @@ namespace Eternal
 			_ShaderFactory->RegisterShaderPath(_Settings.ShaderIncludePath);
 
 			_ImportFbx = new ImportFbx();
-			_ImportFbx->RegisterPath(_Settings.FBXIncludePath);
+			_ImportFbx->RegisterPath(_Settings.FBXPath);
+
+			_ImportTga = new ImportTga();
+
+			_TextureFactory = new TextureFactory();
+			_TextureFactory->RegisterTexturePath(_Settings.TexturePath);
 
 			_SaveSystem = new Eternal::SaveSystem::SaveSystem();
 			_SaveSystem->RegisterSavePath(_Settings.SavePath);
@@ -116,8 +128,10 @@ namespace Eternal
 			_GameDatas = new GameDatas();
 			_SaveSystem->SetGameDataLoader(_GameDatas);
 
+			_TaskManager->GetTaskScheduler().PushTask(_AutoRecompileShaderTask);
 			_TaskManager->GetTaskScheduler().PushTask(_ControlsTask);
 			_TaskManager->GetTaskScheduler().PushTask(_TimeTask);
+			_TaskManager->GetTaskScheduler().PushTask(_InitFrameTask);
 			{
 				_TaskManager->GetTaskScheduler().PushTask(_UpdateTransformComponentTask, _ControlsTask);
 				_TaskManager->GetTaskScheduler().PushTask(_UpdateTransformComponentTask, _TimeTask);
@@ -131,13 +145,14 @@ namespace Eternal
 				_TaskManager->GetTaskScheduler().PushTask(_GameStateTask, _UpdateCameraComponentTask);
 				_TaskManager->GetTaskScheduler().PushTask(_GameStateTask, _ImguiBeginTask);
 			}
-			_TaskManager->GetTaskScheduler().PushTask(_OpaqueTask, _GameStateTask);
-			_TaskManager->GetTaskScheduler().PushTask(_ImguiEndTask, _GameStateTask);
 			{
-				_TaskManager->GetTaskScheduler().PushTask(_CompositingTask, _OpaqueTask);
-				_TaskManager->GetTaskScheduler().PushTask(_CompositingTask, _ImguiEndTask);
+				_TaskManager->GetTaskScheduler().PushTask(_OpaqueTask, _InitFrameTask);
+				_TaskManager->GetTaskScheduler().PushTask(_OpaqueTask, _GameStateTask);
 			}
-			_TaskManager->GetTaskScheduler().PushTask(_SwapFrameTask, _CompositingTask);
+			_TaskManager->GetTaskScheduler().PushTask(_LightingTask, _OpaqueTask);
+			_TaskManager->GetTaskScheduler().PushTask(_CompositingTask, _LightingTask);
+			_TaskManager->GetTaskScheduler().PushTask(_ImguiEndTask, _CompositingTask);
+			_TaskManager->GetTaskScheduler().PushTask(_SwapFrameTask, _ImguiEndTask);
 		}
 		
 		void CoreState::Update()
@@ -208,12 +223,14 @@ namespace Eternal
 		{
 			TransformComponent::Initialize();
 			CameraComponent::Initialize();
+			LightComponent::Initialize();
 		}
 
 		void CoreState::_ReleasePools()
 		{
 			TransformComponent::Release();
 			CameraComponent::Release();
+			LightComponent::Release();
 		}
 
 		void CoreState::_InitializeTasks()
@@ -250,19 +267,35 @@ namespace Eternal
 			GameStateTaskObj->SetTaskName("Game State Task");
 			_GameStateTask = GameStateTaskObj;
 
+			RenderTargetCollection* RenderTargetCollections[] =
+			{
+				_OpaqueRenderTargets,
+				_LightRenderTargets
+			};
+			InitFrameTask* InitFrameTaskObj = new InitFrameTask(*_Renderer, *_ContextCollection, RenderTargetCollections, ETERNAL_ARRAYSIZE(RenderTargetCollections));
+			InitFrameTaskObj->SetTaskName("Init Frame Task");
+			_InitFrameTask = InitFrameTaskObj;
+
 			OpaqueTask* OpaqueTaskObj = new OpaqueTask(*_ContextCollection, *_OpaqueRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection, GetSharedData());
 			OpaqueTaskObj->SetTaskName("Opaque Task");
 			_OpaqueTask = OpaqueTaskObj;
 
 			LightingTask* LightingTaskObj = new LightingTask(*_ContextCollection, *_OpaqueRenderTargets, *_LightRenderTargets, *_SamplerCollection, *_ViewportCollection, GetSharedData());
+			LightingTaskObj->SetTaskName("Lighting Task");
+			_LightingTask = LightingTaskObj;
 
-			CompositingTask* CompositingTaskObj = new CompositingTask(*_Renderer->GetMainContext(), *_ContextCollection, *_OpaqueRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection);
+			CompositingTask* CompositingTaskObj = new CompositingTask(*_ContextCollection, *_OpaqueRenderTargets, *_LightRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection);
 			CompositingTaskObj->SetTaskName("Compositing Task");
 			_CompositingTask = CompositingTaskObj;
 
-			SwapFrameTask* SwapFrameTaskObj = new SwapFrameTask(*_Renderer);
+			SwapFrameTask* SwapFrameTaskObj = new SwapFrameTask(*_Renderer, *_Renderer->GetMainContext(), *_ContextCollection);
 			SwapFrameTaskObj->SetTaskName("Swap Frame Task");
 			_SwapFrameTask = SwapFrameTaskObj;
+
+			AutoRecompileShaderTask* AutoRecompileShaderTaskObj = new AutoRecompileShaderTask();
+			AutoRecompileShaderTaskObj->SetTaskName("Auto Recompile Shader Task");
+			AutoRecompileShaderTaskObj->SetFrameConstraint(false);
+			_AutoRecompileShaderTask = AutoRecompileShaderTaskObj;
 		}
 
 		void CoreState::_ReleaseTasks()
@@ -273,8 +306,14 @@ namespace Eternal
 			delete _CompositingTask;
 			_CompositingTask = nullptr;
 
+			delete _LightingTask;
+			_LightingTask = nullptr;
+
 			delete _OpaqueTask;
 			_OpaqueTask = nullptr;
+
+			delete _InitFrameTask;
+			_InitFrameTask = nullptr;
 
 			delete _GameStateTask;
 			_GameStateTask = nullptr;
@@ -312,10 +351,11 @@ namespace Eternal
 		void CoreState::_InitializeRenderTargets()
 		{
 			Format OpaqueFormat[] = {
-				RGBA8888,
-				RGBA8888,
-				RGBA8888,
-				RGBA8888,
+				BGRA8888,
+				BGRA8888,
+				BGRA8888,
+				BGRA8888,
+				RGBA32323232
 			};
 			_OpaqueRenderTargets = new RenderTargetCollection(1600, 900, ETERNAL_ARRAYSIZE(OpaqueFormat), OpaqueFormat, true);
 			Format LightFormat[] = {

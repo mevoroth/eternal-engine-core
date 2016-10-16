@@ -9,7 +9,6 @@
 #include "Macros/Macros.hpp"
 #include "imgui.h"
 #include "Imgui/D3D11ImguiVertexBuffer.hpp"
-#include "d3d11/D3D11UInt32IndexBuffer.hpp"
 #include "Graphics/Context.hpp"
 #include "Graphics/Resource.hpp"
 #include "Graphics/ShaderFactory.hpp"
@@ -20,6 +19,8 @@
 #include "d3d11/D3D11Renderer.hpp"
 #include "Graphics/ConstantFactory.hpp"
 #include "Graphics/Constant.hpp"
+#include "Graphics/IndexBuffer.hpp"
+#include "Graphics/IndexBufferFactory.hpp"
 #include "d3d11/D3D11Texture.hpp"
 #include "d3d11/D3D11Sampler.hpp"
 #include "d3d11/D3D11BlendState.hpp"
@@ -110,10 +111,9 @@ void ImguiEndTask::Execute()
 	ContextObj.SetViewport(_Viewport);
 	ContextObj.SetRenderTargets(&_RenderTarget, 1);
 
-	int ElementOffset = 0;
-
 	for (int DrawListIndex = 0, VertexBufferCount = ImguiDrawData->CmdListsCount; DrawListIndex < VertexBufferCount; ++DrawListIndex)
 	{
+		int ElementOffset = 0;
 		ImDrawList* CurrentDrawList = ImguiDrawData->CmdLists[DrawListIndex];
 
 		vector<ImDrawVert>* Vertices = new vector<ImDrawVert>();
@@ -133,9 +133,9 @@ void ImguiEndTask::Execute()
 				Indices->push_back(CurrentDrawList->IdxBuffer[ElementIndex + ElementOffset]);
 			}
 			ElementOffset += CurrentDrawCmd.ElemCount;
-			D3D11UInt32IndexBuffer IndicesBuffer(*Indices);
+			IndexBuffer* IndicesBuffer = CreateIndexBuffer<uint32_t>(*Indices);
 			ContextObj.BindBuffer<Context::PIXEL>(0, _Texture->GetAsResource());
-			ContextObj.DrawIndexed(&VerticesBuffer, &IndicesBuffer);
+			ContextObj.DrawIndexed(&VerticesBuffer, IndicesBuffer);
 			delete Indices;
 		}
 
