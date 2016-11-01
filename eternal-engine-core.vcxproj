@@ -148,10 +148,12 @@
     <ClInclude Include="include\Core\LightGameObject.hpp" />
     <ClInclude Include="include\Core\MaterialComponent.hpp" />
     <ClInclude Include="include\Core\MeshComponent.hpp" />
+    <ClInclude Include="include\Core\ShadowComponent.hpp" />
     <ClInclude Include="include\Core\StateSharedData.hpp" />
     <ClInclude Include="include\Core\TransformComponent.hpp" />
     <ClInclude Include="include\GameData\GameDatas.hpp" />
     <ClInclude Include="include\GameData\GraphicGameObjectGameData.hpp" />
+    <ClInclude Include="include\GameData\GraphicGameObjectInstanceGameData.hpp" />
     <ClInclude Include="include\GameData\MaterialGameData.hpp" />
     <ClInclude Include="include\GameData\MeshGameData.hpp" />
     <ClInclude Include="include\GameData\TransformGameData.hpp" />
@@ -166,8 +168,7 @@
     <ClInclude Include="include\Task\Graphics\CompositingTask.hpp" />
     <ClInclude Include="include\Task\Graphics\InitFrameTask.hpp" />
     <ClInclude Include="include\Task\Graphics\LightingTask.hpp" />
-    <ClInclude Include="include\Task\Graphics\OpaqueTask.hpp" />
-    <ClInclude Include="include\Task\Graphics\PrepareOpaqueTask.hpp" />
+    <ClInclude Include="include\Task\Graphics\RenderObjectsTask.hpp" />
     <ClInclude Include="include\Task\Graphics\SwapFrameTask.hpp" />
     <ClInclude Include="include\Task\ImguiBeginTask.hpp" />
     <ClInclude Include="include\Task\ImguiEndTask.hpp" />
@@ -187,6 +188,7 @@
     <ClCompile Include="src\Core\TransformComponent.cpp" />
     <ClCompile Include="src\GameData\GameDatas.cpp" />
     <ClCompile Include="src\GameData\GraphicGameObjectGameData.cpp" />
+    <ClCompile Include="src\GameData\GraphicGameObjectInstanceGameData.cpp" />
     <ClCompile Include="src\GameData\MaterialGameData.cpp" />
     <ClCompile Include="src\GameData\MeshGameData.cpp" />
     <ClCompile Include="src\GameData\TransformGameData.cpp" />
@@ -195,8 +197,7 @@
     <ClCompile Include="src\Task\DebugTask.cpp" />
     <ClCompile Include="src\Task\Graphics\CompositingTask.cpp" />
     <ClCompile Include="src\Task\Graphics\InitFrameTask.cpp" />
-    <ClCompile Include="src\Task\Graphics\PrepareOpaqueTask.cpp" />
-    <ClCompile Include="src\Task\Graphics\OpaqueTask.cpp" />
+    <ClCompile Include="src\Task\Graphics\RenderObjectsTask.cpp" />
     <ClCompile Include="src\Task\Graphics\LightingTask.cpp" />
     <ClCompile Include="src\Task\Graphics\SwapFrameTask.cpp" />
     <ClCompile Include="src\Task\ImguiBeginTask.cpp" />

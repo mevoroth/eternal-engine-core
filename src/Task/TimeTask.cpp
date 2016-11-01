@@ -11,20 +11,15 @@ TimeTask::TimeTask(_In_ Eternal::Time::Time* TimeObj)
 {
 }
 
-void TimeTask::Setup()
+void TimeTask::DoSetup()
 {
-	ETERNAL_ASSERT(GetState() == SCHEDULED);
-	SetState(SETUP);
 }
 
-void TimeTask::Execute()
+void TimeTask::DoExecute()
 {
-	SetState(EXECUTING);
 	_Time->Update();
-	SetState(DONE);
 }
 
-void TimeTask::Reset()
+void TimeTask::DoReset()
 {
-	SetState(IDLE);
 }

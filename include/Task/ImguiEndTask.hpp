@@ -33,9 +33,9 @@ namespace Eternal
 		public:
 			ImguiEndTask(_In_ ContextCollection& Contexts, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports);
 
-			virtual void Setup() override;
-			virtual void Execute() override;
-			virtual void Reset() override;
+			virtual void DoSetup() override;
+			virtual void DoExecute() override;
+			virtual void DoReset() override;
 
 			void SetRenderTarget(_In_ RenderTarget* RenderTargetObj)
 			{

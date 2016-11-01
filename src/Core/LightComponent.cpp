@@ -29,3 +29,18 @@ Light* LightComponent::GetLight()
 {
 	return _Light;
 }
+
+void LightComponent::SetShadow(_In_ Shadow* ShadowObj)
+{
+	_Shadow = ShadowObj;
+}
+
+Shadow* LightComponent::GetShadow()
+{
+	return _Shadow;
+}
+
+bool LightComponent::GetShadowEnabled() const
+{
+	return _Shadow != nullptr;
+}

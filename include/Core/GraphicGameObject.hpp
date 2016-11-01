@@ -7,21 +7,21 @@ namespace Eternal
 {
 	namespace Core
 	{
+		class GraphicGameObjectInstance;
 		class GraphicGameObjectData;
+		class GraphicGameObjectInstanceData;
 		class TransformComponent;
 		class MeshComponent;
 		class MaterialComponent;
 
-		class GraphicGameObject : public GameObject
+		class GraphicGameObject : public InstanciableGameObject<GraphicGameObjectInstance>
 		{
 		public:
 			GraphicGameObject();
 
-			void CopyTransformComponent(_In_ TransformComponent* MeshComponentObj);
 			void SetMeshComponent(_In_ MeshComponent* MeshComponentObj);
 			void SetMaterialComponent(_In_ MaterialComponent* MaterialComponentObj);
 
-			TransformComponent* GetTransformComponent();
 			MeshComponent* GetMeshComponent();
 			MaterialComponent* GetMaterialComponent();
 
@@ -31,6 +31,23 @@ namespace Eternal
 
 		private:
 			GraphicGameObjectData* _GraphicGameObjectData = nullptr;
+		};
+
+		class GraphicGameObjectInstance : public GameObjectInstance
+		{
+		public:
+			GraphicGameObjectInstance();
+			~GraphicGameObjectInstance();
+
+			virtual void Begin() override;
+			virtual void Update(_In_ const TimeSecondsT& ElapsedSeconds) override;
+			virtual void End() override;
+
+			void CopyTransformComponent(_In_ TransformComponent* MeshComponentObj);
+			TransformComponent* GetTransformComponent();
+
+		private:
+			GraphicGameObjectInstanceData* _GraphicGameObjectInstanceData = nullptr;
 		};
 	}
 }

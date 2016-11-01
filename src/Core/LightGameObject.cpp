@@ -45,17 +45,6 @@ namespace Eternal
 	}
 }
 
-LightGameObject::LightGameObject()
-{
-	_LightGameObjectData = new LightGameObjectData();
-}
-
-LightGameObject::~LightGameObject()
-{
-	delete _LightGameObjectData;
-	_LightGameObjectData = nullptr;
-}
-
 void LightGameObject::Begin()
 {
 
@@ -71,6 +60,17 @@ void LightGameObject::End()
 
 }
 
+LightGameObject::LightGameObject()
+{
+	_LightGameObjectData = new LightGameObjectData();
+}
+
+LightGameObject::~LightGameObject()
+{
+	delete _LightGameObjectData;
+	_LightGameObjectData = nullptr;
+}
+
 TransformComponent* LightGameObject::GetTransformComponent()
 {
 	return _LightGameObjectData->GetTransformComponent();
@@ -79,4 +79,21 @@ TransformComponent* LightGameObject::GetTransformComponent()
 LightComponent* LightGameObject::GetLightComponent()
 {
 	return _LightGameObjectData->GetLightComponent();
+}
+
+LightGameObjectInstance::LightGameObjectInstance()
+{
+	ETERNAL_ASSERT(false); // Doesn't make sense to implement light instance
+}
+
+void LightGameObjectInstance::Begin()
+{
+}
+
+void LightGameObjectInstance::Update(_In_ const TimeSecondsT& ElapsedSeconds)
+{
+}
+
+void LightGameObjectInstance::End()
+{
 }

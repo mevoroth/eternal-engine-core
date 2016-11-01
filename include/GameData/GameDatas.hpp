@@ -19,10 +19,12 @@ namespace Eternal
 		public:
 			enum GameDatasKey
 			{
-				GRAPHIC_GAME_OBJECT = 0,
-				TRANSFORM_COMPONENT = 1,
-				MESH_COMPONENT		= 2,
-				MATERIAL_COMPONENT	= 3,
+				GRAPHIC_GAME_OBJECT				= 0,
+				TRANSFORM_COMPONENT				= 1,
+				MESH_COMPONENT					= 2,
+				MATERIAL_COMPONENT				= 3,
+				GRAPHIC_GAME_OBJECT_INSTANCE	= 4,
+				GAME_DATA_COLLECTION			= 5,
 				GAME_DATA_COUNT
 			};
 

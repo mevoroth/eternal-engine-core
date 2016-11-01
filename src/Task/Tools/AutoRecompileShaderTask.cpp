@@ -44,17 +44,12 @@ AutoRecompileShaderTask::~AutoRecompileShaderTask()
 	_DirectoryHandles = nullptr;
 }
 
-void AutoRecompileShaderTask::Setup()
+void AutoRecompileShaderTask::DoSetup()
 {
-	ETERNAL_ASSERT(GetState() == SCHEDULED);
-	SetState(SETUP);
 }
 
-void AutoRecompileShaderTask::Execute()
+void AutoRecompileShaderTask::DoExecute()
 {
-	ETERNAL_ASSERT(GetState() == SETUP);
-	SetState(EXECUTING);
-
 	//vector<string>& ShaderPaths = ShaderFactory::Get()->GetShaderPaths();
 	//DWORD ObjectIndex = WaitForMultipleObjects(_FilesWatchHandlesCount, _FilesWatchHandles, FALSE, INFINITE);
 
@@ -68,12 +63,8 @@ void AutoRecompileShaderTask::Execute()
 	//{
 	//	// BUG?
 	//}
-
-	SetState(DONE);
 }
 
-void AutoRecompileShaderTask::Reset()
+void AutoRecompileShaderTask::DoReset()
 {
-	ETERNAL_ASSERT(GetState() == DONE);
-	SetState(IDLE);
 }

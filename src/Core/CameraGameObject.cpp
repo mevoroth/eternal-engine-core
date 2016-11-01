@@ -75,3 +75,15 @@ CameraComponent* CameraGameObject::GetCameraComponent()
 {
 	return _CameraGameObjectData->GetCameraComponent();
 }
+
+void CameraGameObjectInstance::Begin()
+{
+}
+
+void CameraGameObjectInstance::End()
+{
+}
+
+void CameraGameObjectInstance::Update(_In_ const TimeSecondsT& ElapsedSeconds)
+{
+}

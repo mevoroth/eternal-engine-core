@@ -3,10 +3,12 @@
 #include "Macros/Macros.hpp"
 #include "Log/Log.hpp"
 #include "GameData/GraphicGameObjectGameData.hpp"
+#include "GameData/GraphicGameObjectInstanceGameData.hpp"
 #include "Core/TransformComponent.hpp"
 #include "GameData/TransformGameData.hpp"
 #include "GameData/MeshGameData.hpp"
 #include "GameData/MaterialGameData.hpp"
+#include "SaveSystem/GameDataCollection.hpp"
 
 using namespace Eternal::GameData;
 
@@ -31,6 +33,10 @@ GameDatas::GameDatas()
 	_GameDatas[MESH_COMPONENT] = new MeshGameData();
 
 	_GameDatas[MATERIAL_COMPONENT] = new MaterialGameData();
+
+	_GameDatas[GRAPHIC_GAME_OBJECT_INSTANCE] = new GraphicGameObjectInstanceGameData();
+
+	_GameDatas[GAME_DATA_COLLECTION] = new GameDataCollection();
 
 	_Inst = this;
 }

@@ -23,17 +23,17 @@ namespace Eternal
 				ETERNAL_ASSERT(_Pool);
 			}
 
-			virtual void Setup() override
+			virtual void DoSetup() override
 			{
 				SetState(SETUP);
 			}
 
-			virtual void Reset() override
+			virtual void DoReset() override
 			{
 				SetState(IDLE);
 			}
 
-			virtual void Execute() override
+			virtual void DoExecute() override
 			{
 				SetState(EXECUTING);
 

@@ -51,17 +51,12 @@ void ImguiBeginTask::Map(_In_ const Input::Input::Key& EternalKey, _In_ const Im
 	_MappedKeys.push_back(EternalKey);
 }
 
-void ImguiBeginTask::Setup()
+void ImguiBeginTask::DoSetup()
 {
-	ETERNAL_ASSERT(GetState() == SCHEDULED);
-	SetState(Task::SETUP);
 }
 
-void ImguiBeginTask::Execute()
+void ImguiBeginTask::DoExecute()
 {
-	ETERNAL_ASSERT(GetState() == Task::SETUP);
-	SetState(Task::EXECUTING);
-
 	ImGuiIO& io = ImGui::GetIO();
 	for (int MappedKeyIndex = 0; MappedKeyIndex < _MappedKeys.size(); ++MappedKeyIndex)
 	{
@@ -84,8 +79,6 @@ void ImguiBeginTask::Execute()
 	_ProcessInputCharacter('/', Input::Input::KPDIV);
 
 	ImGui::NewFrame();
-
-	SetState(Task::DONE);
 }
 
 void ImguiBeginTask::_ProcessInputCharacter(_In_ const ImWchar& ImguiKey, _In_ const Input::Input::Key& KeyName)
@@ -105,8 +98,6 @@ void ImguiBeginTask::_ProcessInputCharacterRange(_In_ const ImWchar& ImguiKeySta
 	}
 }
 
-void ImguiBeginTask::Reset()
+void ImguiBeginTask::DoReset()
 {
-	ETERNAL_ASSERT(GetState() == Task::DONE);
-	SetState(Task::IDLE);
 }

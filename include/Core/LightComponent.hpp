@@ -6,6 +6,7 @@ namespace Eternal
 	namespace Components
 	{
 		class Light;
+		class Shadow;
 	}
 
 	namespace Core
@@ -21,8 +22,14 @@ namespace Eternal
 			void SetLight(_In_ Light* LightObj);
 			Light* GetLight();
 
+			Shadow* GetShadow();
+			void SetShadow(_In_ Shadow* ShadowObj);
+
+			bool GetShadowEnabled() const;
+
 		private:
 			Light* _Light = nullptr;
+			Shadow* _Shadow = nullptr;
 		};
 	}
 }

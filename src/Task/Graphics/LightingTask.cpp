@@ -183,17 +183,12 @@ LightingTask::~LightingTask()
 	_LightingTaskData = nullptr;
 }
 
-void LightingTask::Setup()
+void LightingTask::DoSetup()
 {
-	ETERNAL_ASSERT(GetState() == SCHEDULED);
-	SetState(SETUP);
 }
 
-void LightingTask::Execute()
+void LightingTask::DoExecute()
 {
-	ETERNAL_ASSERT(GetState() == SETUP);
-	SetState(EXECUTING);
-
 	if (!_LightingTaskData->GetSharedData()->Camera)
 	{
 		SetState(DONE);
@@ -224,6 +219,7 @@ void LightingTask::Execute()
 	ContextObj.BindBuffer<Context::PIXEL>(1, OpaqueRenderTargets.GetRenderTargets()[0]->GetAsResource());
 	ContextObj.BindBuffer<Context::PIXEL>(2, OpaqueRenderTargets.GetRenderTargets()[1]->GetAsResource());
 	ContextObj.BindBuffer<Context::PIXEL>(3, OpaqueRenderTargets.GetRenderTargets()[3]->GetAsResource());
+	ContextObj.BindBuffer<Context::PIXEL>(4, OpaqueRenderTargets.GetRenderTargets()[4]->GetAsResource());
 	ContextObj.BindBuffer<Context::PIXEL>(10, OpaqueRenderTargets.GetRenderTargets()[4]->GetAsResource());
 
 	ContextObj.BindShader<Context::VERTEX>(_LightingTaskData->GetVS());
@@ -240,6 +236,7 @@ void LightingTask::Execute()
 	ContextObj.UnbindBuffer<Context::PIXEL>(1);
 	ContextObj.UnbindBuffer<Context::PIXEL>(2);
 	ContextObj.UnbindBuffer<Context::PIXEL>(3);
+	ContextObj.UnbindBuffer<Context::PIXEL>(4);
 	ContextObj.UnbindBuffer<Context::PIXEL>(10);
 
 	ContextObj.UnbindSampler<Context::PIXEL>(0);
@@ -250,14 +247,10 @@ void LightingTask::Execute()
 
 	ContextObj.End();
 	_LightingTaskData->GetContexts().Release(ContextObj);
-
-	SetState(DONE);
 }
 
-void LightingTask::Reset()
+void LightingTask::DoReset()
 {
-	ETERNAL_ASSERT(GetState() == DONE);
-	SetState(IDLE);
 }
 
 void LightingTask::_SetupFrameConstants(_In_ Context& ContextObj)

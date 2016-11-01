@@ -14,27 +14,22 @@ GameStateTask::GameStateTask(_In_ GameState* GameStateObj, _In_ StateSharedData*
 	ETERNAL_ASSERT(GameStateObj);
 }
 
-void GameStateTask::Setup()
+void GameStateTask::DoSetup()
 {
-	ETERNAL_ASSERT(GetState() == SCHEDULED);
-	SetState(SETTINGUP);
 	if (_ScheduledToBegin)
 	{
 		_ScheduledToBegin->SetSharedData(_SharedData);
 		_ScheduledToBegin->Begin();
 		_ScheduledToBegin = nullptr;
 	}
-	SetState(SETUP);
 }
 
-void GameStateTask::Execute()
+void GameStateTask::DoExecute()
 {
-	SetState(EXECUTING);
 	_GameState->Update();
-	SetState(DONE);
 }
 
-void GameStateTask::Reset()
+void GameStateTask::DoReset()
 {
 	GameState* NextState = _GameState->NextState();
 
@@ -45,8 +40,6 @@ void GameStateTask::Reset()
 		_GameState = NextState;
 		_ScheduledToBegin = _GameState;
 	}
-
-	SetState(IDLE);
 }
 
 bool GameStateTask::GetRemainingState()

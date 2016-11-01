@@ -19,9 +19,9 @@ namespace Eternal
 		public:
 			TimeTask(_In_ Eternal::Time::Time* TimeObj);
 
-			virtual void Setup() override;
-			virtual void Reset() override;
-			virtual void Execute() override;
+			virtual void DoSetup() override;
+			virtual void DoReset() override;
+			virtual void DoExecute() override;
 
 		private:
 			Eternal::Time::Time* _Time = nullptr;

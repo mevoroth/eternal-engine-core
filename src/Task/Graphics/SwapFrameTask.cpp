@@ -15,25 +15,16 @@ SwapFrameTask::SwapFrameTask(_In_ Renderer& RendererObj, _In_ Context& MainConte
 {
 }
 
-void SwapFrameTask::Setup()
+void SwapFrameTask::DoSetup()
 {
-	ETERNAL_ASSERT(GetState() == SCHEDULED);
-	SetState(SETUP);
 }
 
-void SwapFrameTask::Execute()
+void SwapFrameTask::DoExecute()
 {
-	ETERNAL_ASSERT(GetState() == Task::SETUP);
-	SetState(EXECUTING);
-
 	_DeferredContexts.Flush(_MainContext);
 	_Renderer.Flush();
-
-	SetState(DONE);
 }
 
-void SwapFrameTask::Reset()
+void SwapFrameTask::DoReset()
 {
-	ETERNAL_ASSERT(GetState() == Task::DONE);
-	SetState(IDLE);
 }

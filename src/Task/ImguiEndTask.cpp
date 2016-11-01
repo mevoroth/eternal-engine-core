@@ -63,17 +63,12 @@ ImguiEndTask::ImguiEndTask(_In_ ContextCollection& Contexts, _In_ SamplerCollect
 	_Viewport = Viewports.GetViewport(ViewportCollection::FULLSCREEN);
 }
 
-void ImguiEndTask::Setup()
+void ImguiEndTask::DoSetup()
 {
-	ETERNAL_ASSERT(GetState() == SCHEDULED);
-	SetState(Task::SETUP);
 }
 
-void ImguiEndTask::Execute()
+void ImguiEndTask::DoExecute()
 {
-	ETERNAL_ASSERT(GetState() == Task::SETUP);
-	SetState(Task::EXECUTING);
-
 	ImGui::Render();
 
 	ImDrawData* ImguiDrawData = ImGui::GetDrawData();
@@ -152,12 +147,8 @@ void ImguiEndTask::Execute()
 
 	ContextObj.End();
 	_Contexts.Release(ContextObj);
-
-	SetState(Task::DONE);
 }
 
-void ImguiEndTask::Reset()
+void ImguiEndTask::DoReset()
 {
-	ETERNAL_ASSERT(GetState() == Task::DONE);
-	SetState(Task::IDLE);
 }

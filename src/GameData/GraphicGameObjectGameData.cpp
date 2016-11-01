@@ -14,8 +14,9 @@ GraphicGameObjectGameData::GraphicGameObjectGameData(_In_ GraphicGameObject& Gam
 void GraphicGameObjectGameData::Prepare(void* Parent)
 {
 	Json::Value& GameObjectNode = *(Json::Value*)Parent;
-	TransformGameData TransformComponentObject(*_GameObject.GetTransformComponent());
-	TransformComponentObject.Prepare(&GameObjectNode["Transform"]);
+	ETERNAL_ASSERT(false); // IMPLEMENTATION CHANGED OUT OF DATE
+	//TransformGameData TransformComponentObject(*_GameObject.GetTransformComponent());
+	//TransformComponentObject.Prepare(&GameObjectNode["Transform"]);
 }
 
 void GraphicGameObjectGameData::GetData(uint8_t* Data) const
@@ -38,13 +39,20 @@ void* GraphicGameObjectGameData::Load(const void* SerializedData)
 	Json::Value& GameObjectNode = *(Json::Value*)SerializedData;
 	GraphicGameObject* GameObject = new GraphicGameObject();
 	GameDatas* GameDatasObj = GameDatas::Get();
-	TransformComponent* TransformComponentObj = (TransformComponent*)GameDatasObj->Get(GameDatas::TRANSFORM_COMPONENT)->Load(&GameObjectNode["Transform"]);
+	vector<GraphicGameObjectInstance*>* Instances = (vector<GraphicGameObjectInstance*>*)GameDatasObj->Get(GameDatas::GAME_DATA_COLLECTION)->Load(&GameObjectNode["Instances"]);
+
+	for (int InstanceIndex = 0; InstanceIndex < Instances->size(); ++InstanceIndex)
+	{
+		GameObject->AddInstance((*Instances)[InstanceIndex]);
+	}
+
+	//TransformComponent* TransformComponentObj = (TransformComponent*)GameDatasObj->Get(GameDatas::TRANSFORM_COMPONENT)->Load(&GameObjectNode["Transform"]);
 	
-	GameObject->CopyTransformComponent(TransformComponentObj);
+	//GameObject->CopyTransformComponent(TransformComponentObj);
 	GameObject->SetMeshComponent((MeshComponent*)GameDatasObj->Get(GameDatas::MESH_COMPONENT)->Load(&GameObjectNode["Mesh"]));
 	GameObject->SetMaterialComponent((MaterialComponent*)GameDatasObj->Get(GameDatas::MATERIAL_COMPONENT)->Load(&GameObjectNode["Material"]));
 
-	delete TransformComponentObj;
+	//delete TransformComponentObj;
 
 	return GameObject;
 }

@@ -26,9 +26,9 @@ namespace Eternal
 		public:
 			DebugTask(Context& ContextObj);
 
-			virtual void Setup() override;
-			virtual void Reset() override;
-			virtual void Execute() override;
+			virtual void DoSetup() override;
+			virtual void DoReset() override;
+			virtual void DoExecute() override;
 
 			void SetRenderTarget(RenderTarget* RenderTargetObj);
 			void SetModelViewProjectionMatrix(const Matrix4x4& ModelViewProjectionMatrix);

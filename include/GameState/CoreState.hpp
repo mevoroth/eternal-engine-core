@@ -51,6 +51,7 @@ namespace Eternal
 	}
 	namespace GraphicData
 	{
+		class GraphicTaskConfigCollection;
 		class ContextCollection;
 		class RenderTargetCollection;
 		class SamplerCollection;
@@ -141,6 +142,7 @@ namespace Eternal
 			Task* _GameStateTask = nullptr;
 			Task* _InitFrameTask = nullptr;
 			Task* _OpaqueTask = nullptr;
+			Task* _ShadowTask = nullptr;
 			Task* _LightingTask = nullptr;
 			Task* _CompositingTask = nullptr;
 			Task* _SwapFrameTask = nullptr;
@@ -154,10 +156,12 @@ namespace Eternal
 			Eternal::SaveSystem::SaveSystem* _SaveSystem = nullptr;
 			GameDatas* _GameDatas = nullptr;
 
+			GraphicTaskConfigCollection* _GraphictaskConfigCollection = nullptr;
 			ContextCollection* _ContextCollection = nullptr;
 			SamplerCollection* _SamplerCollection = nullptr;
 			RenderTargetCollection* _OpaqueRenderTargets = nullptr;
 			RenderTargetCollection* _LightRenderTargets = nullptr;
+			RenderTargetCollection* _ShadowRenderTargets = nullptr;
 			ViewportCollection* _ViewportCollection = nullptr;
 			BlendStateCollection* _BlendStateCollection = nullptr;
 			RenderingListCollection* _RenderingListCollection = nullptr;
@@ -166,6 +170,8 @@ namespace Eternal
 			void _ReleasePools();
 			void _InitializeTasks();
 			void _ReleaseTasks();
+			void _InitializeGraphicTaskConfigs();
+			void _ReleaseGraphicTaskConfigs();
 			void _InitializeGraphicContexts();
 			void _ReleaseGraphicContexts();
 			void _InitializeRenderTargets();

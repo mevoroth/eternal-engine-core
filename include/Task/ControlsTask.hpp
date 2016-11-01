@@ -20,9 +20,9 @@ namespace Eternal
 		class ControlsTask : public Task
 		{
 		public:
-			virtual void Setup() override;
-			virtual void Reset() override;
-			virtual void Execute() override;
+			virtual void DoSetup() override;
+			virtual void DoReset() override;
+			virtual void DoExecute() override;
 
 			void RegisterInput(_In_ Input::Input* InputObj);
 

@@ -31,9 +31,9 @@ namespace Eternal
 		public:
 			CompositingTask(_In_ ContextCollection& DeferredContexts, _In_ RenderTargetCollection& OpaqueRenderTargets, _In_ RenderTargetCollection& LightingRenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates);
 
-			virtual void Setup() override;
-			virtual void Reset() override;
-			virtual void Execute() override;
+			virtual void DoSetup() override;
+			virtual void DoReset() override;
+			virtual void DoExecute() override;
 
 		private:
 			ContextCollection& _Contexts;

@@ -97,12 +97,6 @@
     <ClInclude Include="include\Core\LightComponent.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="include\Task\Graphics\OpaqueTask.hpp">
-      <Filter>Task\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Task\Graphics\PrepareOpaqueTask.hpp">
-      <Filter>Task\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\CameraGameObject.hpp">
       <Filter>Core</Filter>
     </ClInclude>
@@ -133,6 +127,15 @@
     </ClInclude>
     <ClInclude Include="include\Task\Tools\AutoRecompileShaderTask.hpp">
       <Filter>Task\Tools</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Task\Graphics\RenderObjectsTask.hpp">
+      <Filter>Task\Graphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameData\GraphicGameObjectInstanceGameData.hpp">
+      <Filter>GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\ShadowComponent.hpp">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -187,12 +190,6 @@
     <ClCompile Include="src\Core\LightComponent.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\Task\Graphics\OpaqueTask.cpp">
-      <Filter>Task\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Task\Graphics\PrepareOpaqueTask.cpp">
-      <Filter>Task\Graphics</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\CameraGameObject.cpp">
       <Filter>Core</Filter>
     </ClCompile>
@@ -223,6 +220,12 @@
     </ClCompile>
     <ClCompile Include="src\Task\Tools\AutoRecompileShaderTask.cpp">
       <Filter>Task\Tools</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task\Graphics\RenderObjectsTask.cpp">
+      <Filter>Task\Graphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameData\GraphicGameObjectInstanceGameData.cpp">
+      <Filter>GameData</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

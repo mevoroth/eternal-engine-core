@@ -15,9 +15,9 @@ namespace Eternal
 			AutoRecompileShaderTask();
 			~AutoRecompileShaderTask();
 
-			virtual void Setup() override;
-			virtual void Reset() override;
-			virtual void Execute() override;
+			virtual void DoSetup() override;
+			virtual void DoReset() override;
+			virtual void DoExecute() override;
 
 		private:
 			void** _FilesWatchHandles = nullptr;

@@ -28,17 +28,12 @@ InitFrameTask::~InitFrameTask()
 	_RenderTargetCollections = nullptr;
 }
 
-void InitFrameTask::Setup()
+void InitFrameTask::DoSetup()
 {
-	ETERNAL_ASSERT(GetState() == SCHEDULED);
-	SetState(SETUP);
 }
 
-void InitFrameTask::Execute()
+void InitFrameTask::DoExecute()
 {
-	ETERNAL_ASSERT(GetState() == Task::SETUP);
-	SetState(EXECUTING);
-
 	Context& ContextObj = _Contexts.Get();
 	ContextObj.Begin();
 
@@ -58,12 +53,8 @@ void InitFrameTask::Execute()
 
 	ContextObj.End();
 	_Contexts.Release(ContextObj);
-
-	SetState(DONE);
 }
 
-void InitFrameTask::Reset()
+void InitFrameTask::DoReset()
 {
-	ETERNAL_ASSERT(GetState() == Task::DONE);
-	SetState(IDLE);
 }

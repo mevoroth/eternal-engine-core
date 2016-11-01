@@ -26,21 +26,14 @@ CompositingTask::CompositingTask(_In_ ContextCollection& DeferredContexts, _In_ 
 	_PS = ShaderFactory::Get()->CreatePixelShader("Compositing", "compositing.ps.hlsl");
 }
 
-void CompositingTask::Setup()
+void CompositingTask::DoSetup()
 {
-	ETERNAL_ASSERT(GetState() == SCHEDULED);
-	SetState(SETUP);
 }
-void CompositingTask::Reset()
+void CompositingTask::DoReset()
 {
-	ETERNAL_ASSERT(GetState() == DONE);
-	SetState(IDLE);
 }
-void CompositingTask::Execute()
+void CompositingTask::DoExecute()
 {
-	ETERNAL_ASSERT(GetState() == SETUP);
-	SetState(EXECUTING);
-
 	RenderTarget* BackBuffer = Renderer::Get()->GetBackBuffer();
 	RenderTarget* NullRenderTarget = nullptr;
 
@@ -78,6 +71,4 @@ void CompositingTask::Execute()
 
 	CompositingContext.End();
 	_Contexts.Release(CompositingContext);
-
-	SetState(DONE);
 }

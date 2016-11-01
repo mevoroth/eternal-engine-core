@@ -27,9 +27,9 @@ namespace Eternal
 		public:
 			ImguiBeginTask(_In_ HWND HWNDObj, _In_ float Width, _In_ float Height);
 
-			virtual void Setup() override;
-			virtual void Execute() override;
-			virtual void Reset() override;
+			virtual void DoSetup() override;
+			virtual void DoExecute() override;
+			virtual void DoReset() override;
 
 			void SetupKeyboard(Input::Input* KeyboardInput)
 			{

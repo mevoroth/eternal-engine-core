@@ -42,26 +42,17 @@ DebugTask::DebugTask(Context& ContextObj)
 	_ModelViewProjectionMatrixConstant = new D3D11Constant(sizeof(Matrix4x4), D3D11Resource::DYNAMIC, Resource::WRITE);
 }
 
-void DebugTask::Setup()
+void DebugTask::DoSetup()
 {
-	ETERNAL_ASSERT(GetState() == SCHEDULED);
-	SetState(SETUP);
 }
 
-void DebugTask::Reset()
+void DebugTask::DoReset()
 {
-	ETERNAL_ASSERT(GetState() == DONE);
-	SetState(IDLE);
 }
 
-void DebugTask::Execute()
+void DebugTask::DoExecute()
 {
-	ETERNAL_ASSERT(GetState() == SETUP);
-	SetState(EXECUTING);
-
 	_DrawGizmo();
-
-	SetState(DONE);
 }
 
 void DebugTask::SetRenderTarget(RenderTarget* RenderTargetObj)

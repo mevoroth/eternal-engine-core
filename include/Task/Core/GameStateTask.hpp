@@ -21,9 +21,9 @@ namespace Eternal
 		public:
 			GameStateTask(_In_ Core::GameState* GameStateObj, _In_ StateSharedData* SharedData);
 
-			virtual void Setup();
-			virtual void Reset();
-			virtual void Execute();
+			virtual void DoSetup();
+			virtual void DoReset();
+			virtual void DoExecute();
 
 			bool GetRemainingState();
 

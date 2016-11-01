@@ -28,9 +28,9 @@ namespace Eternal
 			InitFrameTask(_In_ Renderer& RendererObj, _In_ ContextCollection& Contexts, _In_ RenderTargetCollection** RenderTargetCollections, _In_ int RenderTargetsCollectionsCount);
 			~InitFrameTask();
 
-			virtual void Setup() override;
-			virtual void Reset() override;
-			virtual void Execute() override;
+			virtual void DoSetup() override;
+			virtual void DoReset() override;
+			virtual void DoExecute() override;
 
 		private:
 			Renderer& _Renderer;

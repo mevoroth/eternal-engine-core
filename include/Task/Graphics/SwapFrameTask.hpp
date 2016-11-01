@@ -27,9 +27,9 @@ namespace Eternal
 		public:
 			SwapFrameTask(_In_ Renderer& RendererObj, _In_ Context& MainContext, _In_ ContextCollection& DeferredContexts);
 
-			virtual void Setup() override;
-			virtual void Reset() override;
-			virtual void Execute() override;
+			virtual void DoSetup() override;
+			virtual void DoReset() override;
+			virtual void DoExecute() override;
 
 		private:
 			Renderer& _Renderer;
