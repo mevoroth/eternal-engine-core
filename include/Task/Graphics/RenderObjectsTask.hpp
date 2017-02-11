@@ -53,19 +53,32 @@ namespace Eternal
 			static constexpr int MAX_INSTANCES = 4096;
 
 			RenderObjectsTask(_In_ const GraphicTaskConfig& Config, _In_ ContextCollection& Contexts, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates, _In_ StateSharedData* SharedData);
-			~RenderObjectsTask();
+			virtual ~RenderObjectsTask();
 
-			virtual void DoSetup() override;
 			virtual void DoReset() override;
 			virtual void DoExecute() override;
 
-		private:
+		protected:
 			RenderObjectsTaskData* _RenderObjectsTaskData = nullptr;
 
 			void _SetupFrameConstants(_In_ Context& ContextObj, _In_ Camera* CameraObj);
 			void _SetupInstanceStructuredBuffer(_In_ Context& ContextObj, _In_ GraphicGameObject* GraphicObject);
 			void _SetupObjectConstants(_In_ Context& ContextObj, _In_ Mesh& MeshObj);
 			void _Draw(_In_ Context& ContextObj, _In_ Mesh& MeshObj, _In_ int InstanceCount);
+		};
+
+		class RenderOpaqueObjectsTask : public RenderObjectsTask
+		{
+		public:
+			RenderOpaqueObjectsTask(_In_ const GraphicTaskConfig& Config, _In_ ContextCollection& Contexts, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates, _In_ StateSharedData* SharedData);
+			virtual void DoSetup() override;
+		};
+
+		class RenderObjectsShadowTask : public RenderObjectsTask
+		{
+		public:
+			RenderObjectsShadowTask(_In_ const GraphicTaskConfig& Config, _In_ ContextCollection& Contexts, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates, _In_ StateSharedData* SharedData);
+			virtual void DoSetup() override;
 		};
 	}
 }

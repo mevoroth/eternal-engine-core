@@ -2,6 +2,7 @@
 
 #include "Resources/Pool.hpp"
 #include "Light/Light.hpp"
+#include "Core/TransformComponent.hpp"
 
 using namespace Eternal::Core;
 using namespace Eternal::Resources;
@@ -43,4 +44,24 @@ Shadow* LightComponent::GetShadow()
 bool LightComponent::GetShadowEnabled() const
 {
 	return _Shadow != nullptr;
+}
+
+void LightComponent::AttachTo(_In_ TransformComponent* TransformComponentObj)
+{
+	_TransformComponent = TransformComponentObj;
+}
+
+void LightComponent::Begin()
+{
+
+}
+
+void LightComponent::Update(_In_ const TimeSecondsT& ElapsedSeconds)
+{
+	_Shadow->UpdateView(_TransformComponent->GetTransform());
+}
+
+void LightComponent::End()
+{
+
 }

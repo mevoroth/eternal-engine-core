@@ -139,6 +139,7 @@ namespace Eternal
 			Task* _TimeTask = nullptr;
 			Task* _UpdateTransformComponentTask = nullptr;
 			Task* _UpdateCameraComponentTask = nullptr;
+			Task* _UpdateLightComponentTask = nullptr;
 			Task* _GameStateTask = nullptr;
 			Task* _InitFrameTask = nullptr;
 			Task* _OpaqueTask = nullptr;

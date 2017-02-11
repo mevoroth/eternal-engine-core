@@ -98,6 +98,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <ForcedIncludeFiles>sal.h</ForcedIncludeFiles>
       <AdditionalIncludeDirectories>C:\Program Files\Autodesk\FBX\FBX SDK\2016.1.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

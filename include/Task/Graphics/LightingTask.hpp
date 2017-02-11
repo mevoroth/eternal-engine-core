@@ -35,7 +35,8 @@ namespace Eternal
 		class LightingTask : public Task
 		{
 		public:
-			LightingTask(_In_ ContextCollection& Contexts, _In_ RenderTargetCollection& OpaqueRenderTargets, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ StateSharedData* SharedData);
+			LightingTask(_In_ ContextCollection& Contexts, _In_ RenderTargetCollection& OpaqueRenderTargets, _In_ RenderTargetCollection& ShadowRenderTargets, _In_ RenderTargetCollection& LightRenderTargets,
+				_In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ StateSharedData* SharedData);
 			~LightingTask();
 
 			virtual void DoSetup() override;

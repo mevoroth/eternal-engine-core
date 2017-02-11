@@ -58,16 +58,22 @@ namespace Eternal
 				Light Lights[8];
 			};
 
-			LightingTaskData(_In_ ContextCollection& Contexts, _In_ RenderTargetCollection& OpaqueRenderTargets, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ StateSharedData* SharedData)
+			LightingTaskData(_In_ ContextCollection& Contexts, _In_ RenderTargetCollection& OpaqueRenderTargets, _In_ RenderTargetCollection& ShadowRenderTargets, _In_ RenderTargetCollection& LightRenderTargets,
+				_In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ StateSharedData* SharedData)
 				: _Contexts(Contexts)
 				, _OpaqueRenderTargets(OpaqueRenderTargets)
-				, _RenderTargets(RenderTargets)
+				, _ShadowRenderTargets(ShadowRenderTargets)
+				, _LightRenderTargets(LightRenderTargets)
 				, _SharedData(SharedData)
 			{
 				_VS = ShaderFactory::Get()->CreateVertexShader("Lighting", "lighting.vs.hlsl");
 				_PS = ShaderFactory::Get()->CreatePixelShader("Lighting", "lighting.ps.hlsl");
 
-				_DepthStencil = CreateDepthStencil(DepthTest(), StencilTest()); // Disable depth test
+				_DepthStencil = CreateDepthStencil(DepthTest(), StencilTest(
+					StencilTest::FaceOperator(StencilTest::KEEP, StencilTest::KEEP, StencilTest::KEEP, Comparison::NEVER),
+					StencilTest::FaceOperator(StencilTest::REPLACE, StencilTest::REPLACE, StencilTest::REPLACE, Comparison::ALWAYS),
+					0xFF, 0xFF
+				)); // Disable depth test
 				_FrameConstants = CreateConstant(sizeof(CB0FrameConstants), Resource::DYNAMIC, Resource::WRITE);
 				_LightConstants = CreateConstant(sizeof(CB1LightConstants), Resource::DYNAMIC, Resource::WRITE);
 
@@ -83,6 +89,12 @@ namespace Eternal
 				_PS = nullptr;
 				delete _DepthStencil;
 				_DepthStencil = nullptr;
+
+				delete _FrameConstants;
+				_FrameConstants = nullptr;
+
+				delete _LightConstants;
+				_LightConstants = nullptr;
 
 				_SharedData = nullptr;
 			}
@@ -145,9 +157,14 @@ namespace Eternal
 				return _OpaqueRenderTargets;
 			}
 
-			RenderTargetCollection& GetRenderTargets()
+			RenderTargetCollection& GetLightRenderTargets()
 			{
-				return _RenderTargets;
+				return _LightRenderTargets;
+			}
+
+			RenderTargetCollection& GetShadowRenderTargets()
+			{
+				return _ShadowRenderTargets;
 			}
 
 		private:
@@ -157,7 +174,8 @@ namespace Eternal
 			Shader* _PS = nullptr;
 
 			RenderTargetCollection& _OpaqueRenderTargets;
-			RenderTargetCollection& _RenderTargets;
+			RenderTargetCollection& _LightRenderTargets;
+			RenderTargetCollection& _ShadowRenderTargets;
 			Viewport* _Viewport = nullptr;
 
 			DepthStencil* _DepthStencil = nullptr;
@@ -172,9 +190,10 @@ namespace Eternal
 	}
 }
 
-LightingTask::LightingTask(_In_ ContextCollection& Contexts, _In_ RenderTargetCollection& OpaqueRenderTargets, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ StateSharedData* SharedData)
+LightingTask::LightingTask(_In_ ContextCollection& Contexts, _In_ RenderTargetCollection& OpaqueRenderTargets, _In_ RenderTargetCollection& ShadowRenderTargets, _In_ RenderTargetCollection& LightRenderTargets,
+	_In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ StateSharedData* SharedData)
 {
-	_LightingTaskData = new LightingTaskData(Contexts, OpaqueRenderTargets, RenderTargets, Samplers, Viewports, SharedData);
+	_LightingTaskData = new LightingTaskData(Contexts, OpaqueRenderTargets, ShadowRenderTargets, LightRenderTargets, Samplers, Viewports, SharedData);
 }
 
 LightingTask::~LightingTask()
@@ -195,8 +214,9 @@ void LightingTask::DoExecute()
 		return;
 	}
 
-	RenderTargetCollection& RenderTargets = _LightingTaskData->GetRenderTargets();
+	RenderTargetCollection& LightRenderTargets = _LightingTaskData->GetLightRenderTargets();
 	RenderTargetCollection& OpaqueRenderTargets = _LightingTaskData->GetOpaqueRenderTargets();
+	RenderTargetCollection& ShadowRenderTargets = _LightingTaskData->GetShadowRenderTargets();
 	//RenderTarget* NullRenderTarget[] = { nullptr };
 	RenderTarget* NullRenderTarget[] = { nullptr, nullptr };
 
@@ -220,12 +240,16 @@ void LightingTask::DoExecute()
 	ContextObj.BindBuffer<Context::PIXEL>(2, OpaqueRenderTargets.GetRenderTargets()[1]->GetAsResource());
 	ContextObj.BindBuffer<Context::PIXEL>(3, OpaqueRenderTargets.GetRenderTargets()[3]->GetAsResource());
 	ContextObj.BindBuffer<Context::PIXEL>(4, OpaqueRenderTargets.GetRenderTargets()[4]->GetAsResource());
-	ContextObj.BindBuffer<Context::PIXEL>(10, OpaqueRenderTargets.GetRenderTargets()[4]->GetAsResource());
+	ContextObj.BindBuffer<Context::PIXEL>(5, OpaqueRenderTargets.GetRenderTargets()[5]->GetAsResource());
+
+	ContextObj.BindBuffer<Context::PIXEL>(6, ShadowRenderTargets.GetDepthStencilRenderTarget()->GetAsResource());
+
+	ContextObj.BindBuffer<Context::PIXEL>(10, OpaqueRenderTargets.GetRenderTargets()[4]->GetAsResource()); // Debug World Position
 
 	ContextObj.BindShader<Context::VERTEX>(_LightingTaskData->GetVS());
 	ContextObj.BindShader<Context::PIXEL>(_LightingTaskData->GetPS());
 
-	ContextObj.SetRenderTargets(RenderTargets.GetRenderTargets(), RenderTargets.GetRenderTargetsCount()); // REMOVE THIS
+	ContextObj.SetRenderTargets(LightRenderTargets.GetRenderTargets(), LightRenderTargets.GetRenderTargetsCount()); // REMOVE THIS
 	ContextObj.DrawPrimitive(6);
 	ContextObj.SetRenderTargets(NullRenderTarget, ETERNAL_ARRAYSIZE(NullRenderTarget)); // REMOVE THIS
 
@@ -237,6 +261,10 @@ void LightingTask::DoExecute()
 	ContextObj.UnbindBuffer<Context::PIXEL>(2);
 	ContextObj.UnbindBuffer<Context::PIXEL>(3);
 	ContextObj.UnbindBuffer<Context::PIXEL>(4);
+	ContextObj.UnbindBuffer<Context::PIXEL>(5);
+
+	ContextObj.UnbindBuffer<Context::PIXEL>(6);
+
 	ContextObj.UnbindBuffer<Context::PIXEL>(10);
 
 	ContextObj.UnbindSampler<Context::PIXEL>(0);
@@ -272,7 +300,17 @@ void LightingTask::_SetupFrameConstants(_In_ Context& ContextObj)
 void LightingTask::_SetupLightConstants(_In_ Context& ContextObj)
 {
 	Light* PointLight = _LightingTaskData->GetSharedData()->Lights->GetLightComponent()->GetLight();
+	Shadow* ShadowObj = _LightingTaskData->GetSharedData()->Lights->GetLightComponent()->GetShadow();
 	const Transform& TransformObj = _LightingTaskData->GetSharedData()->Lights->GetTransformComponent()->GetTransform();
+
+	Matrix4x4 ShadowMatrix;
+	Matrix4x4 InvCameraMatrix;
+
+	_LightingTaskData->GetSharedData()->Camera->GetCameraComponent()->GetCamera()->GetViewProjectionMatrixInverse(InvCameraMatrix);
+	ShadowObj->GetViewProjectionMatrix(ShadowMatrix);
+	
+	ShadowMatrix = InvCameraMatrix * ShadowMatrix;
+	Transpose(ShadowMatrix);
 
 	Resource* ConstantObj = _LightingTaskData->GetLightConstants()->GetAsResource();
 	Resource::LockedResource LightConstantsRaw = ConstantObj->Lock(ContextObj, Resource::LOCK_WRITE_DISCARD);
@@ -286,6 +324,8 @@ void LightingTask::_SetupLightConstants(_In_ Context& ContextObj)
 	LightConstants.Lights[0].Color = Vector4(Color.x, Color.y, Color.z, 1.0f);
 	LightConstants.Lights[0].Intensity = PointLight->GetIntensity();
 	LightConstants.Lights[0].Distance = PointLight->GetDistance();
+
+	LightConstants.Lights[0].LightToCamera = ShadowMatrix;
 
 	LightConstants.LightsCount = 1;
 

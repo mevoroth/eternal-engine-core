@@ -49,8 +49,9 @@
 using namespace Eternal::Resources;
 using namespace Eternal::Core;
 
-extern Pool<TransformComponent>* g_TransformComponentPool;
-extern Pool<CameraComponent, 4>* g_CameraComponentPool;
+extern Pool<TransformComponent>*	g_TransformComponentPool;
+extern Pool<CameraComponent, 4>*	g_CameraComponentPool;
+extern Pool<LightComponent, 128>*	g_LightComponentPool;
 
 namespace Eternal
 {
@@ -140,6 +141,7 @@ namespace Eternal
 				_TaskManager->GetTaskScheduler().PushTask(_UpdateTransformComponentTask, _TimeTask);
 			}
 			_TaskManager->GetTaskScheduler().PushTask(_UpdateCameraComponentTask, _UpdateTransformComponentTask);
+			_TaskManager->GetTaskScheduler().PushTask(_UpdateLightComponentTask, _UpdateTransformComponentTask);
 			{
 				_TaskManager->GetTaskScheduler().PushTask(_ImguiBeginTask, _ControlsTask);
 				_TaskManager->GetTaskScheduler().PushTask(_ImguiBeginTask, _TimeTask);
@@ -153,7 +155,7 @@ namespace Eternal
 				_TaskManager->GetTaskScheduler().PushTask(_OpaqueTask, _GameStateTask);
 			}
 			{
-				_TaskManager->GetTaskScheduler().PushTask(_ShadowTask, _InitFrameTask);
+				_TaskManager->GetTaskScheduler().PushTask(_ShadowTask, _UpdateLightComponentTask);
 				_TaskManager->GetTaskScheduler().PushTask(_ShadowTask, _GameStateTask);
 			}
 			_TaskManager->GetTaskScheduler().PushTask(_LightingTask, _OpaqueTask);
@@ -267,34 +269,39 @@ namespace Eternal
 			UpdateTransformComponentTaskObj->SetTaskName("Update Transform Pool Task");
 			_UpdateTransformComponentTask = UpdateTransformComponentTaskObj;
 
-			UpdateComponentTask< Pool<CameraComponent, 4> >* UpdateCameraComponentObj = new UpdateComponentTask< Pool<CameraComponent, 4> >(_Time, g_CameraComponentPool);
-			UpdateCameraComponentObj->SetTaskName("Update Camera Pool Task");
-			_UpdateCameraComponentTask = UpdateCameraComponentObj;
+			UpdateComponentTask< Pool<CameraComponent, 4> >* UpdateCameraComponentTaskObj = new UpdateComponentTask< Pool<CameraComponent, 4> >(_Time, g_CameraComponentPool);
+			UpdateCameraComponentTaskObj->SetTaskName("Update Camera Pool Task");
+			_UpdateCameraComponentTask = UpdateCameraComponentTaskObj;
+
+			UpdateComponentTask< Pool<LightComponent, 128> >* UpdateLightComponentTaskObj = new UpdateComponentTask< Pool<LightComponent, 128> >(_Time, g_LightComponentPool);
+			UpdateLightComponentTaskObj->SetTaskName("Update Light Pool Task");
+			_UpdateLightComponentTask = UpdateLightComponentTaskObj;
 
 			GameStateTask* GameStateTaskObj = new GameStateTask(_InitialGameState, GetSharedData());
 			GameStateTaskObj->SetTaskName("Game State Task");
 			_GameStateTask = GameStateTaskObj;
 
 			RenderTargetCollection* RenderTargetCollections[] =
-			{
+			{ 
 				_OpaqueRenderTargets,
-				_LightRenderTargets
+				_LightRenderTargets,
+				_ShadowRenderTargets
 			};
 			InitFrameTask* InitFrameTaskObj = new InitFrameTask(*_Renderer, *_ContextCollection, RenderTargetCollections, ETERNAL_ARRAYSIZE(RenderTargetCollections));
 			InitFrameTaskObj->SetTaskName("Init Frame Task");
 			_InitFrameTask = InitFrameTaskObj;
 			
-			RenderObjectsTask* OpaqueTaskObj = new RenderObjectsTask(_GraphictaskConfigCollection->GetGraphicTaskConfig(GraphicTaskConfigCollection::OPAQUE_TASK),
+			RenderObjectsTask* OpaqueTaskObj = new RenderOpaqueObjectsTask(_GraphictaskConfigCollection->GetGraphicTaskConfig(GraphicTaskConfigCollection::OPAQUE_TASK),
 				*_ContextCollection, *_OpaqueRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection, GetSharedData());
 			OpaqueTaskObj->SetTaskName("Opaque Task (Render Objects)");
 			_OpaqueTask = OpaqueTaskObj;
 
-			RenderObjectsTask* ShadowTaskObj = new RenderObjectsTask(_GraphictaskConfigCollection->GetGraphicTaskConfig(GraphicTaskConfigCollection::SHADOW_TASK),
+			RenderObjectsTask* ShadowTaskObj = new RenderObjectsShadowTask(_GraphictaskConfigCollection->GetGraphicTaskConfig(GraphicTaskConfigCollection::SHADOW_TASK),
 				*_ContextCollection, *_ShadowRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection, GetSharedData());
 			ShadowTaskObj->SetTaskName("Shadow Task (Render Objects)");
 			_ShadowTask = ShadowTaskObj;
 
-			LightingTask* LightingTaskObj = new LightingTask(*_ContextCollection, *_OpaqueRenderTargets, *_LightRenderTargets, *_SamplerCollection, *_ViewportCollection, GetSharedData());
+			LightingTask* LightingTaskObj = new LightingTask(*_ContextCollection, *_OpaqueRenderTargets, *_ShadowRenderTargets, *_LightRenderTargets, *_SamplerCollection, *_ViewportCollection, GetSharedData());
 			LightingTaskObj->SetTaskName("Lighting Task");
 			_LightingTask = LightingTaskObj;
 
@@ -379,19 +386,24 @@ namespace Eternal
 		void CoreState::_InitializeRenderTargets()
 		{
 			Format OpaqueFormat[] = {
-				BGRA8888,
-				BGRA8888,
-				BGRA8888,
-				BGRA8888,
-				BGRA8888,
-				RGBA32323232
+				BGRA8888,		// Diffuse
+				BGRA8888,		// Specular
+				BGRA8888,		// Emissive
+				BGRA8888,		// Normal
+				BGRA8888,		// Roughness
+				R32,			// W
+				RGBA32323232	// Debug: World position
 			};
 			_OpaqueRenderTargets = new RenderTargetCollection(1600, 900, ETERNAL_ARRAYSIZE(OpaqueFormat), OpaqueFormat, true);
 			Format LightFormat[] = {
 				RGBA8888
 			};
 			_LightRenderTargets = new RenderTargetCollection(1600, 900, ETERNAL_ARRAYSIZE(LightFormat), LightFormat);
-			_ShadowRenderTargets = new RenderTargetCollection(2048, 2048);
+			//_ShadowRenderTargets = new RenderTargetCollection(2048, 2048);
+			Format ShadowFormat[] = {
+				R32
+			};
+			_ShadowRenderTargets = new RenderTargetCollection(2048, 2048, ETERNAL_ARRAYSIZE(ShadowFormat), ShadowFormat, true);
 		}
 
 		void CoreState::_ReleaseRenderTargets()

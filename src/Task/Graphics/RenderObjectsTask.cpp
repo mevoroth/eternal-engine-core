@@ -31,6 +31,9 @@
 #include "Core/TransformComponent.hpp"
 #include "Core/StateSharedData.hpp"
 #include "Core/CameraGameObject.hpp"
+#include "Core/LightGameObject.hpp"
+#include "Core/LightComponent.hpp"
+#include "Light/Shadow.hpp"
 #include "Camera/Camera.hpp"
 #include "Mesh/Mesh.hpp"
 #include "Container/Stack.hpp"
@@ -207,13 +210,6 @@ RenderObjectsTask::~RenderObjectsTask()
 	_RenderObjectsTaskData = nullptr;
 }
 
-void RenderObjectsTask::DoSetup()
-{
-	StateSharedData* SharedData = _RenderObjectsTaskData->GetSharedData();
-	if (SharedData->Camera)
-		_RenderObjectsTaskData->SetCamera(SharedData->Camera->GetCameraComponent()->GetCamera());
-}
-
 void RenderObjectsTask::DoExecute()
 {
 	if (!(_RenderObjectsTaskData->GetSharedData()->GraphicGameObjects && _RenderObjectsTaskData->GetSharedData()->GraphicGameObjects->size())) // REMOVE THIS
@@ -226,7 +222,7 @@ void RenderObjectsTask::DoExecute()
 	RenderTargetCollection& RenderTargetCollectionObj = _RenderObjectsTaskData->GetRenderTargetCollection();
 	
 	//RenderTarget* NullRenderTargets[] = { nullptr, nullptr, nullptr, nullptr, nullptr }; // REMOVE THIS
-	RenderTarget* NullRenderTargets[] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr }; // REMOVE THIS
+	RenderTarget* NullRenderTargets[] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr }; // REMOVE THIS
 	
 	Context& ContextObj = _RenderObjectsTaskData->GetContexts().Get();
 
@@ -360,4 +356,28 @@ void RenderObjectsTask::_Draw(_In_ Context& ContextObj, _In_ Mesh& MeshObj, _In_
 	}
 
 	_RenderObjectsTaskData->GetTransformStack().Pop();
+}
+
+RenderOpaqueObjectsTask::RenderOpaqueObjectsTask(_In_ const GraphicTaskConfig& Config, _In_ ContextCollection& Contexts, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates, _In_ StateSharedData* SharedData)
+	: RenderObjectsTask(Config, Contexts, RenderTargets, Samplers, Viewports, BlendStates, SharedData)
+{
+}
+
+void RenderOpaqueObjectsTask::DoSetup()
+{
+	StateSharedData* SharedData = _RenderObjectsTaskData->GetSharedData();
+	if (SharedData->Camera)
+		_RenderObjectsTaskData->SetCamera(SharedData->Camera->GetCameraComponent()->GetCamera());
+}
+
+RenderObjectsShadowTask::RenderObjectsShadowTask(_In_ const GraphicTaskConfig& Config, _In_ ContextCollection& Contexts, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates, _In_ StateSharedData* SharedData)
+	: RenderObjectsTask(Config, Contexts, RenderTargets, Samplers, Viewports, BlendStates, SharedData)
+{
+}
+
+void RenderObjectsShadowTask::DoSetup()
+{
+	StateSharedData* SharedData = _RenderObjectsTaskData->GetSharedData();
+	if (SharedData->Lights)
+		_RenderObjectsTaskData->SetCamera((Camera*)SharedData->Lights[GetInstanceID()].GetLightComponent()->GetShadow());
 }
