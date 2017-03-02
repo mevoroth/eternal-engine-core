@@ -50,25 +50,25 @@ void AutoRecompileShaderTask::DoSetup()
 
 void AutoRecompileShaderTask::DoExecute()
 {
-	vector<string>& ShaderPaths = ShaderFactory::Get()->GetShaderPaths();
-	FILE_NOTIFY_INFORMATION FileNotifyInformation[1024];
+	//vector<string>& ShaderPaths = ShaderFactory::Get()->GetShaderPaths();
+	//FILE_NOTIFY_INFORMATION FileNotifyInformation[1024];
 
-	for (;;)
-	{
-		DWORD BytesReturned;
-		for (int ShaderPathIndex = 0; ShaderPathIndex < ShaderPaths.size(); ++ShaderPathIndex)
-		{
-			if (!ReadDirectoryChangesW(_DirectoryHandles[ShaderPathIndex], &FileNotifyInformation, 1024, FALSE, FILE_NOTIFY_CHANGE_LAST_WRITE, &BytesReturned, nullptr, nullptr))
-			{
-				OutputDebugString("error");
-			}
-			else
-			{
-				OutputDebugString("ok");
-				ETERNAL_ASSERT(false);
-			}
-		}
-	}
+	//for (;;)
+	//{
+	//	DWORD BytesReturned;
+	//	for (int ShaderPathIndex = 0; ShaderPathIndex < ShaderPaths.size(); ++ShaderPathIndex)
+	//	{
+	//		if (!ReadDirectoryChangesW(_DirectoryHandles[ShaderPathIndex], &FileNotifyInformation, 1024, FALSE, FILE_NOTIFY_CHANGE_LAST_WRITE, &BytesReturned, nullptr, nullptr))
+	//		{
+	//			OutputDebugString("error");
+	//		}
+	//		else
+	//		{
+	//			OutputDebugString("ok");
+	//			ETERNAL_ASSERT(false);
+	//		}
+	//	}
+	//}
 
 	//vector<string>& ShaderPaths = ShaderFactory::Get()->GetShaderPaths();
 	//DWORD ObjectIndex = WaitForMultipleObjects(_FilesWatchHandlesCount, _FilesWatchHandles, FALSE, INFINITE);

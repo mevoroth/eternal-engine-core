@@ -57,9 +57,9 @@ namespace Eternal
 		class RenderObjectsTaskData
 		{
 		public:
-			RenderObjectsTaskData(_In_ const GraphicTaskConfig& Config, _In_ ContextCollection& Contexts, _In_ RenderTargetCollection& RenderTargetCollectionObj, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates, _In_ StateSharedData* SharedData)
+			RenderObjectsTaskData(_In_ const GraphicTaskConfig& Config, _In_ ContextCollection& Contexts, _In_ RenderTargetCollection& RenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ BlendStateCollection& BlendStates, _In_ StateSharedData* SharedData)
 				: _Contexts(Contexts)
-				, _RenderTargetCollection(RenderTargetCollectionObj)
+				, _RenderTargets(RenderTargets)
 				, _SharedData(SharedData)
 			{
 				ETERNAL_ASSERT(_SharedData);
@@ -107,9 +107,9 @@ namespace Eternal
 				return _Contexts;
 			}
 
-			RenderTargetCollection& GetRenderTargetCollection()
+			RenderTargetCollection& GetRenderTargets()
 			{
-				return _RenderTargetCollection;
+				return _RenderTargets;
 			}
 
 			Constant* GetFrameConstants()
@@ -182,7 +182,7 @@ namespace Eternal
 
 			StateSharedData* _SharedData = nullptr;
 			ContextCollection& _Contexts;
-			RenderTargetCollection& _RenderTargetCollection;
+			RenderTargetCollection& _RenderTargets;
 			GraphicObjects* _Objects = nullptr;
 			Shader* _VS = nullptr;
 			Shader* _PS = nullptr;
@@ -219,7 +219,7 @@ void RenderObjectsTask::DoExecute()
 
 	vector<GraphicGameObject*>& GameObjects = *_RenderObjectsTaskData->GetSharedData()->GraphicGameObjects;
 	TransformStack& TransformStackObj = _RenderObjectsTaskData->GetTransformStack();
-	RenderTargetCollection& RenderTargetCollectionObj = _RenderObjectsTaskData->GetRenderTargetCollection();
+	RenderTargetCollection& RenderTargets = _RenderObjectsTaskData->GetRenderTargets();
 	
 	//RenderTarget* NullRenderTargets[] = { nullptr, nullptr, nullptr, nullptr, nullptr }; // REMOVE THIS
 	RenderTarget* NullRenderTargets[] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr }; // REMOVE THIS
@@ -233,11 +233,11 @@ void RenderObjectsTask::DoExecute()
 	ContextObj.SetTopology(Context::TRIANGLELIST);
 	ContextObj.SetViewport(_RenderObjectsTaskData->GetViewport());
 	ContextObj.SetBlendMode(_RenderObjectsTaskData->GetBlendState());
-	ContextObj.SetDepthBuffer(RenderTargetCollectionObj.GetDepthStencilRenderTarget());
+	ContextObj.SetDepthBuffer(RenderTargets.GetDepthStencilRenderTarget());
 	ContextObj.BindDepthStencilState(_RenderObjectsTaskData->GetDepthStencil());
 
-	if (RenderTargetCollectionObj.GetRenderTargetsCount())
-		ContextObj.SetRenderTargets(RenderTargetCollectionObj.GetRenderTargets(), RenderTargetCollectionObj.GetRenderTargetsCount());
+	if (RenderTargets.GetRenderTargetsCount())
+		ContextObj.SetRenderTargets(RenderTargets.GetRenderTargets(), RenderTargets.GetRenderTargetsCount());
 	
 	ContextObj.BindSampler<Context::PIXEL>(0, _RenderObjectsTaskData->GetSampler());
 	ContextObj.BindShader<Context::VERTEX>(_RenderObjectsTaskData->GetVS());
@@ -248,6 +248,8 @@ void RenderObjectsTask::DoExecute()
 	TransformStackObj.Push(NewIdentity());
 	for (int GameObjectIndex = 0; GameObjectIndex < GameObjects.size(); ++GameObjectIndex) // Parallel For?
 	{
+		if (GameObjectIndex == 1 && _RenderObjectsTaskData->GetPS() == ShaderFactory::Get()->CreatePixelShader("OpaqueDepthOnly", "opaque.ps.hlsl"))
+			break;
 		Mesh* CurrentMesh = GameObjects[GameObjectIndex]->GetMeshComponent()->GetMesh();
 		Material* CurrentMaterial = GameObjects[GameObjectIndex]->GetMaterialComponent()->GetMaterial();
 		CurrentMaterial->Apply(ContextObj);
@@ -269,7 +271,7 @@ void RenderObjectsTask::DoExecute()
 	ContextObj.UnbindShader<Context::PIXEL>();
 	ContextObj.UnbindSampler<Context::PIXEL>(0);
 	
-	if (RenderTargetCollectionObj.GetRenderTargetsCount())
+	if (RenderTargets.GetRenderTargetsCount())
 		ContextObj.SetRenderTargets(NullRenderTargets, ETERNAL_ARRAYSIZE(NullRenderTargets));	// REMOVE THIS
 	
 	ContextObj.UnbindDepthStencilState();

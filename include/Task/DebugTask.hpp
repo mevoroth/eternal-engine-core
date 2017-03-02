@@ -7,48 +7,35 @@
 
 namespace Eternal
 {
-	namespace Graphics
+	namespace GraphicData
 	{
-		class Context;
-		class VertexBuffer;
-		class Shader;
-		class RenderTarget;
-		class Constant;
+		class ContextCollection;
+		class RenderTargetCollection;
+		class SamplerCollection;
+		class ViewportCollection;
+		class StateSharedData;
 	}
 	namespace Task
 	{
-		using namespace Eternal::Graphics;
+		using namespace Eternal::GraphicData;
 		using namespace Eternal::Parallel;
 		using namespace Eternal::Types;
+
+		class DebugTaskData;
 
 		class DebugTask : public Task
 		{
 		public:
-			DebugTask(Context& ContextObj);
+			DebugTask(_In_ ContextCollection& Contexts, _In_ RenderTargetCollection& OpaqueRenderTargets, _In_ SamplerCollection& Samplers, _In_ ViewportCollection& Viewports, _In_ StateSharedData* SharedData);
 
 			virtual void DoSetup() override;
 			virtual void DoReset() override;
 			virtual void DoExecute() override;
 
-			void SetRenderTarget(RenderTarget* RenderTargetObj);
-			void SetModelViewProjectionMatrix(const Matrix4x4& ModelViewProjectionMatrix);
-
 		private:
+			DebugTaskData*  _DebugTaskData = nullptr;
+
 			void _DrawGizmo();
-
-			Context& _Context;
-
-			VertexBuffer* _AxisGizmoVerticesBuffer = nullptr;
-			//vector<Graphics::D3D11PosColorVertexBuffer::PosColorVertex> _AxisGizmoVertices;
-
-			Shader* _VS = nullptr;
-			Shader* _PS = nullptr;
-
-			Constant* _ModelViewProjectionMatrixConstant = nullptr;
-
-			RenderTarget* _RenderTarget = nullptr;
-
-			Matrix4x4 _ModelViewProjectionMatrix;
 		};
 	}
 }
