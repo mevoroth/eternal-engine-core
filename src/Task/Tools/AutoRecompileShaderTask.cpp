@@ -14,6 +14,7 @@ using namespace Eternal::Graphics;
 
 AutoRecompileShaderTask::AutoRecompileShaderTask()
 {
+	return;
 	vector<string>& ShaderPaths = ShaderFactory::Get()->GetShaderPaths();
 	_FilesWatchHandlesCount = ShaderPaths.size();
 	_FilesWatchHandles = new void*[_FilesWatchHandlesCount];

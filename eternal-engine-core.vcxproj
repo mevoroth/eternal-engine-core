@@ -170,10 +170,14 @@
     <ClInclude Include="include\Task\Graphics\CompositingTask.hpp" />
     <ClInclude Include="include\Task\Graphics\InitFrameTask.hpp" />
     <ClInclude Include="include\Task\Graphics\LightingTask.hpp" />
-    <ClInclude Include="include\Task\Graphics\RenderObjectsTask.hpp" />
+    <ClInclude Include="include\Task\Graphics\RenderObjectsTask.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="include\Task\Graphics\SwapFrameTask.hpp" />
     <ClInclude Include="include\Task\ImguiBeginTask.hpp" />
     <ClInclude Include="include\Task\ImguiEndTask.hpp" />
+    <ClInclude Include="include\Task\NextGenGraphics\GraphicTask.hpp" />
+    <ClInclude Include="include\Task\NextGenGraphics\RenderObjectsTask.hpp" />
     <ClInclude Include="include\Task\TimeTask.hpp" />
     <ClInclude Include="include\Task\Tools\AutoRecompileShaderTask.hpp" />
   </ItemGroup>
@@ -199,12 +203,16 @@
     <ClCompile Include="src\Task\DebugTask.cpp" />
     <ClCompile Include="src\Task\Graphics\CompositingTask.cpp" />
     <ClCompile Include="src\Task\Graphics\InitFrameTask.cpp" />
-    <ClCompile Include="src\Task\Graphics\RenderObjectsTask.cpp" />
+    <ClCompile Include="src\Task\Graphics\RenderObjectsTask.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\Task\Graphics\LightingTask.cpp" />
     <ClCompile Include="src\Task\Graphics\SwapFrameTask.cpp" />
     <ClCompile Include="src\Task\ImguiBeginTask.cpp" />
     <ClCompile Include="src\Task\ImguiEndTask.cpp" />
     <ClCompile Include="src\Task\ControlsTask.cpp" />
+    <ClCompile Include="src\Task\NextGenGraphics\RenderObjectsTask.cpp" />
+    <ClCompile Include="src\Task\NextGenGraphics\GraphicTask.cpp" />
     <ClCompile Include="src\Task\Task\GameStateTask.cpp" />
     <ClCompile Include="src\Task\TimeTask.cpp" />
     <ClCompile Include="src\Task\Tools\AutoRecompileShaderTask.cpp" />

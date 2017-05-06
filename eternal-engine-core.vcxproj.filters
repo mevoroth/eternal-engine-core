@@ -28,6 +28,9 @@
     <Filter Include="Task\Tools">
       <UniqueIdentifier>{85b89528-88a3-4b05-b7db-c22923bc8480}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Task\NextGenGraphics">
+      <UniqueIdentifier>{cddc970c-fb5c-4f58-8a53-e4ca0c205f22}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Game.hpp">
@@ -137,6 +140,12 @@
     <ClInclude Include="include\Core\ShadowComponent.hpp">
       <Filter>Core</Filter>
     </ClInclude>
+    <ClInclude Include="include\Task\NextGenGraphics\RenderObjectsTask.hpp">
+      <Filter>Task\NextGenGraphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Task\NextGenGraphics\GraphicTask.hpp">
+      <Filter>Task\NextGenGraphics</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Game.cpp">
@@ -226,6 +235,12 @@
     </ClCompile>
     <ClCompile Include="src\GameData\GraphicGameObjectInstanceGameData.cpp">
       <Filter>GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task\NextGenGraphics\RenderObjectsTask.cpp">
+      <Filter>Task\NextGenGraphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task\NextGenGraphics\GraphicTask.cpp">
+      <Filter>Task\NextGenGraphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

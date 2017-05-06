@@ -1,12 +1,13 @@
 #include "GameState/CoreState.hpp"
 
 #include "Platform/WindowsProcess.hpp"
-#include "Graphics/DeviceFactory.hpp"
-#include "Graphics/RendererFactory.hpp"
-#include "Graphics/Device.hpp"
-#include "Graphics/Renderer.hpp"
-#include "Graphics/ShaderFactory.hpp"
-#include "Graphics/ShaderFactoryFactory.hpp"
+#include "Window/Window.hpp"
+#include "NextGenGraphics/DeviceFactory.hpp"
+#include "NextGenGraphics/Device.hpp"
+//#include "Graphics/RendererFactory.hpp"
+//#include "Graphics/Renderer.hpp"
+//#include "Graphics/ShaderFactory.hpp"
+//#include "Graphics/ShaderFactoryFactory.hpp"
 #include "Graphics/Format.hpp"
 #include "Input/InputFactory.hpp"
 #include "Time/TimeFactory.hpp"
@@ -19,16 +20,18 @@
 #include "Task/TimeTask.hpp"
 #include "Task/Core/UpdateComponentTask.hpp"
 #include "Task/Core/GameStateTask.hpp"
-#include "Task/Graphics/InitFrameTask.hpp"
-#include "Task/Graphics/RenderObjectsTask.hpp"
-#include "Task/Graphics/LightingTask.hpp"
-#include "Task/Graphics/CompositingTask.hpp"
-#include "Task/Graphics/SwapFrameTask.hpp"
+//#include "Task/Graphics/InitFrameTask.hpp"
+//#include "Task/Graphics/RenderObjectsTask.hpp"
+//#include "Task/Graphics/LightingTask.hpp"
+//#include "Task/Graphics/CompositingTask.hpp"
+//#include "Task/Graphics/SwapFrameTask.hpp"
+#include "Task/NextGenGraphics/RenderObjectsTask.hpp"
 #include "Resources/Pool.hpp"
 #include "Resources/TextureFactory.hpp"
 #include "Core/TransformComponent.hpp"
 #include "Core/CameraComponent.hpp"
 #include "Core/LightComponent.hpp"
+#include "GraphicData/GraphicResources.hpp"
 #include "GraphicData/ContextCollection.hpp"
 #include "GraphicData/RenderTargetCollection.hpp"
 #include "GraphicData/SamplerCollection.hpp"
@@ -99,13 +102,15 @@ namespace Eternal
 			WindowsProcess::SetInputHandler(_KeyboardInput);
 			_WindowsProcess = new WindowsProcess();
 
-			_Device = CreateDevice(WINDOWS, WindowsProcess::WindowProc, _hInstance, _nCmdShow, "ReShield", "EternalClass");
-			_Renderer = CreateRenderer(RENDERER_D3D11);
+			_Window = new Window(_hInstance, _nCmdShow, "ReShield", "EternalClass", 1280, 720);
+			_Device = CreateDevice(VULKAN, *_Window);
+			//_Device = CreateDevice(WINDOWS, WindowsProcess::WindowProc, _hInstance, _nCmdShow, "ReShield", "EternalClass");
+			//_Renderer = CreateRenderer(RENDERER_D3D11);
 
-			_InitializeGraphicContexts();
+			//_InitializeGraphicContexts();
 
-			_ShaderFactory = CreateShaderFactory(SHADER_FACTORY_D3D11);
-			_ShaderFactory->RegisterShaderPath(_Settings.ShaderIncludePath);
+			//_ShaderFactory = CreateShaderFactory(SHADER_FACTORY_D3D11);
+			//_ShaderFactory->RegisterShaderPath(_Settings.ShaderIncludePath);
 
 			_ImportFbx = new ImportFbx();
 			_ImportFbx->RegisterPath(_Settings.FBXPath);
@@ -120,6 +125,9 @@ namespace Eternal
 
 			_TaskManager = new TaskManager();
 
+			_GraphicResources = new GraphicResources();
+			_GraphicResources->Initialize(*_Device);
+
 			_InitializeGraphicTaskConfigs();
 			_InitializeViewports();
 			_InitializeBlendStates();
@@ -132,36 +140,7 @@ namespace Eternal
 			_GameDatas = new GameDatas();
 			_SaveSystem->SetGameDataLoader(_GameDatas);
 
-			_TaskManager->GetTaskScheduler().PushTask(_AutoRecompileShaderTask);
-			_TaskManager->GetTaskScheduler().PushTask(_ControlsTask);
-			_TaskManager->GetTaskScheduler().PushTask(_TimeTask);
-			_TaskManager->GetTaskScheduler().PushTask(_InitFrameTask);
-			{
-				_TaskManager->GetTaskScheduler().PushTask(_UpdateTransformComponentTask, _ControlsTask);
-				_TaskManager->GetTaskScheduler().PushTask(_UpdateTransformComponentTask, _TimeTask);
-			}
-			_TaskManager->GetTaskScheduler().PushTask(_UpdateCameraComponentTask, _UpdateTransformComponentTask);
-			_TaskManager->GetTaskScheduler().PushTask(_UpdateLightComponentTask, _UpdateTransformComponentTask);
-			{
-				_TaskManager->GetTaskScheduler().PushTask(_ImguiBeginTask, _ControlsTask);
-				_TaskManager->GetTaskScheduler().PushTask(_ImguiBeginTask, _TimeTask);
-			}
-			{
-				_TaskManager->GetTaskScheduler().PushTask(_GameStateTask, _UpdateCameraComponentTask);
-				_TaskManager->GetTaskScheduler().PushTask(_GameStateTask, _ImguiBeginTask);
-			}
-			{
-				_TaskManager->GetTaskScheduler().PushTask(_OpaqueTask, _InitFrameTask);
-				_TaskManager->GetTaskScheduler().PushTask(_OpaqueTask, _GameStateTask);
-			}
-			{
-				_TaskManager->GetTaskScheduler().PushTask(_ShadowTask, _UpdateLightComponentTask);
-				_TaskManager->GetTaskScheduler().PushTask(_ShadowTask, _GameStateTask);
-			}
-			_TaskManager->GetTaskScheduler().PushTask(_LightingTask, _OpaqueTask);
-			_TaskManager->GetTaskScheduler().PushTask(_CompositingTask, _LightingTask);
-			_TaskManager->GetTaskScheduler().PushTask(_ImguiEndTask, _CompositingTask);
-			_TaskManager->GetTaskScheduler().PushTask(_SwapFrameTask, _ImguiEndTask);
+			_ScheduleTasks();
 		}
 		
 		void CoreState::Update()
@@ -195,11 +174,11 @@ namespace Eternal
 			delete _TaskManager;
 			_TaskManager = nullptr;
 
-			delete _ShaderFactory;
-			_ShaderFactory = nullptr;
+			//delete _ShaderFactory;
+			//_ShaderFactory = nullptr;
 
-			delete _Renderer;
-			_Renderer = nullptr;
+			//delete _Renderer;
+			//_Renderer = nullptr;
 
 			delete _Device;
 			_Device = nullptr;
@@ -251,15 +230,15 @@ namespace Eternal
 			ControlsTaskObj->RegisterInput(_KeyboardInput);
 			_ControlsTask = ControlsTaskObj;
 
-			ImguiBeginTask* ImguiBeginTaskObj = new ImguiBeginTask(_Device->GetWindow(), Device::WIDTH, Device::HEIGHT);
-			ImguiBeginTaskObj->SetTaskName("Imgui Begin Task");
-			ImguiBeginTaskObj->SetupKeyboard(_KeyboardInput);
-			_ImguiBeginTask = ImguiBeginTaskObj;
+			//ImguiBeginTask* ImguiBeginTaskObj = new ImguiBeginTask(_Device->GetWindow(), Device::WIDTH, Device::HEIGHT);
+			//ImguiBeginTaskObj->SetTaskName("Imgui Begin Task");
+			//ImguiBeginTaskObj->SetupKeyboard(_KeyboardInput);
+			//_ImguiBeginTask = ImguiBeginTaskObj;
 
-			ImguiEndTask* ImguiEndTaskObj = new ImguiEndTask(*_ContextCollection, *_SamplerCollection, *_ViewportCollection);
-			ImguiEndTaskObj->SetTaskName("Imgui End Task");
-			ImguiEndTaskObj->SetRenderTarget(_Renderer->GetBackBuffer());
-			_ImguiEndTask = ImguiEndTaskObj;
+			//ImguiEndTask* ImguiEndTaskObj = new ImguiEndTask(*_ContextCollection, *_SamplerCollection, *_ViewportCollection);
+			//ImguiEndTaskObj->SetTaskName("Imgui End Task");
+			//ImguiEndTaskObj->SetRenderTarget(_Renderer->GetBackBuffer());
+			//_ImguiEndTask = ImguiEndTaskObj;
 
 			TimeTask* TimeTaskObj = new TimeTask(_Time);
 			TimeTaskObj->SetTaskName("Time Task");
@@ -287,36 +266,81 @@ namespace Eternal
 				_LightRenderTargets,
 				_ShadowRenderTargets
 			};
-			InitFrameTask* InitFrameTaskObj = new InitFrameTask(*_Renderer, *_ContextCollection, RenderTargetCollections, ETERNAL_ARRAYSIZE(RenderTargetCollections));
-			InitFrameTaskObj->SetTaskName("Init Frame Task");
-			_InitFrameTask = InitFrameTaskObj;
-			
-			RenderObjectsTask* OpaqueTaskObj = new RenderOpaqueObjectsTask(_GraphictaskConfigCollection->GetGraphicTaskConfig(GraphicTaskConfigCollection::OPAQUE_TASK),
-				*_ContextCollection, *_OpaqueRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection, GetSharedData());
-			OpaqueTaskObj->SetTaskName("Opaque Task (Render Objects)");
+			//InitFrameTask* InitFrameTaskObj = new InitFrameTask(*_Renderer, *_ContextCollection, RenderTargetCollections, ETERNAL_ARRAYSIZE(RenderTargetCollections));
+			//InitFrameTaskObj->SetTaskName("Init Frame Task");
+			//_InitFrameTask = InitFrameTaskObj;
+			//
+			//RenderObjectsTask* OpaqueTaskObj = new RenderOpaqueObjectsTask(_GraphictaskConfigCollection->GetGraphicTaskConfig(GraphicTaskConfigCollection::OPAQUE_TASK),
+			//	*_ContextCollection, *_OpaqueRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection, GetSharedData());
+			//OpaqueTaskObj->SetTaskName("Opaque Task (Render Objects)");
+			//_OpaqueTask = OpaqueTaskObj;
+
+			//RenderObjectsTask* ShadowTaskObj = new RenderObjectsShadowTask(_GraphictaskConfigCollection->GetGraphicTaskConfig(GraphicTaskConfigCollection::SHADOW_TASK),
+			//	*_ContextCollection, *_ShadowRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection, GetSharedData());
+			//ShadowTaskObj->SetTaskName("Shadow Task (Render Objects)");
+			//_ShadowTask = ShadowTaskObj;
+
+			//LightingTask* LightingTaskObj = new LightingTask(*_ContextCollection, *_OpaqueRenderTargets, *_ShadowRenderTargets, *_LightRenderTargets, *_SamplerCollection, *_ViewportCollection, GetSharedData());
+			//LightingTaskObj->SetTaskName("Lighting Task");
+			//_LightingTask = LightingTaskObj;
+
+			//CompositingTask* CompositingTaskObj = new CompositingTask(*_ContextCollection, *_OpaqueRenderTargets, *_LightRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection);
+			//CompositingTaskObj->SetTaskName("Compositing Task");
+			//_CompositingTask = CompositingTaskObj;
+
+			//SwapFrameTask* SwapFrameTaskObj = new SwapFrameTask(*_Renderer, *_Renderer->GetMainContext(), *_ContextCollection);
+			//SwapFrameTaskObj->SetTaskName("Swap Frame Task");
+			//_SwapFrameTask = SwapFrameTaskObj;
+
+#pragma region NextGenGraphics
+			RenderObjectsTask* OpaqueTaskObj = new RenderObjectsTask(*_Device, _GraphicResources, GetSharedData());
+			OpaqueTaskObj->SetTaskName("Render Object Task (Opaque Task)");
 			_OpaqueTask = OpaqueTaskObj;
-
-			RenderObjectsTask* ShadowTaskObj = new RenderObjectsShadowTask(_GraphictaskConfigCollection->GetGraphicTaskConfig(GraphicTaskConfigCollection::SHADOW_TASK),
-				*_ContextCollection, *_ShadowRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection, GetSharedData());
-			ShadowTaskObj->SetTaskName("Shadow Task (Render Objects)");
-			_ShadowTask = ShadowTaskObj;
-
-			LightingTask* LightingTaskObj = new LightingTask(*_ContextCollection, *_OpaqueRenderTargets, *_ShadowRenderTargets, *_LightRenderTargets, *_SamplerCollection, *_ViewportCollection, GetSharedData());
-			LightingTaskObj->SetTaskName("Lighting Task");
-			_LightingTask = LightingTaskObj;
-
-			CompositingTask* CompositingTaskObj = new CompositingTask(*_ContextCollection, *_OpaqueRenderTargets, *_LightRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection);
-			CompositingTaskObj->SetTaskName("Compositing Task");
-			_CompositingTask = CompositingTaskObj;
-
-			SwapFrameTask* SwapFrameTaskObj = new SwapFrameTask(*_Renderer, *_Renderer->GetMainContext(), *_ContextCollection);
-			SwapFrameTaskObj->SetTaskName("Swap Frame Task");
-			_SwapFrameTask = SwapFrameTaskObj;
+#pragma endregion NextGenGraphics
 
 			AutoRecompileShaderTask* AutoRecompileShaderTaskObj = new AutoRecompileShaderTask();
 			AutoRecompileShaderTaskObj->SetTaskName("Auto Recompile Shader Task");
 			AutoRecompileShaderTaskObj->SetFrameConstraint(false);
 			_AutoRecompileShaderTask = AutoRecompileShaderTaskObj;
+		}
+
+		void CoreState::_ScheduleTasks()
+		{
+			TaskManager& Scheduler = *_TaskManager;
+			Scheduler().PushTask(_AutoRecompileShaderTask);
+			Scheduler().PushTask(_ControlsTask);
+			Scheduler().PushTask(_TimeTask);
+			//Scheduler().PushTask(_InitFrameTask);
+			{
+				Scheduler().PushTask(_UpdateTransformComponentTask, _ControlsTask);
+				Scheduler().PushTask(_UpdateTransformComponentTask, _TimeTask);
+			}
+			Scheduler().PushTask(_UpdateCameraComponentTask, _UpdateTransformComponentTask);
+			Scheduler().PushTask(_UpdateLightComponentTask, _UpdateTransformComponentTask);
+			//{
+			//	Scheduler().PushTask(_ImguiBeginTask, _ControlsTask);
+			//	Scheduler().PushTask(_ImguiBeginTask, _TimeTask);
+			//}
+			{
+				Scheduler().PushTask(_GameStateTask, _UpdateCameraComponentTask);
+				//Scheduler().PushTask(_GameStateTask, _ImguiBeginTask);
+			}
+			//{
+			//	Scheduler().PushTask(_OpaqueTask, _InitFrameTask);
+			//	Scheduler().PushTask(_OpaqueTask, _GameStateTask);
+			//}
+			//{
+			//	Scheduler().PushTask(_ShadowTask, _UpdateLightComponentTask);
+			//	Scheduler().PushTask(_ShadowTask, _GameStateTask);
+			//}
+			//Scheduler().PushTask(_LightingTask, _OpaqueTask);
+			//Scheduler().PushTask(_CompositingTask, _LightingTask);
+			//Scheduler().PushTask(_ImguiEndTask, _CompositingTask);
+			//Scheduler().PushTask(_SwapFrameTask, _ImguiEndTask);
+
+#pragma region NextGenGraphics
+			Scheduler().PushTask(_OpaqueTask, _GameStateTask);
+#pragma endregion NextGenGraphics
 		}
 
 		void CoreState::_ReleaseTasks()
@@ -363,7 +387,7 @@ namespace Eternal
 
 		void CoreState::_InitializeGraphicContexts()
 		{
-			_ContextCollection = new ContextCollection(*_Renderer, (int)CpuCoreCount());
+			//_ContextCollection = new ContextCollection(*_Renderer, (int)CpuCoreCount());
 		}
 
 		void CoreState::_ReleaseGraphicContexts()

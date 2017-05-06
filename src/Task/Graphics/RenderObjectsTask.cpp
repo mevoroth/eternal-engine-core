@@ -337,11 +337,11 @@ void RenderObjectsTask::_Draw(_In_ Context& ContextObj, _In_ Mesh& MeshObj, _In_
 		ContextObj.BindConstant<Context::VERTEX>(1, _RenderObjectsTaskData->GetObjectConstants());
 
 		// REMOVE THIS
-		ContextObj.BindBuffer<Context::PIXEL>(0, MeshObj._Diffuse->GetAsResource());
-		ContextObj.BindBuffer<Context::PIXEL>(1, MeshObj._Specular->GetAsResource());
-		ContextObj.BindBuffer<Context::PIXEL>(3, MeshObj._Normal->GetAsResource());
-		
-		ContextObj.DrawIndexedInstanced(MeshObj.GetVertexBuffer(), MeshObj.GetIndexBuffer(), InstanceCount);
+		//ContextObj.BindBuffer<Context::PIXEL>(0, MeshObj._Diffuse->GetAsResource());
+		//ContextObj.BindBuffer<Context::PIXEL>(1, MeshObj._Specular->GetAsResource());
+		//ContextObj.BindBuffer<Context::PIXEL>(3, MeshObj._Normal->GetAsResource());
+		//
+		//ContextObj.DrawIndexedInstanced(MeshObj.GetVertexBuffer(), MeshObj.GetIndexBuffer(), InstanceCount);
 
 		ContextObj.UnbindConstant<Context::PIXEL>(1);
 		ContextObj.UnbindConstant<Context::VERTEX>(1);

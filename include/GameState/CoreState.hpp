@@ -14,10 +14,11 @@ namespace Eternal
 {
 	namespace Graphics
 	{
+		class Window;
 		class Device;
-		class Renderer;
-		class ShaderFactory;
-		class Context;
+		//class Renderer;
+		//class ShaderFactory;
+		//class Context;
 	}
 	namespace Input
 	{
@@ -51,6 +52,8 @@ namespace Eternal
 	}
 	namespace GraphicData
 	{
+		class GraphicResources;
+
 		class GraphicTaskConfigCollection;
 		class ContextCollection;
 		class RenderTargetCollection;
@@ -115,15 +118,16 @@ namespace Eternal
 			Eternal::Log::Log* _ConsoleLog = nullptr;
 			Eternal::Log::Log* _MultiChannelLog = nullptr;
 
+			Window*			_Window			= nullptr;
 			WindowsProcess* _WindowsProcess = nullptr;
 
 			Device* _Device = nullptr;
 			HINSTANCE _hInstance = nullptr;
 			int _nCmdShow = 0;
 
-			Renderer* _Renderer = nullptr;
+			//Renderer* _Renderer = nullptr;
 
-			ShaderFactory* _ShaderFactory = nullptr;
+			//ShaderFactory* _ShaderFactory = nullptr;
 
 			TaskManager* _TaskManager = nullptr;
 
@@ -147,6 +151,7 @@ namespace Eternal
 			Task* _LightingTask = nullptr;
 			Task* _CompositingTask = nullptr;
 			Task* _SwapFrameTask = nullptr;
+
 #ifdef ETERNAL_DEBUG
 			Task* _AutoRecompileShaderTask = nullptr;
 #endif
@@ -156,6 +161,8 @@ namespace Eternal
 			TextureFactory* _TextureFactory = nullptr;
 			Eternal::SaveSystem::SaveSystem* _SaveSystem = nullptr;
 			GameDatas* _GameDatas = nullptr;
+
+			GraphicResources* _GraphicResources = nullptr;
 
 			GraphicTaskConfigCollection* _GraphictaskConfigCollection = nullptr;
 			ContextCollection* _ContextCollection = nullptr;
@@ -167,6 +174,7 @@ namespace Eternal
 			BlendStateCollection* _BlendStateCollection = nullptr;
 			RenderingListCollection* _RenderingListCollection = nullptr;
 
+			void _ScheduleTasks();
 			void _InitializePools();
 			void _ReleasePools();
 			void _InitializeTasks();
