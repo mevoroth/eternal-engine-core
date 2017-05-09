@@ -1,5 +1,6 @@
 #include "Task/NextGenGraphics/RenderObjectsTask.hpp"
 
+#include <vector>
 #include "Core/StateSharedData.hpp"
 #include "Core/GraphicGameObject.hpp"
 #include "Core/MeshComponent.hpp"
@@ -8,9 +9,19 @@
 #include "Graphics/RootSignatureFactory.hpp"
 #include "Graphics/InputLayout.hpp"
 #include "Graphics/InputLayoutFactory.hpp"
+#include "Graphics/RenderPassFactory.hpp"
+#include "Graphics/Shader.hpp"
+#include "Graphics/PipelineFactory.hpp"
 #include "GraphicData/GraphicResources.hpp"
 #include "GraphicData/Viewports.hpp"
+#include "GraphicData/GraphicBuffers.hpp"
+#include "GraphicData/Shaders.hpp"
+#include "GraphicData/StaticSamplers.hpp"
 #include "Mesh/Mesh.hpp"
+
+#include "Graphics/DescriptorHeapFactory.hpp"
+#include "Graphics/RootSignature.hpp"
+//#include "Graphics"
 
 using namespace Eternal::Task;
 using namespace Eternal::Components;
@@ -35,10 +46,31 @@ namespace Eternal
 					InputLayout::UV_T
 				};
 
-				_Viewport		= Resources->GetViewports()->Get(FULLSCREEN);
+				vector<View*> RenderTargets;
+				RenderTargets.resize(GRAPHIC_BUFFER_NO_DEPTH_COUNT);
+				for (uint32_t GraphicBufferIndex = 0; GraphicBufferIndex < GRAPHIC_BUFFER_NO_DEPTH_COUNT; ++GraphicBufferIndex)
+				{
+					RenderTargets[GraphicBufferIndex] = Resources->GetGraphicBuffers()->Get((GraphicBufferKey)GraphicBufferIndex);
+				}
+
+				Sampler* BilinearSampler = Resources->GetStaticSamplers()->Get(SAMPLER_BILINEAR);
+
+				DescriptorHeap* ObjectInstanceData	= CreateDescriptorHeap(DeviceObj, ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER, 1, (RootSignatureAccess)(ROOT_SIGNATURE_IA | ROOT_SIGNATURE_VS | ROOT_SIGNATURE_PS));
+				DescriptorHeap* ObjectTextureSet	= CreateDescriptorHeap(DeviceObj, ROOT_SIGNATURE_PARAMETER_TEXTURE, 4, (RootSignatureAccess)(ROOT_SIGNATURE_IA | ROOT_SIGNATURE_VS | ROOT_SIGNATURE_PS));
+
+				DescriptorHeap* DescriptorHeaps[] =
+				{
+					ObjectInstanceData,
+					ObjectTextureSet
+				};
+
+				_Viewport		= Resources->GetViewports()->Get(VIEWPORT_FULLSCREEN);
 				_InputLayout	= CreateInputLayout(DeviceObj, DataTypes, ETERNAL_ARRAYSIZE(DataTypes));
-				_RootSignature	= CreateRootSignature(DeviceObj);
-				//_Pipeline		= CreatePipeline(DeviceObj, *_RootSignature, *_InputLayout, *(RenderPass*)nullptr, *(Shader*)nullptr);
+				_RootSignature	= CreateRootSignature(DeviceObj, &BilinearSampler, 1, DescriptorHeaps, ETERNAL_ARRAYSIZE(DescriptorHeaps), (RootSignatureAccess)(ROOT_SIGNATURE_IA | ROOT_SIGNATURE_VS | ROOT_SIGNATURE_PS));
+				_RenderPass		= CreateRenderPass(DeviceObj, RenderTargets, Resources->GetGraphicBuffers()->Get(GRAPHIC_BUFFER_DEPTH));
+				_VS				= Resources->GetShaders()->Get(SHADER_OPAQUE_VS);
+				_PS				= Resources->GetShaders()->Get(SHADER_OPAQUE_PS);
+				_Pipeline		= CreatePipeline(DeviceObj, *_RootSignature, *_InputLayout, *_RenderPass, *GetVS(), *GetPS(), *GetViewport());
 			}
 
 			Viewport* GetViewport() { return _Viewport; }
@@ -46,6 +78,8 @@ namespace Eternal
 			RenderPass* GetRenderPass() { return _RenderPass; }
 			RenderTarget* GetRenderTargets() { return _RenderTargets; }
 			StateSharedData* GetSharedData() { return _SharedData; }
+			Shader* GetVS() { return _VS; }
+			Shader* GetPS() { return _PS; }
 
 		private:
 			StateSharedData*	_SharedData		= nullptr;
@@ -55,6 +89,8 @@ namespace Eternal
 			RenderPass*			_RenderPass		= nullptr;
 			RenderTarget*		_RenderTargets	= nullptr;
 			InputLayout*		_InputLayout	= nullptr;
+			Shader*				_VS				= nullptr;
+			Shader*				_PS				= nullptr;
 		};
 	}
 }

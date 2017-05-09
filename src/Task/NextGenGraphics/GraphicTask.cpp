@@ -23,7 +23,7 @@ namespace Eternal
 		public:
 			GraphicTaskData(_In_ Device& DeviceObj, _In_ GraphicResources* Resources)
 			{
-				_CommandQueue = Resources->GetCommandQueues()->Get(GRAPHIC_QUEUE_0);
+				_CommandQueue		= Resources->GetCommandQueues()->Get(COMMAND_QUEUE_GRAPHIC_0);
 			}
 
 			CommandQueue*	GetCommandQueue()	{ return _CommandQueue; }

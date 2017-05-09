@@ -16,8 +16,8 @@ namespace Eternal
 	{
 		class Window;
 		class Device;
+		class ShaderFactory;
 		//class Renderer;
-		//class ShaderFactory;
 		//class Context;
 	}
 	namespace Input
@@ -121,13 +121,13 @@ namespace Eternal
 			Window*			_Window			= nullptr;
 			WindowsProcess* _WindowsProcess = nullptr;
 
-			Device* _Device = nullptr;
-			HINSTANCE _hInstance = nullptr;
-			int _nCmdShow = 0;
+			ShaderFactory* _ShaderFactory	= nullptr;
+
+			Device* _Device					= nullptr;
+			HINSTANCE _hInstance			= nullptr;
+			int _nCmdShow					= 0;
 
 			//Renderer* _Renderer = nullptr;
-
-			//ShaderFactory* _ShaderFactory = nullptr;
 
 			TaskManager* _TaskManager = nullptr;
 
@@ -165,13 +165,13 @@ namespace Eternal
 			GraphicResources* _GraphicResources = nullptr;
 
 			GraphicTaskConfigCollection* _GraphictaskConfigCollection = nullptr;
-			ContextCollection* _ContextCollection = nullptr;
-			SamplerCollection* _SamplerCollection = nullptr;
-			RenderTargetCollection* _OpaqueRenderTargets = nullptr;
-			RenderTargetCollection* _LightRenderTargets = nullptr;
-			RenderTargetCollection* _ShadowRenderTargets = nullptr;
-			ViewportCollection* _ViewportCollection = nullptr;
-			BlendStateCollection* _BlendStateCollection = nullptr;
+			//ContextCollection* _ContextCollection = nullptr;
+			//SamplerCollection* _SamplerCollection = nullptr;
+			//RenderTargetCollection* _OpaqueRenderTargets = nullptr;
+			//RenderTargetCollection* _LightRenderTargets = nullptr;
+			//RenderTargetCollection* _ShadowRenderTargets = nullptr;
+			//ViewportCollection* _ViewportCollection = nullptr;
+			//BlendStateCollection* _BlendStateCollection = nullptr;
 			RenderingListCollection* _RenderingListCollection = nullptr;
 
 			void _ScheduleTasks();
@@ -181,16 +181,16 @@ namespace Eternal
 			void _ReleaseTasks();
 			void _InitializeGraphicTaskConfigs();
 			void _ReleaseGraphicTaskConfigs();
-			void _InitializeGraphicContexts();
-			void _ReleaseGraphicContexts();
-			void _InitializeRenderTargets();
-			void _ReleaseRenderTargets();
-			void _InitializeSamplers();
-			void _ReleaseSamplers();
-			void _InitializeViewports();
-			void _ReleaseViewports();
-			void _InitializeBlendStates();
-			void _ReleaseBlendStates();
+			//void _InitializeGraphicContexts();
+			//void _ReleaseGraphicContexts();
+			//void _InitializeRenderTargets();
+			//void _ReleaseRenderTargets();
+			//void _InitializeSamplers();
+			//void _ReleaseSamplers();
+			//void _InitializeViewports();
+			//void _ReleaseViewports();
+			//void _InitializeBlendStates();
+			//void _ReleaseBlendStates();
 			void _InitializeRenderingLists();
 			void _ReleaseRenderingLists();
 		};

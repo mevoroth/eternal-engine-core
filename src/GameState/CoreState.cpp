@@ -4,6 +4,7 @@
 #include "Window/Window.hpp"
 #include "NextGenGraphics/DeviceFactory.hpp"
 #include "NextGenGraphics/Device.hpp"
+#include "NextGenGraphics/ShaderFactory.hpp"
 //#include "Graphics/RendererFactory.hpp"
 //#include "Graphics/Renderer.hpp"
 //#include "Graphics/ShaderFactory.hpp"
@@ -43,7 +44,7 @@
 #include "Import/tga/ImportTga.hpp"
 #include "SaveSystem/SaveSystem.hpp"
 #include "GameData/GameDatas.hpp"
-
+#include "File/FilePath.hpp"
 
 #ifdef ETERNAL_DEBUG
 #include "Task/Tools/AutoRecompileShaderTask.hpp"
@@ -67,6 +68,7 @@ namespace Eternal
 		using namespace Eternal::SaveSystem;
 		using namespace Eternal::GameData;
 		using namespace Eternal::Parallel;
+		using namespace Eternal::File;
 
 		CoreState::CoreState(_In_ const CoreStateSettings& Settings, _In_ HINSTANCE hInstance, _In_ int nCmdShow, _In_ GameState* InitialGameState)
 			: _Settings(Settings)
@@ -79,6 +81,8 @@ namespace Eternal
 
 		void CoreState::Begin()
 		{
+			FilePath::Register(_Settings.ShaderIncludePath, FilePath::SHADERS);
+
 			_Time = CreateTime(TimeType::WIN);
 
 			_FileLog = CreateLog(FILE, "Eternal");
@@ -110,7 +114,8 @@ namespace Eternal
 			//_InitializeGraphicContexts();
 
 			//_ShaderFactory = CreateShaderFactory(SHADER_FACTORY_D3D11);
-			//_ShaderFactory->RegisterShaderPath(_Settings.ShaderIncludePath);
+
+			_ShaderFactory = new ShaderFactory();
 
 			_ImportFbx = new ImportFbx();
 			_ImportFbx->RegisterPath(_Settings.FBXPath);
@@ -129,10 +134,10 @@ namespace Eternal
 			_GraphicResources->Initialize(*_Device);
 
 			_InitializeGraphicTaskConfigs();
-			_InitializeViewports();
-			_InitializeBlendStates();
-			_InitializeSamplers();
-			_InitializeRenderTargets();
+			//_InitializeViewports();
+			//_InitializeBlendStates();
+			//_InitializeSamplers();
+			//_InitializeRenderTargets();
 			_InitializePools();
 			_InitializeRenderingLists();
 			_InitializeTasks();
@@ -165,10 +170,10 @@ namespace Eternal
 			_ReleaseTasks();
 			_ReleaseRenderingLists();
 			_ReleasePools();
-			_ReleaseRenderTargets();
-			_ReleaseSamplers();
-			_ReleaseBlendStates();
-			_ReleaseViewports();
+			//_ReleaseRenderTargets();
+			//_ReleaseSamplers();
+			//_ReleaseBlendStates();
+			//_ReleaseViewports();
 			_ReleaseGraphicTaskConfigs();
 
 			delete _TaskManager;
@@ -260,12 +265,12 @@ namespace Eternal
 			GameStateTaskObj->SetTaskName("Game State Task");
 			_GameStateTask = GameStateTaskObj;
 
-			RenderTargetCollection* RenderTargetCollections[] =
-			{ 
-				_OpaqueRenderTargets,
-				_LightRenderTargets,
-				_ShadowRenderTargets
-			};
+			//RenderTargetCollection* RenderTargetCollections[] =
+			//{ 
+			//	_OpaqueRenderTargets,
+			//	_LightRenderTargets,
+			//	_ShadowRenderTargets
+			//};
 			//InitFrameTask* InitFrameTaskObj = new InitFrameTask(*_Renderer, *_ContextCollection, RenderTargetCollections, ETERNAL_ARRAYSIZE(RenderTargetCollections));
 			//InitFrameTaskObj->SetTaskName("Init Frame Task");
 			//_InitFrameTask = InitFrameTaskObj;
@@ -385,16 +390,16 @@ namespace Eternal
 			_ControlsTask = nullptr;
 		}
 
-		void CoreState::_InitializeGraphicContexts()
-		{
-			//_ContextCollection = new ContextCollection(*_Renderer, (int)CpuCoreCount());
-		}
+		//void CoreState::_InitializeGraphicContexts()
+		//{
+		//	_ContextCollection = new ContextCollection(*_Renderer, (int)CpuCoreCount());
+		//}
 
-		void CoreState::_ReleaseGraphicContexts()
-		{
-			delete _ContextCollection;
-			_ContextCollection = nullptr;
-		}
+		//void CoreState::_ReleaseGraphicContexts()
+		//{
+		//	delete _ContextCollection;
+		//	_ContextCollection = nullptr;
+		//}
 		
 		void CoreState::_InitializeGraphicTaskConfigs()
 		{
@@ -407,71 +412,71 @@ namespace Eternal
 			_GraphictaskConfigCollection = nullptr;
 		}
 		
-		void CoreState::_InitializeRenderTargets()
-		{
-			Format OpaqueFormat[] = {
-				BGRA8888,		// Diffuse
-				BGRA8888,		// Specular
-				BGRA8888,		// Emissive
-				BGRA8888,		// Normal
-				BGRA8888,		// Roughness
-				R32,			// W
-				RGBA32323232	// Debug: World position
-			};
-			_OpaqueRenderTargets = new RenderTargetCollection(1600, 900, ETERNAL_ARRAYSIZE(OpaqueFormat), OpaqueFormat, true);
-			Format LightFormat[] = {
-				RGBA8888
-			};
-			_LightRenderTargets = new RenderTargetCollection(1600, 900, ETERNAL_ARRAYSIZE(LightFormat), LightFormat);
-			//_ShadowRenderTargets = new RenderTargetCollection(2048, 2048);
-			Format ShadowFormat[] = {
-				R32
-			};
-			_ShadowRenderTargets = new RenderTargetCollection(2048, 2048, ETERNAL_ARRAYSIZE(ShadowFormat), ShadowFormat, true);
-		}
+		//void CoreState::_InitializeRenderTargets()
+		//{
+		//	Format OpaqueFormat[] = {
+		//		FORMAT_BGRA8888,	// Diffuse
+		//		FORMAT_BGRA8888,	// Specular
+		//		FORMAT_BGRA8888,	// Emissive
+		//		FORMAT_BGRA8888,	// Normal
+		//		FORMAT_BGRA8888,	// Roughness
+		//		FORMAT_R32,			// W
+		//		FORMAT_RGBA32323232	// Debug: World position
+		//	};
+		//	_OpaqueRenderTargets = new RenderTargetCollection(1600, 900, ETERNAL_ARRAYSIZE(OpaqueFormat), OpaqueFormat, true);
+		//	Format LightFormat[] = {
+		//		RGBA8888
+		//	};
+		//	_LightRenderTargets = new RenderTargetCollection(1600, 900, ETERNAL_ARRAYSIZE(LightFormat), LightFormat);
+		//	//_ShadowRenderTargets = new RenderTargetCollection(2048, 2048);
+		//	Format ShadowFormat[] = {
+		//		R32
+		//	};
+		//	_ShadowRenderTargets = new RenderTargetCollection(2048, 2048, ETERNAL_ARRAYSIZE(ShadowFormat), ShadowFormat, true);
+		//}
 
-		void CoreState::_ReleaseRenderTargets()
-		{
-			delete _OpaqueRenderTargets;
-			_OpaqueRenderTargets = nullptr;
-			delete _LightRenderTargets;
-			_LightRenderTargets = nullptr;
-			delete _ShadowRenderTargets;
-			_ShadowRenderTargets = nullptr;
-		}
+		//void CoreState::_ReleaseRenderTargets()
+		//{
+		//	delete _OpaqueRenderTargets;
+		//	_OpaqueRenderTargets = nullptr;
+		//	delete _LightRenderTargets;
+		//	_LightRenderTargets = nullptr;
+		//	delete _ShadowRenderTargets;
+		//	_ShadowRenderTargets = nullptr;
+		//}
 
-		void CoreState::_InitializeSamplers()
-		{
-			_SamplerCollection = new SamplerCollection();
-		}
+		//void CoreState::_InitializeSamplers()
+		//{
+		//	_SamplerCollection = new SamplerCollection();
+		//}
 
-		void CoreState::_ReleaseSamplers()
-		{
-			delete _SamplerCollection;
-			_SamplerCollection = nullptr;
-		}
+		//void CoreState::_ReleaseSamplers()
+		//{
+		//	delete _SamplerCollection;
+		//	_SamplerCollection = nullptr;
+		//}
 
-		void CoreState::_InitializeViewports()
-		{
-			_ViewportCollection = new ViewportCollection();
-		}
+		//void CoreState::_InitializeViewports()
+		//{
+		//	_ViewportCollection = new ViewportCollection();
+		//}
 
-		void CoreState::_ReleaseViewports()
-		{
-			delete _ViewportCollection;
-			_ViewportCollection = nullptr;
-		}
+		//void CoreState::_ReleaseViewports()
+		//{
+		//	delete _ViewportCollection;
+		//	_ViewportCollection = nullptr;
+		//}
 
-		void CoreState::_InitializeBlendStates()
-		{
-			_BlendStateCollection = new BlendStateCollection();
-		}
+		//void CoreState::_InitializeBlendStates()
+		//{
+		//	_BlendStateCollection = new BlendStateCollection();
+		//}
 
-		void CoreState::_ReleaseBlendStates()
-		{
-			delete _BlendStateCollection;
-			_BlendStateCollection = nullptr;
-		}
+		//void CoreState::_ReleaseBlendStates()
+		//{
+		//	delete _BlendStateCollection;
+		//	_BlendStateCollection = nullptr;
+		//}
 
 		void CoreState::_InitializeRenderingLists()
 		{

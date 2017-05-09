@@ -52,7 +52,7 @@ ImguiEndTask::ImguiEndTask(_In_ ContextCollection& Contexts, _In_ SamplerCollect
 	int Width;
 
 	ImGui::GetIO().Fonts->GetTexDataAsRGBA32(&Pixels, &Width, &Height);
-	_Texture = new D3D11Texture(RGBA8888, D3D11Resource::DEFAULT, Resource::NONE, Width, Height, Pixels);
+	_Texture = new D3D11Texture(FORMAT_RGBA8888, D3D11Resource::DEFAULT, Resource::NONE, Width, Height, Pixels);
 	ImGui::GetIO().Fonts->TexID = ((D3D11Texture*)_Texture)->GetD3D11ShaderResourceView();
 
 	_Sampler = Samplers.GetSampler(SamplerCollection::BILINEAR);
