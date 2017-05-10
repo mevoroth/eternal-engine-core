@@ -17,6 +17,8 @@ namespace Eternal
 		class Window;
 		class Device;
 		class ShaderFactory;
+		class SwapChain;
+		class CommandQueue;
 		//class Renderer;
 		//class Context;
 	}
@@ -110,30 +112,32 @@ namespace Eternal
 			virtual void End() override;
 
 		private:
-			CoreStateSettings _Settings;
+			CoreStateSettings		_Settings;
 
-			Eternal::Time::Time* _Time = nullptr;
+			Eternal::Time::Time*	_Time				= nullptr;
 
-			Eternal::Log::Log* _FileLog = nullptr;
-			Eternal::Log::Log* _ConsoleLog = nullptr;
-			Eternal::Log::Log* _MultiChannelLog = nullptr;
+			Eternal::Log::Log*		_FileLog			= nullptr;
+			Eternal::Log::Log*		_ConsoleLog			= nullptr;
+			Eternal::Log::Log*		_MultiChannelLog	= nullptr;
 
-			Window*			_Window			= nullptr;
-			WindowsProcess* _WindowsProcess = nullptr;
+			Window*					_Window				= nullptr;
+			WindowsProcess*			_WindowsProcess		= nullptr;
 
-			ShaderFactory* _ShaderFactory	= nullptr;
+			ShaderFactory*			_ShaderFactory		= nullptr;
 
-			Device* _Device					= nullptr;
-			HINSTANCE _hInstance			= nullptr;
-			int _nCmdShow					= 0;
+			Device*					_Device				= nullptr;
+			SwapChain*				_SwapChain			= nullptr;
+			CommandQueue*			_MainCommandQueue	= nullptr;
+			HINSTANCE				_hInstance			= nullptr;
+			int						_nCmdShow			= 0;
 
 			//Renderer* _Renderer = nullptr;
 
-			TaskManager* _TaskManager = nullptr;
+			TaskManager*			_TaskManager		= nullptr;
 
-			Eternal::Input::Input* _KeyboardInput = nullptr;
-			Eternal::Input::Input* _PadInput = nullptr;
-			Eternal::Input::Input* _MultiInput = nullptr;
+			Eternal::Input::Input*	_KeyboardInput		= nullptr;
+			Eternal::Input::Input*	_PadInput			= nullptr;
+			Eternal::Input::Input*	_MultiInput			= nullptr;
 
 			GameState* _InitialGameState = nullptr;
 

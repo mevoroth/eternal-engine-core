@@ -1,5 +1,6 @@
 #include "GameState/CoreState.hpp"
 
+#include "GraphicsSettings.hpp"
 #include "Platform/WindowsProcess.hpp"
 #include "Window/Window.hpp"
 #include "NextGenGraphics/DeviceFactory.hpp"
@@ -9,6 +10,9 @@
 //#include "Graphics/Renderer.hpp"
 //#include "Graphics/ShaderFactory.hpp"
 //#include "Graphics/ShaderFactoryFactory.hpp"
+#include "Graphics/CommandQueueFactory.hpp"
+#include "Graphics/SwapChain.hpp"
+#include "Graphics/SwapChainFactory.hpp"
 #include "Graphics/Format.hpp"
 #include "Input/InputFactory.hpp"
 #include "Time/TimeFactory.hpp"
@@ -106,8 +110,11 @@ namespace Eternal
 			WindowsProcess::SetInputHandler(_KeyboardInput);
 			_WindowsProcess = new WindowsProcess();
 
-			_Window = new Window(_hInstance, _nCmdShow, "ReShield", "EternalClass", 1280, 720);
-			_Device = CreateDevice(VULKAN, *_Window);
+			_Window				= new Window(_hInstance, _nCmdShow, "ReShield", "EternalClass", 1280, 720);
+			_Window->Create(WindowsProcess::WindowProc);
+			_Device				= CreateDevice(D3D12, *_Window);
+			_MainCommandQueue	= CreateCommandQueue(*_Device, FRAME_LAG);
+			_SwapChain			= CreateSwapChain(*_Device, *_Window, *_MainCommandQueue);
 			//_Device = CreateDevice(WINDOWS, WindowsProcess::WindowProc, _hInstance, _nCmdShow, "ReShield", "EternalClass");
 			//_Renderer = CreateRenderer(RENDERER_D3D11);
 

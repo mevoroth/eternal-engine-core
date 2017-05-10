@@ -55,11 +55,13 @@ namespace Eternal
 
 				Sampler* BilinearSampler = Resources->GetStaticSamplers()->Get(SAMPLER_BILINEAR);
 
-				DescriptorHeap* ObjectInstanceData	= CreateDescriptorHeap(DeviceObj, ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER, 1, (RootSignatureAccess)(ROOT_SIGNATURE_IA | ROOT_SIGNATURE_VS | ROOT_SIGNATURE_PS));
-				DescriptorHeap* ObjectTextureSet	= CreateDescriptorHeap(DeviceObj, ROOT_SIGNATURE_PARAMETER_TEXTURE, 4, (RootSignatureAccess)(ROOT_SIGNATURE_IA | ROOT_SIGNATURE_VS | ROOT_SIGNATURE_PS));
+				DescriptorHeap* FrameConstants		= CreateDescriptorHeap(DeviceObj, 0, ROOT_SIGNATURE_PARAMETER_DYNAMIC_BUFFER, 2, (RootSignatureAccess)(ROOT_SIGNATURE_IA | ROOT_SIGNATURE_VS | ROOT_SIGNATURE_PS));
+				DescriptorHeap* ObjectInstanceData	= CreateDescriptorHeap(DeviceObj, 0, ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER, 1, (RootSignatureAccess)(ROOT_SIGNATURE_IA | ROOT_SIGNATURE_VS | ROOT_SIGNATURE_PS));
+				DescriptorHeap* ObjectTextureSet	= CreateDescriptorHeap(DeviceObj, 1, ROOT_SIGNATURE_PARAMETER_TEXTURE, 4, (RootSignatureAccess)(ROOT_SIGNATURE_IA | ROOT_SIGNATURE_VS | ROOT_SIGNATURE_PS));
 
 				DescriptorHeap* DescriptorHeaps[] =
 				{
+					FrameConstants,
 					ObjectInstanceData,
 					ObjectTextureSet
 				};
