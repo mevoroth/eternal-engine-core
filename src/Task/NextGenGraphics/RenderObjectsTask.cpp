@@ -12,11 +12,15 @@
 #include "Graphics/RenderPassFactory.hpp"
 #include "Graphics/Shader.hpp"
 #include "Graphics/PipelineFactory.hpp"
+#include "Graphics/DepthTest.hpp"
+#include "Graphics/StencilTest.hpp"
+#include "Graphics/BlendState.hpp"
 #include "GraphicData/GraphicResources.hpp"
 #include "GraphicData/Viewports.hpp"
 #include "GraphicData/GraphicBuffers.hpp"
 #include "GraphicData/Shaders.hpp"
 #include "GraphicData/StaticSamplers.hpp"
+#include "GraphicData/BlendStates.hpp"
 #include "Mesh/Mesh.hpp"
 
 #include "Graphics/DescriptorHeapFactory.hpp"
@@ -34,8 +38,7 @@ namespace Eternal
 		class RenderObjectsTaskData
 		{
 		public:
-			RenderObjectsTaskData(_In_ Device& DeviceObj, _In_ GraphicResources* Resources, _In_ StateSharedData* SharedData)
-				: _SharedData(SharedData)
+			RenderObjectsTaskData(_In_ Device& DeviceObj, _In_ GraphicResources* Resources)
 			{
 				//_RootSignature = CreateRootSignature(DeviceObj, )
 				InputLayout::VertexDataType DataTypes[] = {
@@ -55,36 +58,45 @@ namespace Eternal
 
 				Sampler* BilinearSampler = Resources->GetStaticSamplers()->Get(SAMPLER_BILINEAR);
 
-				DescriptorHeap* FrameConstants		= CreateDescriptorHeap(DeviceObj, 0, ROOT_SIGNATURE_PARAMETER_DYNAMIC_BUFFER, 2, (RootSignatureAccess)(ROOT_SIGNATURE_IA | ROOT_SIGNATURE_VS | ROOT_SIGNATURE_PS));
-				DescriptorHeap* ObjectInstanceData	= CreateDescriptorHeap(DeviceObj, 0, ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER, 1, (RootSignatureAccess)(ROOT_SIGNATURE_IA | ROOT_SIGNATURE_VS | ROOT_SIGNATURE_PS));
-				DescriptorHeap* ObjectTextureSet	= CreateDescriptorHeap(DeviceObj, 1, ROOT_SIGNATURE_PARAMETER_TEXTURE, 4, (RootSignatureAccess)(ROOT_SIGNATURE_IA | ROOT_SIGNATURE_VS | ROOT_SIGNATURE_PS));
+				DescriptorHeap* FrameConstants		= CreateDescriptorHeap(DeviceObj, 0, 0, ROOT_SIGNATURE_PARAMETER_DYNAMIC_BUFFER, 1, (RootSignatureAccess)(ROOT_SIGNATURE_IA | ROOT_SIGNATURE_VS | ROOT_SIGNATURE_PS));
+				DescriptorHeap* ObjectConstants		= CreateDescriptorHeap(DeviceObj, 0, 1, ROOT_SIGNATURE_PARAMETER_DYNAMIC_BUFFER, 1, (RootSignatureAccess)(ROOT_SIGNATURE_IA | ROOT_SIGNATURE_VS | ROOT_SIGNATURE_PS));
+				DescriptorHeap* ObjectInstanceData	= CreateDescriptorHeap(DeviceObj, 0, 0, ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER, 1, (RootSignatureAccess)(ROOT_SIGNATURE_IA | ROOT_SIGNATURE_VS | ROOT_SIGNATURE_PS));
+				DescriptorHeap* ObjectTextureSet	= CreateDescriptorHeap(DeviceObj, 1, 0, ROOT_SIGNATURE_PARAMETER_TEXTURE, 4, (RootSignatureAccess)(ROOT_SIGNATURE_IA | ROOT_SIGNATURE_VS | ROOT_SIGNATURE_PS));
 
 				DescriptorHeap* DescriptorHeaps[] =
 				{
 					FrameConstants,
+					ObjectConstants,
 					ObjectInstanceData,
 					ObjectTextureSet
 				};
 
+				vector<BlendState*> GraphicBufferBlendStates;
+				GraphicBufferBlendStates.resize(GRAPHIC_BUFFER_NO_DEPTH_COUNT);
+				for (uint32_t BlendStateIndex = 0; BlendStateIndex < GRAPHIC_BUFFER_NO_DEPTH_COUNT; ++BlendStateIndex)
+				{
+					GraphicBufferBlendStates[BlendStateIndex] = Resources->GetBlendStates()->Get(BLEND_STATE_SOURCE);
+				}
+
 				_Viewport		= Resources->GetViewports()->Get(VIEWPORT_FULLSCREEN);
 				_InputLayout	= CreateInputLayout(DeviceObj, DataTypes, ETERNAL_ARRAYSIZE(DataTypes));
 				_RootSignature	= CreateRootSignature(DeviceObj, &BilinearSampler, 1, DescriptorHeaps, ETERNAL_ARRAYSIZE(DescriptorHeaps), (RootSignatureAccess)(ROOT_SIGNATURE_IA | ROOT_SIGNATURE_VS | ROOT_SIGNATURE_PS));
-				_RenderPass		= CreateRenderPass(DeviceObj, RenderTargets, Resources->GetGraphicBuffers()->Get(GRAPHIC_BUFFER_DEPTH));
+				_RenderPass		= CreateRenderPass(DeviceObj, *_Viewport, RenderTargets, GraphicBufferBlendStates, Resources->GetGraphicBuffers()->Get(GRAPHIC_BUFFER_DEPTH));
 				_VS				= Resources->GetShaders()->Get(SHADER_OPAQUE_VS);
 				_PS				= Resources->GetShaders()->Get(SHADER_OPAQUE_PS);
-				_Pipeline		= CreatePipeline(DeviceObj, *_RootSignature, *_InputLayout, *_RenderPass, *GetVS(), *GetPS(), *GetViewport());
+				_Pipeline		= CreatePipeline(DeviceObj, *_RootSignature, *_InputLayout, *_RenderPass, *GetVS(), *GetPS(), GetDepthTest(), GetStencilTest(), *GetViewport());
 			}
 
+			DepthTest& GetDepthTest() { return _DepthTest; }
+			StencilTest& GetStencilTest() { return _StencilTest; }
 			Viewport* GetViewport() { return _Viewport; }
 			Pipeline* GetPipeline() { return _Pipeline; }
 			RenderPass* GetRenderPass() { return _RenderPass; }
 			RenderTarget* GetRenderTargets() { return _RenderTargets; }
-			StateSharedData* GetSharedData() { return _SharedData; }
 			Shader* GetVS() { return _VS; }
 			Shader* GetPS() { return _PS; }
 
 		private:
-			StateSharedData*	_SharedData		= nullptr;
 			RootSignature*		_RootSignature	= nullptr;
 			Viewport*			_Viewport		= nullptr;
 			Pipeline*			_Pipeline		= nullptr;
@@ -93,19 +105,21 @@ namespace Eternal
 			InputLayout*		_InputLayout	= nullptr;
 			Shader*				_VS				= nullptr;
 			Shader*				_PS				= nullptr;
+			DepthTest			_DepthTest;
+			StencilTest			_StencilTest;
 		};
 	}
 }
 
 RenderObjectsTask::RenderObjectsTask(_In_ Device& DeviceObj, _In_ GraphicResources* Resources, _In_ StateSharedData* SharedData)
-	: GraphicTask(DeviceObj, Resources)
-	, _RenderObjectsTaskData(new RenderObjectsTaskData(DeviceObj, Resources, SharedData))
+	: GraphicTask(DeviceObj, Resources, SharedData)
+	, _RenderObjectsTaskData(new RenderObjectsTaskData(DeviceObj, Resources))
 {
 }
 
 void RenderObjectsTask::Render(_Inout_ CommandList* CommandListObj)
 {
-	vector<GraphicGameObject*>& GameObjects = *_RenderObjectsTaskData->GetSharedData()->GraphicGameObjects;
+	vector<GraphicGameObject*>& GameObjects = *GetSharedData()->GraphicGameObjects;
 
 	for (uint32_t GameObjectIndex = 0; GameObjectIndex < GameObjects.size(); ++GameObjectIndex)
 	{
@@ -137,4 +151,16 @@ RenderPass* RenderObjectsTask::GetRenderPass()
 RenderTarget* RenderObjectsTask::GetRenderTargets()
 {
 	return _RenderObjectsTaskData->GetRenderTargets();
+}
+
+RenderOpaqueObjectsTask::RenderOpaqueObjectsTask(_In_ Device& DeviceObj, _In_ GraphicResources* Resources, _In_ StateSharedData* SharedData)
+	: RenderObjectsTask(DeviceObj, Resources, SharedData)
+{
+}
+
+bool RenderOpaqueObjectsTask::IsRendered() const
+{
+	const StateSharedData* SharedData = GetSharedData();
+	return SharedData->GraphicGameObjects != nullptr
+		&& SharedData->GraphicGameObjects->size();
 }

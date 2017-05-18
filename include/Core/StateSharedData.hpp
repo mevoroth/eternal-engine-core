@@ -1,6 +1,7 @@
 #ifndef _STATE_SHARED_DATA_HPP_
 #define _STATE_SHARED_DATA_HPP_
 
+#include <cstdint>
 #include <vector>
 
 namespace Eternal
@@ -16,9 +17,10 @@ namespace Eternal
 		class StateSharedData
 		{
 		public:
-			vector<GraphicGameObject*>* GraphicGameObjects = nullptr;
-			CameraGameObject* Camera = nullptr;
-			LightGameObject* Lights = nullptr;
+			uint32_t					CurrentFrame		= 0u;
+			vector<GraphicGameObject*>*	GraphicGameObjects	= nullptr;
+			CameraGameObject*			Camera				= nullptr;
+			LightGameObject*			Lights				= nullptr;
 		};
 	}
 }

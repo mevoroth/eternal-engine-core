@@ -176,6 +176,7 @@
     <ClInclude Include="include\Task\Graphics\SwapFrameTask.hpp" />
     <ClInclude Include="include\Task\ImguiBeginTask.hpp" />
     <ClInclude Include="include\Task\ImguiEndTask.hpp" />
+    <ClInclude Include="include\Task\NextGenGraphics\FinalizeFrameTask.hpp" />
     <ClInclude Include="include\Task\NextGenGraphics\GraphicTask.hpp" />
     <ClInclude Include="include\Task\NextGenGraphics\RenderObjectsTask.hpp" />
     <ClInclude Include="include\Task\TimeTask.hpp" />
@@ -211,6 +212,7 @@
     <ClCompile Include="src\Task\ImguiBeginTask.cpp" />
     <ClCompile Include="src\Task\ImguiEndTask.cpp" />
     <ClCompile Include="src\Task\ControlsTask.cpp" />
+    <ClCompile Include="src\Task\NextGenGraphics\FinalizeFrameTask.cpp" />
     <ClCompile Include="src\Task\NextGenGraphics\RenderObjectsTask.cpp" />
     <ClCompile Include="src\Task\NextGenGraphics\GraphicTask.cpp" />
     <ClCompile Include="src\Task\Task\GameStateTask.cpp" />

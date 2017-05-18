@@ -37,8 +37,8 @@ void GameStateTask::DoReset()
 		|| NextState != _GameState)		// Changing state
 	{
 		_GameState->End();
-		_GameState = NextState;
-		_ScheduledToBegin = _GameState;
+		_GameState			= NextState;
+		_ScheduledToBegin	= _GameState;
 	}
 }
 

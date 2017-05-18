@@ -141,20 +141,20 @@ namespace Eternal
 
 			GameState* _InitialGameState = nullptr;
 
-			Task* _ControlsTask = nullptr;
-			Task* _ImguiBeginTask = nullptr;
-			Task* _ImguiEndTask = nullptr;
-			Task* _TimeTask = nullptr;
-			Task* _UpdateTransformComponentTask = nullptr;
-			Task* _UpdateCameraComponentTask = nullptr;
-			Task* _UpdateLightComponentTask = nullptr;
-			Task* _GameStateTask = nullptr;
-			Task* _InitFrameTask = nullptr;
-			Task* _OpaqueTask = nullptr;
-			Task* _ShadowTask = nullptr;
-			Task* _LightingTask = nullptr;
-			Task* _CompositingTask = nullptr;
-			Task* _SwapFrameTask = nullptr;
+			Task* _ControlsTask					= nullptr;
+			Task* _ImguiBeginTask				= nullptr;
+			Task* _ImguiEndTask					= nullptr;
+			Task* _TimeTask						= nullptr;
+			Task* _UpdateTransformComponentTask	= nullptr;
+			Task* _UpdateCameraComponentTask	= nullptr;
+			Task* _UpdateLightComponentTask		= nullptr;
+			Task* _GameStateTask				= nullptr;
+			Task* _InitFrameTask				= nullptr;
+			Task* _OpaqueTask					= nullptr;
+			Task* _ShadowTask					= nullptr;
+			Task* _LightingTask					= nullptr;
+			Task* _CompositingTask				= nullptr;
+			Task* _SwapFrameTask				= nullptr;
 
 #ifdef ETERNAL_DEBUG
 			Task* _AutoRecompileShaderTask = nullptr;

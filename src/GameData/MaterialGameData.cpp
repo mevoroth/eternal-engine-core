@@ -30,8 +30,9 @@ void* MaterialGameData::Load(_In_ const void* SerializedData)
 {
 	MaterialComponent* MaterialComponentObj = new MaterialComponent();
 	Material* MaterialObj = new Material();
-	vector<MaterialProperty*>* Properties = new vector<MaterialProperty*>();
-	MaterialObj->SetProperties(Properties);
+	//vector<MaterialProperty*>* Properties = new vector<MaterialProperty*>();
+	//MaterialObj->SetProperties(Properties);
+	ETERNAL_ASSERT(false);
 	Eternal::Log::Log::Get()->Write(Eternal::Log::Log::Warning, Eternal::Log::Log::Save, "[MaterialGameData::Load]Material properties not implemented!");
 	MaterialComponentObj->SetMaterial(MaterialObj);
 	return MaterialComponentObj;

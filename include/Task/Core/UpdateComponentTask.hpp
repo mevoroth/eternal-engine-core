@@ -25,18 +25,14 @@ namespace Eternal
 
 			virtual void DoSetup() override
 			{
-				SetState(SETUP);
 			}
 
 			virtual void DoReset() override
 			{
-				SetState(IDLE);
 			}
 
 			virtual void DoExecute() override
 			{
-				SetState(EXECUTING);
-
 				Eternal::Time::TimeSecondsT DeltaTimeSeconds = _Time->GetDeltaTimeSeconds();
 
 				for (uint32_t ObjectIndex = 0; ObjectIndex < _Pool->GetSize(); ++ObjectIndex)
@@ -46,8 +42,6 @@ namespace Eternal
 						_Pool->Get((PoolHandle)ObjectIndex)->Update(DeltaTimeSeconds);
 					}
 				}
-
-				SetState(DONE);
 			}
 
 		private:

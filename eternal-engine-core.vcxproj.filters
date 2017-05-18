@@ -115,9 +115,6 @@
     <ClInclude Include="include\GameData\GameDatas.hpp">
       <Filter>GameData</Filter>
     </ClInclude>
-    <ClInclude Include="include\GameData\MaterialGameData.hpp">
-      <Filter>GameData</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\StateSharedData.hpp" />
     <ClInclude Include="include\Core\LightGameObject.hpp">
       <Filter>Core</Filter>
@@ -144,6 +141,12 @@
       <Filter>Task\NextGenGraphics</Filter>
     </ClInclude>
     <ClInclude Include="include\Task\NextGenGraphics\GraphicTask.hpp">
+      <Filter>Task\NextGenGraphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameData\MaterialGameData.hpp">
+      <Filter>GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Task\NextGenGraphics\FinalizeFrameTask.hpp">
       <Filter>Task\NextGenGraphics</Filter>
     </ClInclude>
   </ItemGroup>
@@ -214,9 +217,6 @@
     <ClCompile Include="src\GameData\GameDatas.cpp">
       <Filter>GameData</Filter>
     </ClCompile>
-    <ClCompile Include="src\GameData\MaterialGameData.cpp">
-      <Filter>GameData</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\GameState.cpp" />
     <ClCompile Include="src\Task\Graphics\LightingTask.cpp">
       <Filter>Task\Graphics</Filter>
@@ -240,6 +240,12 @@
       <Filter>Task\NextGenGraphics</Filter>
     </ClCompile>
     <ClCompile Include="src\Task\NextGenGraphics\GraphicTask.cpp">
+      <Filter>Task\NextGenGraphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameData\MaterialGameData.cpp">
+      <Filter>GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task\NextGenGraphics\FinalizeFrameTask.cpp">
       <Filter>Task\NextGenGraphics</Filter>
     </ClCompile>
   </ItemGroup>

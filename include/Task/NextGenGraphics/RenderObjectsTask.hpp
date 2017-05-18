@@ -33,8 +33,19 @@ namespace Eternal
 			virtual RenderPass* GetRenderPass() override;
 			virtual RenderTarget* GetRenderTargets() override;
 
+		protected:
+			RenderObjectsTaskData* GetRenderObjectsTaskData() { return _RenderObjectsTaskData; }
+			const RenderObjectsTaskData* GetRenderObjectsTaskData() const { return _RenderObjectsTaskData; }
+
 		private:
 			RenderObjectsTaskData* _RenderObjectsTaskData = nullptr;
+		};
+
+		class RenderOpaqueObjectsTask : public RenderObjectsTask
+		{
+		public:
+			RenderOpaqueObjectsTask(_In_ Device& DeviceObj, _In_ GraphicResources* Resources, _In_ StateSharedData* SharedData);
+			virtual bool IsRendered() const override;
 		};
 	}
 }

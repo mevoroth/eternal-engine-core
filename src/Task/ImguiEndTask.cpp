@@ -57,8 +57,8 @@ ImguiEndTask::ImguiEndTask(_In_ ContextCollection& Contexts, _In_ SamplerCollect
 
 	_Sampler = Samplers.GetSampler(SamplerCollection::BILINEAR);
 
-	_BlendState = new D3D11BlendState(BlendState::SRC_ALPHA, BlendState::INV_SRC_ALPHA, BlendState::OP_ADD,
-		BlendState::SRC_ALPHA, BlendState::INV_SRC_ALPHA, BlendState::OP_ADD);
+	//_BlendState = new D3D11BlendState(BlendState::SRC_ALPHA, BlendState::INV_SRC_ALPHA, BlendState::OP_ADD,
+	//	BlendState::SRC_ALPHA, BlendState::INV_SRC_ALPHA, BlendState::OP_ADD);
 
 	_Viewport = Viewports.GetViewport(ViewportCollection::FULLSCREEN);
 }

@@ -2,6 +2,7 @@
 
 #include "Macros/Macros.hpp"
 #include "NextGenGraphics/Device.hpp"
+#include "Core/StateSharedData.hpp"
 #include "Graphics/CommandQueueFactory.hpp"
 #include "Graphics/CommandQueue.hpp"
 #include "Graphics/CommandList.hpp"
@@ -26,22 +27,17 @@ namespace Eternal
 				_CommandQueue		= Resources->GetCommandQueues()->Get(COMMAND_QUEUE_GRAPHIC_0);
 			}
 
-			CommandQueue*	GetCommandQueue()	{ return _CommandQueue; }
+			CommandQueue*		GetCommandQueue()	{ return _CommandQueue; }
+			StateSharedData*	GetSharedData()		{ return _SharedData; }
 
 		private:
-			CommandQueue*	_CommandQueue	= nullptr;
+			CommandQueue*		_CommandQueue	= nullptr;
+			StateSharedData*	_SharedData		= nullptr;
 		};
 	}
 }
 
-uint32_t GraphicTask::CurrentFrame = 0u;
-
-void GraphicTask::SetCurrentFrame(_In_ uint32_t CurrentFrame)
-{
-	GraphicTask::CurrentFrame = CurrentFrame;
-}
-
-GraphicTask::GraphicTask(_In_ Device& DeviceObj, _In_ GraphicResources* Resources)
+GraphicTask::GraphicTask(_In_ Device& DeviceObj, _In_ GraphicResources* Resources, _In_ StateSharedData* SharedData)
 	: _GraphicTaskData(new GraphicTaskData(DeviceObj, Resources))
 {
 }
@@ -59,12 +55,15 @@ void GraphicTask::DoSetup()
 
 void GraphicTask::DoExecute()
 {
+	if (!IsRendered())
+		return;
+
 	CommandList* CommandListObj = _GraphicTaskData->GetCommandQueue()->Pop();
-	CommandAllocator* CommandAllocatorObj = _GraphicTaskData->GetCommandQueue()->GetCommandAllocator(GraphicTask::CurrentFrame);
+	CommandAllocator* CommandAllocatorObj = _GraphicTaskData->GetCommandQueue()->GetCommandAllocator(GetSharedData()->CurrentFrame);
 	Viewport& ViewportObj = *GetViewport();
 	
 	CommandListObj->Begin(*CommandAllocatorObj, *GetPipeline());
-	CommandListObj->BeginRenderPass(*GetRenderPass(), *GetRenderTargets(), ViewportObj);
+	CommandListObj->BeginRenderPass(*GetRenderPass());
 
 	Render(CommandListObj);
 
@@ -75,4 +74,14 @@ void GraphicTask::DoExecute()
 void GraphicTask::DoReset()
 {
 
+}
+
+StateSharedData* GraphicTask::GetSharedData()
+{
+	return _GraphicTaskData->GetSharedData();
+}
+
+const StateSharedData* GraphicTask::GetSharedData() const
+{
+	return _GraphicTaskData->GetSharedData();
 }

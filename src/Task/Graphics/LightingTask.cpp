@@ -69,11 +69,11 @@ namespace Eternal
 				_VS = ShaderFactory::Get()->CreateVertexShader("Lighting", "lighting.vs.hlsl");
 				_PS = ShaderFactory::Get()->CreatePixelShader("Lighting", "lighting.ps.hlsl");
 
-				_DepthStencil = CreateDepthStencil(DepthTest(), StencilTest(
-					StencilTest::FaceOperator(StencilTest::KEEP, StencilTest::KEEP, StencilTest::KEEP, Comparison::NEVER),
-					StencilTest::FaceOperator(StencilTest::REPLACE, StencilTest::REPLACE, StencilTest::REPLACE, Comparison::ALWAYS),
-					0xFF, 0xFF
-				)); // Disable depth test
+				//_DepthStencil = CreateDepthStencil(DepthTest(), StencilTest(
+				//	StencilTest::FaceOperator(StencilTest::KEEP, StencilTest::KEEP, StencilTest::KEEP, Comparison::NEVER),
+				//	StencilTest::FaceOperator(StencilTest::REPLACE, StencilTest::REPLACE, StencilTest::REPLACE, Comparison::ALWAYS),
+				//	0xFF, 0xFF
+				//)); // Disable depth test
 				_FrameConstants = CreateConstant(sizeof(CB0FrameConstants), Resource::DYNAMIC, Resource::WRITE);
 				_LightConstants = CreateConstant(sizeof(CB1LightConstants), Resource::DYNAMIC, Resource::WRITE);
 

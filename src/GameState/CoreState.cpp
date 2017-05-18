@@ -37,11 +37,12 @@
 #include "Core/CameraComponent.hpp"
 #include "Core/LightComponent.hpp"
 #include "GraphicData/GraphicResources.hpp"
-#include "GraphicData/ContextCollection.hpp"
-#include "GraphicData/RenderTargetCollection.hpp"
-#include "GraphicData/SamplerCollection.hpp"
-#include "GraphicData/ViewportCollection.hpp"
-#include "GraphicData/BlendStateCollection.hpp"
+#include "GraphicData/CommandQueues.hpp"
+//#include "GraphicData/ContextCollection.hpp"
+//#include "GraphicData/RenderTargetCollection.hpp"
+//#include "GraphicData/SamplerCollection.hpp"
+//#include "GraphicData/ViewportCollection.hpp"
+//#include "GraphicData/BlendStateCollection.hpp"
 #include "GraphicData/RenderingListCollection.hpp"
 #include "GraphicData/GraphicTaskConfigCollection.hpp"
 #include "Import/fbx/ImportFbx.hpp"
@@ -108,12 +109,21 @@ namespace Eternal
 			_MultiInput = CreateMultiInput(Inputs, ETERNAL_ARRAYSIZE(Inputs));
 
 			WindowsProcess::SetInputHandler(_KeyboardInput);
-			_WindowsProcess = new WindowsProcess();
+			_WindowsProcess		= new WindowsProcess();
 
 			_Window				= new Window(_hInstance, _nCmdShow, "ReShield", "EternalClass", 1280, 720);
 			_Window->Create(WindowsProcess::WindowProc);
+			//*
 			_Device				= CreateDevice(D3D12, *_Window);
-			_MainCommandQueue	= CreateCommandQueue(*_Device, FRAME_LAG);
+			/*/
+			_Device				= CreateDevice(VULKAN, *_Window);
+			/**/
+			_ShaderFactory		= new ShaderFactory();
+			_GraphicResources	= new GraphicResources();
+			_GraphicResources->Initialize(*_Device);
+
+			//_MainCommandQueue	= CreateCommandQueue(*_Device, FRAME_LAG);
+			_MainCommandQueue	= _GraphicResources->GetCommandQueues()->Get(COMMAND_QUEUE_PRESENT);
 			_SwapChain			= CreateSwapChain(*_Device, *_Window, *_MainCommandQueue);
 			//_Device = CreateDevice(WINDOWS, WindowsProcess::WindowProc, _hInstance, _nCmdShow, "ReShield", "EternalClass");
 			//_Renderer = CreateRenderer(RENDERER_D3D11);
@@ -121,8 +131,6 @@ namespace Eternal
 			//_InitializeGraphicContexts();
 
 			//_ShaderFactory = CreateShaderFactory(SHADER_FACTORY_D3D11);
-
-			_ShaderFactory = new ShaderFactory();
 
 			_ImportFbx = new ImportFbx();
 			_ImportFbx->RegisterPath(_Settings.FBXPath);
@@ -136,9 +144,6 @@ namespace Eternal
 			_SaveSystem->RegisterSavePath(_Settings.SavePath);
 
 			_TaskManager = new TaskManager();
-
-			_GraphicResources = new GraphicResources();
-			_GraphicResources->Initialize(*_Device);
 
 			_InitializeGraphicTaskConfigs();
 			//_InitializeViewports();
@@ -305,7 +310,7 @@ namespace Eternal
 			//_SwapFrameTask = SwapFrameTaskObj;
 
 #pragma region NextGenGraphics
-			RenderObjectsTask* OpaqueTaskObj = new RenderObjectsTask(*_Device, _GraphicResources, GetSharedData());
+			RenderOpaqueObjectsTask* OpaqueTaskObj = new RenderOpaqueObjectsTask(*_Device, _GraphicResources, GetSharedData());
 			OpaqueTaskObj->SetTaskName("Render Object Task (Opaque Task)");
 			_OpaqueTask = OpaqueTaskObj;
 #pragma endregion NextGenGraphics
