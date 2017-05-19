@@ -9,6 +9,7 @@ namespace Eternal
 	namespace Components
 	{
 		class Mesh;
+		class BoundingBox;
 	}
 
 	namespace Core
@@ -25,8 +26,12 @@ namespace Eternal
 			void SetMesh(_In_ Mesh* MeshObj);
 			Mesh* GetMesh();
 
+			void SetBoundingBox(_In_ Mesh* BoundingBoxObj);
+			Mesh* GetBoundingBox();
+
 		private:
-			Mesh* _Mesh = nullptr;
+			Mesh*	_Mesh			= nullptr;
+			Mesh*	_BoundingBox	= nullptr;
 		};
 	}
 }

@@ -22,7 +22,8 @@ namespace Eternal
 		class GraphicTaskData
 		{
 		public:
-			GraphicTaskData(_In_ Device& DeviceObj, _In_ GraphicResources* Resources)
+			GraphicTaskData(_In_ Device& DeviceObj, _In_ GraphicResources* Resources, _In_ StateSharedData* SharedData)
+				: _SharedData(SharedData)
 			{
 				_CommandQueue		= Resources->GetCommandQueues()->Get(COMMAND_QUEUE_GRAPHIC_0);
 			}
@@ -38,7 +39,7 @@ namespace Eternal
 }
 
 GraphicTask::GraphicTask(_In_ Device& DeviceObj, _In_ GraphicResources* Resources, _In_ StateSharedData* SharedData)
-	: _GraphicTaskData(new GraphicTaskData(DeviceObj, Resources))
+	: _GraphicTaskData(new GraphicTaskData(DeviceObj, Resources, SharedData))
 {
 }
 

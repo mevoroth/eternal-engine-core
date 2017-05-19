@@ -153,8 +153,7 @@ namespace Eternal
 			Task* _OpaqueTask					= nullptr;
 			Task* _ShadowTask					= nullptr;
 			Task* _LightingTask					= nullptr;
-			Task* _CompositingTask				= nullptr;
-			Task* _SwapFrameTask				= nullptr;
+			Task* _FinalizeFrameTask			= nullptr;
 
 #ifdef ETERNAL_DEBUG
 			Task* _AutoRecompileShaderTask = nullptr;

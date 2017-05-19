@@ -31,6 +31,7 @@
 //#include "Task/Graphics/CompositingTask.hpp"
 //#include "Task/Graphics/SwapFrameTask.hpp"
 #include "Task/NextGenGraphics/RenderObjectsTask.hpp"
+#include "Task/NextGenGraphics/FinalizeFrameTask.hpp"
 #include "Resources/Pool.hpp"
 #include "Resources/TextureFactory.hpp"
 #include "Core/TransformComponent.hpp"
@@ -313,6 +314,10 @@ namespace Eternal
 			RenderOpaqueObjectsTask* OpaqueTaskObj = new RenderOpaqueObjectsTask(*_Device, _GraphicResources, GetSharedData());
 			OpaqueTaskObj->SetTaskName("Render Object Task (Opaque Task)");
 			_OpaqueTask = OpaqueTaskObj;
+
+			FinalizeFrameTask* FinalizeFrameTaskObj = new FinalizeFrameTask(*_Device, *_SwapChain, _GraphicResources, GetSharedData());
+			FinalizeFrameTaskObj->SetTaskName("Finalize Frame Task");
+			_FinalizeFrameTask = FinalizeFrameTaskObj;
 #pragma endregion NextGenGraphics
 
 			AutoRecompileShaderTask* AutoRecompileShaderTaskObj = new AutoRecompileShaderTask();
@@ -357,16 +362,14 @@ namespace Eternal
 
 #pragma region NextGenGraphics
 			Scheduler().PushTask(_OpaqueTask, _GameStateTask);
+			Scheduler().PushTask(_FinalizeFrameTask, _OpaqueTask);
 #pragma endregion NextGenGraphics
 		}
 
 		void CoreState::_ReleaseTasks()
 		{
-			delete _SwapFrameTask;
-			_SwapFrameTask = nullptr;
-
-			delete _CompositingTask;
-			_CompositingTask = nullptr;
+			delete _FinalizeFrameTask;
+			_FinalizeFrameTask = nullptr;
 
 			delete _LightingTask;
 			_LightingTask = nullptr;

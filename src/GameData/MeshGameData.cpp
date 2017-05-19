@@ -30,6 +30,10 @@ void* MeshGameData::Load(_In_ const void* SerializedData)
 {
 	Json::Value& MeshValue = *(Json::Value*)SerializedData;
 	MeshComponent* MeshComponentObj = new MeshComponent();
-	MeshComponentObj->SetMesh(CreateMesh(MeshValue.asString().c_str()));
+	Mesh* MeshObj = nullptr;
+	Mesh* BoundingBoxMesh = nullptr;
+	CreateMesh(MeshValue.asString().c_str(), MeshObj, BoundingBoxMesh);
+	MeshComponentObj->SetMesh(MeshObj);
+	MeshComponentObj->SetBoundingBox(BoundingBoxMesh);
 	return MeshComponentObj;
 }
