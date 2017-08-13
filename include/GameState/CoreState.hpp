@@ -19,6 +19,7 @@ namespace Eternal
 		class ShaderFactory;
 		class SwapChain;
 		class CommandQueue;
+		class Fence;
 		//class Renderer;
 		//class Context;
 	}
@@ -55,6 +56,7 @@ namespace Eternal
 	namespace GraphicData
 	{
 		class GraphicResources;
+		class GCommandQueue;
 
 		class GraphicTaskConfigCollection;
 		class ContextCollection;
@@ -127,7 +129,8 @@ namespace Eternal
 
 			Device*					_Device				= nullptr;
 			SwapChain*				_SwapChain			= nullptr;
-			CommandQueue*			_MainCommandQueue	= nullptr;
+			Fence*					_FrameFence			= nullptr;
+			GCommandQueue*			_MainCommandQueue	= nullptr;
 			HINSTANCE				_hInstance			= nullptr;
 			int						_nCmdShow			= 0;
 
@@ -145,6 +148,7 @@ namespace Eternal
 			Task* _ImguiBeginTask				= nullptr;
 			Task* _ImguiEndTask					= nullptr;
 			Task* _TimeTask						= nullptr;
+			Task* _CommandsTask					= nullptr;
 			Task* _UpdateTransformComponentTask	= nullptr;
 			Task* _UpdateCameraComponentTask	= nullptr;
 			Task* _UpdateLightComponentTask		= nullptr;

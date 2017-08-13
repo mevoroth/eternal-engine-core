@@ -39,8 +39,9 @@ namespace Eternal
 		{
 		public:
 			RenderObjectsTaskData(_In_ Device& DeviceObj, _In_ GraphicResources* Resources)
+				: _GraphicResources(Resources)
 			{
-				//_RootSignature = CreateRootSignature(DeviceObj, )
+				return;
 				InputLayout::VertexDataType DataTypes[] = {
 					InputLayout::POSITION_T,
 					InputLayout::NORMAL_T,
@@ -58,10 +59,10 @@ namespace Eternal
 
 				Sampler* BilinearSampler = Resources->GetStaticSamplers()->Get(SAMPLER_BILINEAR);
 
-				DescriptorHeap* FrameConstants		= CreateDescriptorHeap(DeviceObj, 0, 0, ROOT_SIGNATURE_PARAMETER_DYNAMIC_BUFFER, 1, (RootSignatureAccess)(ROOT_SIGNATURE_IA | ROOT_SIGNATURE_VS | ROOT_SIGNATURE_PS));
-				DescriptorHeap* ObjectConstants		= CreateDescriptorHeap(DeviceObj, 0, 1, ROOT_SIGNATURE_PARAMETER_DYNAMIC_BUFFER, 1, (RootSignatureAccess)(ROOT_SIGNATURE_IA | ROOT_SIGNATURE_VS | ROOT_SIGNATURE_PS));
-				DescriptorHeap* ObjectInstanceData	= CreateDescriptorHeap(DeviceObj, 0, 0, ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER, 1, (RootSignatureAccess)(ROOT_SIGNATURE_IA | ROOT_SIGNATURE_VS | ROOT_SIGNATURE_PS));
-				DescriptorHeap* ObjectTextureSet	= CreateDescriptorHeap(DeviceObj, 1, 0, ROOT_SIGNATURE_PARAMETER_TEXTURE, 4, (RootSignatureAccess)(ROOT_SIGNATURE_IA | ROOT_SIGNATURE_VS | ROOT_SIGNATURE_PS));
+				DescriptorHeap* FrameConstants		;//= CreateDescriptorHeap(DeviceObj, 0, 0, ROOT_SIGNATURE_PARAMETER_DYNAMIC_BUFFER, 1, (RootSignatureAccess)(ROOT_SIGNATURE_ACCESS_IA | ROOT_SIGNATURE_ACCESS_VS | ROOT_SIGNATURE_ACCESS_PS));
+				DescriptorHeap* ObjectConstants		;//= CreateDescriptorHeap(DeviceObj, 0, 1, ROOT_SIGNATURE_PARAMETER_DYNAMIC_BUFFER, 1, (RootSignatureAccess)(ROOT_SIGNATURE_ACCESS_IA | ROOT_SIGNATURE_ACCESS_VS | ROOT_SIGNATURE_ACCESS_PS));
+				DescriptorHeap* ObjectInstanceData	;//= CreateDescriptorHeap(DeviceObj, 0, 0, ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER, 1, (RootSignatureAccess)(ROOT_SIGNATURE_ACCESS_IA | ROOT_SIGNATURE_ACCESS_VS | ROOT_SIGNATURE_ACCESS_PS));
+				DescriptorHeap* ObjectTextureSet	;//= CreateDescriptorHeap(DeviceObj, 1, 0, ROOT_SIGNATURE_PARAMETER_TEXTURE, 4, (RootSignatureAccess)(ROOT_SIGNATURE_ACCESS_IA | ROOT_SIGNATURE_ACCESS_VS | ROOT_SIGNATURE_ACCESS_PS));
 
 				DescriptorHeap* DescriptorHeaps[] =
 				{
@@ -80,31 +81,34 @@ namespace Eternal
 
 				_Viewport		= Resources->GetViewports()->Get(VIEWPORT_FULLSCREEN);
 				_InputLayout	= CreateInputLayout(DeviceObj, DataTypes, ETERNAL_ARRAYSIZE(DataTypes));
-				_RootSignature	= CreateRootSignature(DeviceObj, &BilinearSampler, 1, DescriptorHeaps, ETERNAL_ARRAYSIZE(DescriptorHeaps), (RootSignatureAccess)(ROOT_SIGNATURE_IA | ROOT_SIGNATURE_VS | ROOT_SIGNATURE_PS));
-				_RenderPass		= CreateRenderPass(DeviceObj, *_Viewport, RenderTargets, GraphicBufferBlendStates, Resources->GetGraphicBuffers()->Get(GRAPHIC_BUFFER_DEPTH));
+				//_RootSignature	= CreateRootSignature(DeviceObj, &BilinearSampler, 1, DescriptorHeaps, ETERNAL_ARRAYSIZE(DescriptorHeaps), (RootSignatureAccess)(ROOT_SIGNATURE_ACCESS_IA | ROOT_SIGNATURE_ACCESS_VS | ROOT_SIGNATURE_ACCESS_PS));
+				//_RenderPass		= CreateRenderPass(DeviceObj, *_Viewport, RenderTargets, GraphicBufferBlendStates, Resources->GetGraphicBuffers()->Get(GRAPHIC_BUFFER_DEPTH));
 				_VS				= Resources->GetShaders()->Get(SHADER_OPAQUE_VS);
 				_PS				= Resources->GetShaders()->Get(SHADER_OPAQUE_PS);
 				_Pipeline		= CreatePipeline(DeviceObj, *_RootSignature, *_InputLayout, *_RenderPass, *GetVS(), *GetPS(), GetDepthTest(), GetStencilTest(), *GetViewport());
 			}
 
-			DepthTest& GetDepthTest() { return _DepthTest; }
-			StencilTest& GetStencilTest() { return _StencilTest; }
-			Viewport* GetViewport() { return _Viewport; }
-			Pipeline* GetPipeline() { return _Pipeline; }
-			RenderPass* GetRenderPass() { return _RenderPass; }
-			RenderTarget* GetRenderTargets() { return _RenderTargets; }
-			Shader* GetVS() { return _VS; }
-			Shader* GetPS() { return _PS; }
+			GraphicResources*	GetGraphicResources()	{ return _GraphicResources; }
+			DepthTest&			GetDepthTest()			{ return _DepthTest; }
+			StencilTest&		GetStencilTest()		{ return _StencilTest; }
+			RootSignature*		GetRootSignature()		{ return _RootSignature; }
+			Viewport*			GetViewport()			{ return _Viewport; }
+			Pipeline*			GetPipeline()			{ return _Pipeline; }
+			RenderPass*			GetRenderPass()			{ return _RenderPass; }
+			RenderTarget*		GetRenderTargets()		{ return _RenderTargets; }
+			Shader*				GetVS()					{ return _VS; }
+			Shader*				GetPS()					{ return _PS; }
 
 		private:
-			RootSignature*		_RootSignature	= nullptr;
-			Viewport*			_Viewport		= nullptr;
-			Pipeline*			_Pipeline		= nullptr;
-			RenderPass*			_RenderPass		= nullptr;
-			RenderTarget*		_RenderTargets	= nullptr;
-			InputLayout*		_InputLayout	= nullptr;
-			Shader*				_VS				= nullptr;
-			Shader*				_PS				= nullptr;
+			GraphicResources*	_GraphicResources	= nullptr;
+			RootSignature*		_RootSignature		= nullptr;
+			Viewport*			_Viewport			= nullptr;
+			Pipeline*			_Pipeline			= nullptr;
+			RenderPass*			_RenderPass			= nullptr;
+			RenderTarget*		_RenderTargets		= nullptr;
+			InputLayout*		_InputLayout		= nullptr;
+			Shader*				_VS					= nullptr;
+			Shader*				_PS					= nullptr;
 			DepthTest			_DepthTest;
 			StencilTest			_StencilTest;
 		};
@@ -117,19 +121,38 @@ RenderObjectsTask::RenderObjectsTask(_In_ Device& DeviceObj, _In_ GraphicResourc
 {
 }
 
+static void RenderObjectsTask_RenderSubMeshes(_Inout_ CommandList* CommandListObj, _In_ Mesh& MeshObj)
+{
+	if (MeshObj.GetVerticesCount())
+	{
+		Resource* VertexBuffer = MeshObj.GetVerticesBuffer();
+		CommandListObj->SetIndicesBuffer(MeshObj.GetIndicesBuffer());
+		CommandListObj->SetVerticesBuffers(0, 1, &VertexBuffer);
+		CommandListObj->DrawIndexed(MeshObj.GetIndicesCount(), 0, 0);
+	}
+
+	for (uint32_t SubMeshIndex = 0; SubMeshIndex < MeshObj.GetSubMeshesCount(); ++SubMeshIndex)
+	{
+		RenderObjectsTask_RenderSubMeshes(CommandListObj, MeshObj.GetSubMesh(SubMeshIndex));
+	}
+}
+
 void RenderObjectsTask::Render(_Inout_ CommandList* CommandListObj)
 {
-	vector<GraphicGameObject*>& GameObjects = *GetSharedData()->GraphicGameObjects;
-
+	vector<GraphicGameObject*>& GameObjects	= GetSharedData()->GraphicGameObjects;
+	RootSignature* RootSignatureObj			= _RenderObjectsTaskData->GetRootSignature();
+	CommandListObj->BindPipelineInput(*RootSignatureObj, nullptr, 0);
+	
 	for (uint32_t GameObjectIndex = 0; GameObjectIndex < GameObjects.size(); ++GameObjectIndex)
 	{
 		Mesh* CurrentMesh = GameObjects[GameObjectIndex]->GetMeshComponent()->GetMesh();
-		Resource* VertexBufferObj = CurrentMesh->GetVerticesBuffer();
+		//Resource* VertexBufferObj = CurrentMesh->GetVerticesBuffer();
 
-		CommandListObj->SetIndicesBuffer(CurrentMesh->GetIndicesBuffer());
-		CommandListObj->SetVerticesBuffers(0, 1, &VertexBufferObj);
-		//CommandListObj->BindPipelineInput()
-		CommandListObj->DrawIndexed(CurrentMesh->GetIndicesCount(), 0, 0);
+		//CommandListObj->SetIndicesBuffer(CurrentMesh->GetIndicesBuffer());
+		//CommandListObj->SetVerticesBuffers(0, 1, &VertexBufferObj);
+		////CommandListObj->BindPipelineInput()
+		//CommandListObj->DrawIndexed(CurrentMesh->GetIndicesCount(), 0, 0);
+		RenderObjectsTask_RenderSubMeshes(CommandListObj, *CurrentMesh);
 	}
 }
 
@@ -148,10 +171,10 @@ RenderPass* RenderObjectsTask::GetRenderPass()
 	return _RenderObjectsTaskData->GetRenderPass();
 }
 
-RenderTarget* RenderObjectsTask::GetRenderTargets()
-{
-	return _RenderObjectsTaskData->GetRenderTargets();
-}
+//RenderTarget* RenderObjectsTask::GetRenderTargets()
+//{
+//	return _RenderObjectsTaskData->GetRenderTargets();
+//}
 
 RenderOpaqueObjectsTask::RenderOpaqueObjectsTask(_In_ Device& DeviceObj, _In_ GraphicResources* Resources, _In_ StateSharedData* SharedData)
 	: RenderObjectsTask(DeviceObj, Resources, SharedData)
@@ -161,6 +184,5 @@ RenderOpaqueObjectsTask::RenderOpaqueObjectsTask(_In_ Device& DeviceObj, _In_ Gr
 bool RenderOpaqueObjectsTask::IsRendered() const
 {
 	const StateSharedData* SharedData = GetSharedData();
-	return SharedData->GraphicGameObjects != nullptr
-		&& SharedData->GraphicGameObjects->size();
+	return SharedData->GraphicGameObjects.size();
 }

@@ -44,15 +44,15 @@ namespace Eternal
 
 			virtual void DoSetup() override;
 			virtual void DoReset() override;
-			virtual void DoExecute() override;
+			virtual void DoExecute() override final;
 
 			virtual bool IsRendered() const = 0;
 			virtual void Render(_Inout_ CommandList* CommandListObj) = 0;
 
-			virtual Viewport* GetViewport() = 0;
+			virtual const Viewport* GetViewport() = 0;
 			virtual Pipeline* GetPipeline() = 0;
 			virtual RenderPass* GetRenderPass() = 0;
-			virtual RenderTarget* GetRenderTargets() = 0;
+			//virtual RenderTarget* GetRenderTargets() = 0;
 
 			StateSharedData* GetSharedData();
 			const StateSharedData* GetSharedData() const;

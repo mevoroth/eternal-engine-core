@@ -7,7 +7,14 @@ namespace Eternal
 {
 	namespace Graphics
 	{
-		class Renderer;
+		class Device;
+		class SwapChain;
+		class Fence;
+	}
+
+	namespace Core
+	{
+		class StateSharedData;
 	}
 
 	namespace GraphicData
@@ -20,12 +27,13 @@ namespace Eternal
 	{
 		using namespace Eternal::Parallel;
 		using namespace Eternal::Graphics;
-		using namespace Eternal::GraphicData;
+		using namespace Eternal::Core;
 
+		class InitFrameTaskData;
 		class InitFrameTask : public Task
 		{
 		public:
-			InitFrameTask(_In_ Renderer& RendererObj, _In_ ContextCollection& Contexts, _In_ RenderTargetCollection** RenderTargetCollections, _In_ int RenderTargetsCollectionsCount);
+			InitFrameTask(_In_ Device& DeviceObj, _In_ SwapChain& SwapChainObj, _In_ Fence& FenceObj, _In_ StateSharedData* SharedData);
 			~InitFrameTask();
 
 			virtual void DoSetup() override;
@@ -33,11 +41,7 @@ namespace Eternal
 			virtual void DoExecute() override;
 
 		private:
-			Renderer& _Renderer;
-
-			ContextCollection& _Contexts;
-			RenderTargetCollection** _RenderTargetCollections;
-			int _RenderTargetCollectionsCount = 0;
+			InitFrameTaskData* _InitFrameTaskData = nullptr;
 		};
 	}
 }

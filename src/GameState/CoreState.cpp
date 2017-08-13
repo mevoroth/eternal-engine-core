@@ -10,10 +10,13 @@
 //#include "Graphics/Renderer.hpp"
 //#include "Graphics/ShaderFactory.hpp"
 //#include "Graphics/ShaderFactoryFactory.hpp"
+#include "Graphics/ContextFactory.hpp"
 #include "Graphics/CommandQueueFactory.hpp"
 #include "Graphics/SwapChain.hpp"
 #include "Graphics/SwapChainFactory.hpp"
 #include "Graphics/Format.hpp"
+#include "Graphics/Fence.hpp"
+#include "Graphics/FenceFactory.hpp"
 #include "Input/InputFactory.hpp"
 #include "Time/TimeFactory.hpp"
 #include "Log/LogFactory.hpp"
@@ -25,15 +28,18 @@
 #include "Task/TimeTask.hpp"
 #include "Task/Core/UpdateComponentTask.hpp"
 #include "Task/Core/GameStateTask.hpp"
-//#include "Task/Graphics/InitFrameTask.hpp"
+#include "Task/Core/CommandsTask.hpp"
+#include "Task/Graphics/InitFrameTask.hpp"
+#include "Task/Graphics/SwapFrameTask.hpp"
 //#include "Task/Graphics/RenderObjectsTask.hpp"
 //#include "Task/Graphics/LightingTask.hpp"
 //#include "Task/Graphics/CompositingTask.hpp"
-//#include "Task/Graphics/SwapFrameTask.hpp"
 #include "Task/NextGenGraphics/RenderObjectsTask.hpp"
+#include "Task/NextGenGraphics/DebugRenderTask.hpp"
 #include "Task/NextGenGraphics/FinalizeFrameTask.hpp"
 #include "Resources/Pool.hpp"
 #include "Resources/TextureFactory.hpp"
+#include "Core/StateSharedData.hpp"
 #include "Core/TransformComponent.hpp"
 #include "Core/CameraComponent.hpp"
 #include "Core/LightComponent.hpp"
@@ -87,12 +93,14 @@ namespace Eternal
 
 		void CoreState::Begin()
 		{
-			FilePath::Register(_Settings.ShaderIncludePath, FilePath::SHADERS);
+			FilePath::Register(_Settings.ShaderIncludePath,	FilePath::SHADERS);
+			FilePath::Register(_Settings.SavePath,			FilePath::SAVES);
+			FilePath::Register(_Settings.TexturePath,		FilePath::TEXTURES);
 
 			_Time = CreateTime(TimeType::WIN);
 
-			_FileLog = CreateLog(FILE, "Eternal");
-			_ConsoleLog = CreateLog(CONSOLE, "Eternal");
+			_FileLog	= CreateLog(FILE, "Eternal");
+			_ConsoleLog	= CreateLog(CONSOLE, "Eternal");
 			Eternal::Log::Log* Logs[] =
 			{
 				//_FileLog,
@@ -100,8 +108,8 @@ namespace Eternal
 			};
 			_MultiChannelLog = CreateMultiChannelLog(Logs, ETERNAL_ARRAYSIZE(Logs));
 
-			_PadInput = CreateInput(XINPUT);
-			_KeyboardInput = CreateInput(InputType::WIN);
+			_PadInput		= CreateInput(XINPUT);
+			_KeyboardInput	= CreateInput(InputType::WIN);
 			Eternal::Input::Input* Inputs[] =
 			{
 				_PadInput,
@@ -114,7 +122,7 @@ namespace Eternal
 
 			_Window				= new Window(_hInstance, _nCmdShow, "ReShield", "EternalClass", 1280, 720);
 			_Window->Create(WindowsProcess::WindowProc);
-			//*
+			/*
 			_Device				= CreateDevice(D3D12, *_Window);
 			/*/
 			_Device				= CreateDevice(VULKAN, *_Window);
@@ -124,8 +132,16 @@ namespace Eternal
 			_GraphicResources->Initialize(*_Device);
 
 			//_MainCommandQueue	= CreateCommandQueue(*_Device, FRAME_LAG);
-			_MainCommandQueue	= _GraphicResources->GetCommandQueues()->Get(COMMAND_QUEUE_PRESENT);
-			_SwapChain			= CreateSwapChain(*_Device, *_Window, *_MainCommandQueue);
+			_MainCommandQueue	= _GraphicResources->GetCommandQueues()->Get(COMMAND_QUEUE_GRAPHIC);
+			_SwapChain			= CreateSwapChain(*_Device, *_Window, *_MainCommandQueue->Queue);
+			_FrameFence			= CreateFence(*_Device);
+			_MainCommandQueue->QueueFence	=	_FrameFence; // HACK
+
+			for (uint32_t ContextIndex = 0; ContextIndex < ETERNAL_ARRAYSIZE(GetSharedData()->GfxContexts); ++ContextIndex)
+			{
+				GetSharedData()->GfxContexts[ContextIndex] = CreateContext(*_Device);
+			}
+
 			//_Device = CreateDevice(WINDOWS, WindowsProcess::WindowProc, _hInstance, _nCmdShow, "ReShield", "EternalClass");
 			//_Renderer = CreateRenderer(RENDERER_D3D11);
 
@@ -142,7 +158,7 @@ namespace Eternal
 			_TextureFactory->RegisterTexturePath(_Settings.TexturePath);
 
 			_SaveSystem = new Eternal::SaveSystem::SaveSystem();
-			_SaveSystem->RegisterSavePath(_Settings.SavePath);
+			//_SaveSystem->RegisterSavePath(_Settings.SavePath);
 
 			_TaskManager = new TaskManager();
 
@@ -262,6 +278,10 @@ namespace Eternal
 			TimeTaskObj->SetTaskName("Time Task");
 			_TimeTask = TimeTaskObj;
 
+			CommandsTask* CommandsTaskObj = new CommandsTask(*_Device, _GraphicResources, GetSharedData());
+			CommandsTaskObj->SetTaskName("Commands Taks");
+			_CommandsTask = CommandsTaskObj;
+
 			UpdateComponentTask< Pool<TransformComponent> >* UpdateTransformComponentTaskObj = new UpdateComponentTask< Pool<TransformComponent> >(_Time, g_TransformComponentPool);
 			UpdateTransformComponentTaskObj->SetTaskName("Update Transform Pool Task");
 			_UpdateTransformComponentTask = UpdateTransformComponentTaskObj;
@@ -284,10 +304,10 @@ namespace Eternal
 			//	_LightRenderTargets,
 			//	_ShadowRenderTargets
 			//};
-			//InitFrameTask* InitFrameTaskObj = new InitFrameTask(*_Renderer, *_ContextCollection, RenderTargetCollections, ETERNAL_ARRAYSIZE(RenderTargetCollections));
-			//InitFrameTaskObj->SetTaskName("Init Frame Task");
-			//_InitFrameTask = InitFrameTaskObj;
-			//
+			InitFrameTask* InitFrameTaskObj = new InitFrameTask(*_Device, *_SwapChain, *_FrameFence, GetSharedData());
+			InitFrameTaskObj->SetTaskName("Init Frame Task");
+			_InitFrameTask = InitFrameTaskObj;
+			
 			//RenderObjectsTask* OpaqueTaskObj = new RenderOpaqueObjectsTask(_GraphictaskConfigCollection->GetGraphicTaskConfig(GraphicTaskConfigCollection::OPAQUE_TASK),
 			//	*_ContextCollection, *_OpaqueRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection, GetSharedData());
 			//OpaqueTaskObj->SetTaskName("Opaque Task (Render Objects)");
@@ -306,16 +326,16 @@ namespace Eternal
 			//CompositingTaskObj->SetTaskName("Compositing Task");
 			//_CompositingTask = CompositingTaskObj;
 
-			//SwapFrameTask* SwapFrameTaskObj = new SwapFrameTask(*_Renderer, *_Renderer->GetMainContext(), *_ContextCollection);
-			//SwapFrameTaskObj->SetTaskName("Swap Frame Task");
-			//_SwapFrameTask = SwapFrameTaskObj;
-
 #pragma region NextGenGraphics
 			RenderOpaqueObjectsTask* OpaqueTaskObj = new RenderOpaqueObjectsTask(*_Device, _GraphicResources, GetSharedData());
 			OpaqueTaskObj->SetTaskName("Render Object Task (Opaque Task)");
-			_OpaqueTask = OpaqueTaskObj;
+			//_OpaqueTask = OpaqueTaskObj;
 
-			FinalizeFrameTask* FinalizeFrameTaskObj = new FinalizeFrameTask(*_Device, *_SwapChain, _GraphicResources, GetSharedData());
+			DebugRenderTask* DebugRenderTaskObj = new DebugRenderTask(*_Device, *_SwapChain, _GraphicResources, GetSharedData());
+			DebugRenderTaskObj->SetTaskName("Debug Render Task");
+			_OpaqueTask = DebugRenderTaskObj;
+
+			FinalizeFrameTask* FinalizeFrameTaskObj = new FinalizeFrameTask(*_Device, *_SwapChain, *_FrameFence, _GraphicResources, GetSharedData());
 			FinalizeFrameTaskObj->SetTaskName("Finalize Frame Task");
 			_FinalizeFrameTask = FinalizeFrameTaskObj;
 #pragma endregion NextGenGraphics
@@ -329,13 +349,15 @@ namespace Eternal
 		void CoreState::_ScheduleTasks()
 		{
 			TaskManager& Scheduler = *_TaskManager;
+			Scheduler().PushTask(_InitFrameTask);
 			Scheduler().PushTask(_AutoRecompileShaderTask);
 			Scheduler().PushTask(_ControlsTask);
 			Scheduler().PushTask(_TimeTask);
-			//Scheduler().PushTask(_InitFrameTask);
+			Scheduler().PushTask(_CommandsTask, _InitFrameTask);
 			{
 				Scheduler().PushTask(_UpdateTransformComponentTask, _ControlsTask);
 				Scheduler().PushTask(_UpdateTransformComponentTask, _TimeTask);
+				Scheduler().PushTask(_UpdateTransformComponentTask, _CommandsTask);
 			}
 			Scheduler().PushTask(_UpdateCameraComponentTask, _UpdateTransformComponentTask);
 			Scheduler().PushTask(_UpdateLightComponentTask, _UpdateTransformComponentTask);

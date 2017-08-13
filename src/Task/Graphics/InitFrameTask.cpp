@@ -1,31 +1,65 @@
 #include "Task/Graphics/InitFrameTask.hpp"
 
 #include "Macros/Macros.hpp"
-#include "Graphics/Renderer.hpp"
-#include "Graphics/Context.hpp"
-#include "Graphics/RenderTarget.hpp"
-#include "GraphicData/ContextCollection.hpp"
-#include "GraphicData/RenderTargetCollection.hpp"
+#include "Graphics/Device.hpp"
+#include "Graphics/Fence.hpp"
+#include "Graphics/SwapChain.hpp"
+#include "Core/StateSharedData.hpp"
+#include "NextGenGraphics/Context.hpp"
 
 using namespace Eternal::Task;
 
-InitFrameTask::InitFrameTask(_In_ Renderer& RendererObj, _In_ ContextCollection& Contexts, RenderTargetCollection** RenderTargetCollections, _In_ int RenderTargetsCollectionsCount)
-	: _Renderer(RendererObj)
-	, _Contexts(Contexts)
-	, _RenderTargetCollectionsCount(RenderTargetsCollectionsCount)
+namespace Eternal
 {
-	ETERNAL_ASSERT(_RenderTargetCollectionsCount > 0);
-	_RenderTargetCollections = new RenderTargetCollection*[_RenderTargetCollectionsCount];
-	for (int RenderTargetsIndex = 0; RenderTargetsIndex < _RenderTargetCollectionsCount; ++RenderTargetsIndex)
+	namespace Task
 	{
-		_RenderTargetCollections[RenderTargetsIndex] = RenderTargetCollections[RenderTargetsIndex];
+		class InitFrameTaskData
+		{
+		public:
+			InitFrameTaskData(_In_ Device& DeviceObj, _In_ SwapChain& SwapChainObj, _In_ Fence& FrameFence, _In_ StateSharedData* SharedData)
+				: _Device(DeviceObj)
+				, _SwapChain(SwapChainObj)
+				, _FrameFence(FrameFence)
+				, _SharedData(SharedData)
+			{
+			}
+
+			Device& GetDevice()
+			{
+				return _Device;
+			}
+
+			SwapChain& GetSwapChain()
+			{
+				return _SwapChain;
+			}
+
+			Fence& GetFrameFence()
+			{
+				return _FrameFence;
+			}
+
+			StateSharedData* GetSharedData()
+			{
+				return _SharedData;
+			}
+
+		private:
+			Device&				_Device;
+			SwapChain&			_SwapChain;
+			Fence&				_FrameFence;
+			StateSharedData*	_SharedData = nullptr;
+		};
 	}
+}
+
+InitFrameTask::InitFrameTask(_In_ Device& DeviceObj, _In_ SwapChain& SwapChainObj, _In_ Fence& FenceObj, _In_ StateSharedData* SharedData)
+	: _InitFrameTaskData(new InitFrameTaskData(DeviceObj, SwapChainObj, FenceObj, SharedData))
+{
 }
 
 InitFrameTask::~InitFrameTask()
 {
-	delete[] _RenderTargetCollections;
-	_RenderTargetCollections = nullptr;
 }
 
 void InitFrameTask::DoSetup()
@@ -34,25 +68,17 @@ void InitFrameTask::DoSetup()
 
 void InitFrameTask::DoExecute()
 {
-	Context& ContextObj = _Contexts.Get();
-	ContextObj.Begin();
+	Device& DeviceObj			= _InitFrameTaskData->GetDevice();
+	SwapChain& SwapChainObj		= _InitFrameTaskData->GetSwapChain();
+	StateSharedData* SharedData	= _InitFrameTaskData->GetSharedData();
 
-	_Renderer.GetBackBuffer()->Clear(&ContextObj);
-	for (int RenderTargetsIndex = 0; RenderTargetsIndex < _RenderTargetCollectionsCount; ++RenderTargetsIndex)
-	{
-		RenderTargetCollection& CurrentRenderTargets = *_RenderTargetCollections[RenderTargetsIndex];
-		if (CurrentRenderTargets.GetDepthStencilRenderTarget())
-			CurrentRenderTargets.GetDepthStencilRenderTarget()->Clear(&ContextObj);
-		for (int BufferIndex = 0, BufferCount = CurrentRenderTargets.GetRenderTargetsCount(); BufferIndex < BufferCount; ++BufferIndex)
-		{
-			CurrentRenderTargets.GetRenderTargets()[BufferIndex]->Clear(&ContextObj);
-		}
-	}
+	Fence* FrameFence = SharedData->GfxContexts[SharedData->CurrentFrame]->GetFrameFence();
 
-	_RenderTargetCollections[0]->GetRenderTargets()[3]->Clear(&ContextObj, 0.5f);
-
-	ContextObj.End();
-	_Contexts.Release(ContextObj);
+	FrameFence->Wait(DeviceObj);
+	FrameFence->Reset(DeviceObj);
+	SwapChainObj.AcquireFrame(DeviceObj, *SharedData->GfxContexts[SharedData->CurrentFrame]);
+	SharedData->Reset();
+	///*SharedData->CurrentFrame = */SwapChainObj.AcquireFrame(DeviceObj, FrameFence);
 }
 
 void InitFrameTask::DoReset()

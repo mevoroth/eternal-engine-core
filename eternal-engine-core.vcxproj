@@ -94,7 +94,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>ETERNAL_DEBUG;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ETERNAL_DEBUG;ETERNAL_ENABLE_D3D12;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <ForcedIncludeFiles>sal.h</ForcedIncludeFiles>
       <AdditionalIncludeDirectories>C:\Program Files\Autodesk\FBX\FBX SDK\2016.1.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -164,6 +164,9 @@
     <ClInclude Include="include\Platform\WindowsProcess.hpp" />
     <ClInclude Include="include\GamePools.hpp" />
     <ClInclude Include="include\Task\ControlsTask.hpp" />
+    <ClInclude Include="include\Task\Core\CommandsTask.hpp" />
+    <ClInclude Include="include\Task\Core\Commands\EngineCommand.hpp" />
+    <ClInclude Include="include\Task\Core\Commands\UploadTextureDataCommand.hpp" />
     <ClInclude Include="include\Task\Core\GameStateTask.hpp" />
     <ClInclude Include="include\Task\Core\UpdateComponentTask.hpp" />
     <ClInclude Include="include\Task\DebugTask.hpp" />
@@ -173,9 +176,12 @@
     <ClInclude Include="include\Task\Graphics\RenderObjectsTask.hpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="include\Task\Graphics\SwapFrameTask.hpp" />
+    <ClInclude Include="include\Task\Graphics\SwapFrameTask.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="include\Task\ImguiBeginTask.hpp" />
     <ClInclude Include="include\Task\ImguiEndTask.hpp" />
+    <ClInclude Include="include\Task\NextGenGraphics\DebugRenderTask.hpp" />
     <ClInclude Include="include\Task\NextGenGraphics\FinalizeFrameTask.hpp" />
     <ClInclude Include="include\Task\NextGenGraphics\GraphicTask.hpp" />
     <ClInclude Include="include\Task\NextGenGraphics\RenderObjectsTask.hpp" />
@@ -185,6 +191,8 @@
   <ItemGroup>
     <ClCompile Include="src\Core\CameraComponent.cpp" />
     <ClCompile Include="src\Core\CameraGameObject.cpp" />
+    <ClCompile Include="src\Core\CommandsTask.cpp" />
+    <ClCompile Include="src\Core\Commands\UploadTextureDataCommand.cpp" />
     <ClCompile Include="src\Core\GameState.cpp" />
     <ClCompile Include="src\Core\GraphicGameObject.cpp" />
     <ClCompile Include="src\Core\Game.cpp" />
@@ -192,6 +200,7 @@
     <ClCompile Include="src\Core\LightGameObject.cpp" />
     <ClCompile Include="src\Core\MaterialComponent.cpp" />
     <ClCompile Include="src\Core\MeshComponent.cpp" />
+    <ClCompile Include="src\Core\StateSharedData.cpp" />
     <ClCompile Include="src\Core\TransformComponent.cpp" />
     <ClCompile Include="src\GameData\GameDatas.cpp" />
     <ClCompile Include="src\GameData\GraphicGameObjectGameData.cpp" />
@@ -208,13 +217,16 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="src\Task\Graphics\LightingTask.cpp" />
-    <ClCompile Include="src\Task\Graphics\SwapFrameTask.cpp" />
+    <ClCompile Include="src\Task\Graphics\SwapFrameTask.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\Task\ImguiBeginTask.cpp" />
     <ClCompile Include="src\Task\ImguiEndTask.cpp" />
     <ClCompile Include="src\Task\ControlsTask.cpp" />
     <ClCompile Include="src\Task\NextGenGraphics\FinalizeFrameTask.cpp" />
     <ClCompile Include="src\Task\NextGenGraphics\RenderObjectsTask.cpp" />
     <ClCompile Include="src\Task\NextGenGraphics\GraphicTask.cpp" />
+    <ClCompile Include="src\Task\NextGenGraphics\DebugRenderTask.cpp" />
     <ClCompile Include="src\Task\Task\GameStateTask.cpp" />
     <ClCompile Include="src\Task\TimeTask.cpp" />
     <ClCompile Include="src\Task\Tools\AutoRecompileShaderTask.cpp" />

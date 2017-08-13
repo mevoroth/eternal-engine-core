@@ -31,6 +31,9 @@
     <Filter Include="Task\NextGenGraphics">
       <UniqueIdentifier>{cddc970c-fb5c-4f58-8a53-e4ca0c205f22}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Task\Core\Commands">
+      <UniqueIdentifier>{8c892df6-d3d7-45c1-8ffd-7f6ed1f36117}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Game.hpp">
@@ -149,6 +152,18 @@
     <ClInclude Include="include\Task\NextGenGraphics\FinalizeFrameTask.hpp">
       <Filter>Task\NextGenGraphics</Filter>
     </ClInclude>
+    <ClInclude Include="include\Task\Core\CommandsTask.hpp">
+      <Filter>Task\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Task\NextGenGraphics\DebugRenderTask.hpp">
+      <Filter>Task\NextGenGraphics</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Task\Core\Commands\EngineCommand.hpp">
+      <Filter>Task\Core\Commands</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Task\Core\Commands\UploadTextureDataCommand.hpp">
+      <Filter>Task\Core\Commands</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Game.cpp">
@@ -247,6 +262,18 @@
     </ClCompile>
     <ClCompile Include="src\Task\NextGenGraphics\FinalizeFrameTask.cpp">
       <Filter>Task\NextGenGraphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\StateSharedData.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\CommandsTask.cpp">
+      <Filter>Task\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task\NextGenGraphics\DebugRenderTask.cpp">
+      <Filter>Task\NextGenGraphics</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Commands\UploadTextureDataCommand.cpp">
+      <Filter>Task\Core\Commands</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

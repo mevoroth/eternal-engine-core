@@ -31,7 +31,7 @@ namespace Eternal
 			virtual Viewport* GetViewport() override;
 			virtual Pipeline* GetPipeline() override;
 			virtual RenderPass* GetRenderPass() override;
-			virtual RenderTarget* GetRenderTargets() override;
+			//virtual RenderTarget* GetRenderTargets() override;
 
 		protected:
 			RenderObjectsTaskData* GetRenderObjectsTaskData() { return _RenderObjectsTaskData; }
