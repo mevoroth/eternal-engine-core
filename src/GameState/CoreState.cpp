@@ -122,7 +122,7 @@ namespace Eternal
 
 			_Window				= new Window(_hInstance, _nCmdShow, "ReShield", "EternalClass", 1280, 720);
 			_Window->Create(WindowsProcess::WindowProc);
-			/*
+			//*
 			_Device				= CreateDevice(D3D12, *_Window);
 			/*/
 			_Device				= CreateDevice(VULKAN, *_Window);

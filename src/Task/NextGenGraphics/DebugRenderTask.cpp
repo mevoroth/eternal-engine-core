@@ -41,7 +41,7 @@ namespace Eternal
 			DebugRenderTaskData(_In_ Device& DeviceObj, _In_ SwapChain& SwapChainObj, _In_ GraphicResources* Resources, _In_ StateSharedData* SharedData)
 			{
 				_TextureHeap	= CreateHeap(DeviceObj, HEAP_TYPE_TEXTURE, 1, true, false, false, false);
-				_Texture		= CreateResource(DeviceObj, *_TextureHeap, L"Test Texture", RESOURCE_DIMENSION_TEXTURE_2D, FORMAT_BGRA8888, (TextureType)(TEXTURE_READ | TEXTURE_RENDER_TARGET), 1024, 1024, 1, 1, TRANSITION_COPY_WRITE);
+				_Texture		= CreateResource(DeviceObj, *_TextureHeap, L"Test Texture", RESOURCE_DIMENSION_TEXTURE_2D, FORMAT_BGRA8888, (TextureType)(TEXTURE_READ | TEXTURE_COPY_WRITE), 1024, 1024, 1, 1, TRANSITION_COPY_WRITE);
 
 				uint32_t Height, Width;
 				uint8_t* TextureData = Eternal::Import::ImportTga::Get()->Import(Eternal::File::FilePath::Find("fzero.tga", Eternal::File::FilePath::TEXTURES), Height, Width);
@@ -67,6 +67,7 @@ namespace Eternal
 				_PS				= Resources->GetShaders()->Get(DEBUG_RENDER_PS);
 				_InputLayout	= CreateInputLayout(DeviceObj, nullptr, 0);
 				_RootSignature	= CreateRootSignature(DeviceObj, TextureParameters, ETERNAL_ARRAYSIZE(TextureParameters), ROOT_SIGNATURE_ACCESS_PS);
+				//_RootSignature	= CreateRootSignature(DeviceObj);
 				_Pipeline		= CreatePipeline(DeviceObj, *_RootSignature, *_InputLayout, SwapChainObj.GetMainRenderPass(), *GetVS(), *GetPS(), GetDepthTest(), GetStencilTest(), SwapChainObj.GetMainViewport());
 			}
 			

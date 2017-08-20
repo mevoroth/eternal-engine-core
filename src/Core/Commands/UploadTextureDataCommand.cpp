@@ -21,16 +21,33 @@ void UploadTextureDataCommand::Execute(_In_ Device& DeviceObj, _In_ GraphicResou
 		memcpy(UploadBufferData, TextureData, sizeof(uint8_t) * 4 * Width * Height);
 		UploadBuffer->Unmap(DeviceObj);
 
+		ResourceTransition TextureTransitionBefore(DestinationTexture, TRANSITION_UNDEFINED, TRANSITION_COPY_WRITE);
+		CommandListObj.Transition(nullptr, 0u, &TextureTransitionBefore, 1u);
+
 		Position3D Pos = { 0, 0, 0 };
 		Extent Ext = { Width, Height, 1 };
 		CommandListObj.CopyBufferToTexture(*UploadBuffer, *DestinationTexture, 0, sizeof(uint32_t) * Width * Height, Pos, Ext);
+
+		ResourceTransition TextureTransitionAfter(DestinationTexture, TRANSITION_COPY_WRITE, TRANSITION_SHADER_READ);
+		CommandListObj.Transition(nullptr, 0u, &TextureTransitionAfter, 1u);
 	} break;
 #endif
 	case VULKAN:
 	{
-		void* Buffer = DestinationTexture->Map(DeviceObj);
-		memcpy(Buffer, TextureData, sizeof(uint8_t) * 4 * Width * Height);
-		DestinationTexture->Unmap(DeviceObj);
+		Resource* UploadBuffer = Resources->GetUploadBuffers()->Get(UPLOAD_BUFFER_TEXTURE)->Pop();
+		void* UploadBufferData = UploadBuffer->Map(DeviceObj);
+		memcpy(UploadBufferData, TextureData, sizeof(uint8_t) * 4 * Width * Height);
+		UploadBuffer->Unmap(DeviceObj);
+
+		ResourceTransition TextureTransitionBefore(DestinationTexture, TRANSITION_UNDEFINED, TRANSITION_COPY_WRITE);
+		CommandListObj.Transition(nullptr, 0u, &TextureTransitionBefore, 1u);
+
+		Position3D Pos = { 0, 0, 0 };
+		Extent Ext = { Width, Height, 1 };
+		CommandListObj.CopyBufferToTexture(*UploadBuffer, *DestinationTexture, 0, sizeof(uint32_t) * Width * Height, Pos, Ext);
+
+		ResourceTransition TextureTransitionAfter(DestinationTexture, TRANSITION_COPY_WRITE, TRANSITION_SHADER_READ);
+		CommandListObj.Transition(nullptr, 0u, &TextureTransitionAfter, 1u);
 	} break;
 
 	default:

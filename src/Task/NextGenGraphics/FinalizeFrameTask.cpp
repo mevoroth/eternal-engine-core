@@ -72,20 +72,13 @@ void FinalizeFrameTask::DoExecute()
 	Context* GfxContext = SharedData->GfxContexts[CurrentFrame];
 	//GfxContext->GetFrameFence()
 
-	GCommandQueue* CommandQueue0 = _FinalizeFrameTaskData->GetGraphicResources()->GetCommandQueues()->Get(COMMAND_QUEUE_GRAPHIC);
-	//CommandQueue0->QueueFence->Wait(DeviceObj);
-	//CommandQueue0->QueueFence->Reset(DeviceObj);
-
-	//CommandQueue0->Queue->Submit()
-	
-	//MainGCommandQueue->Queue->Submit(CurrentFrame, &CommandListObj, 1, FrameFence, SwapChainObj);
-
+	GCommandQueue* GraphicCommandQueue	= _FinalizeFrameTaskData->GetGraphicResources()->GetCommandQueues()->Get(COMMAND_QUEUE_GRAPHIC);
 	CommandList** RecordedCommandLists	= SharedData->RecordedCommandLists[CurrentFrame];
 	int CommandListsCount				= SharedData->CommandListsCount[CurrentFrame]->Load();
-	CommandQueue0->Queue->Submit(CurrentFrame, RecordedCommandLists, CommandListsCount > 1 ? 1 : CommandListsCount, *GfxContext->GetFrameFence(), SwapChainObj);
+	//CommandQueue0->Queue->Submit(CurrentFrame, RecordedCommandLists, CommandListsCount > 1 ? 1 : CommandListsCount, *GfxContext->GetFrameFence(), SwapChainObj);
+	GraphicCommandQueue->Queue->Submit(*GfxContext, RecordedCommandLists, CommandListsCount);
 	GfxContext->GetFrameFence()->Signal(*MainGCommandQueue->Queue);
-	//SwapChainObj.Present(DeviceObj, *MainGCommandQueue->Queue, CurrentFrame);
-	SwapChainObj.Present(DeviceObj, *GfxContext);
+	SwapChainObj.Present(DeviceObj, *GraphicCommandQueue->Queue, *GfxContext);
 
 	_FinalizeFrameTaskData->GetSharedData()->CurrentFrame = (_FinalizeFrameTaskData->GetSharedData()->CurrentFrame + 1) % FRAME_LAG;
 }

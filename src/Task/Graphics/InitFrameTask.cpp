@@ -72,11 +72,12 @@ void InitFrameTask::DoExecute()
 	SwapChain& SwapChainObj		= _InitFrameTaskData->GetSwapChain();
 	StateSharedData* SharedData	= _InitFrameTaskData->GetSharedData();
 
+	SwapChainObj.AcquireFrame(DeviceObj, *SharedData->GfxContexts[SharedData->CurrentFrame]);
+
 	Fence* FrameFence = SharedData->GfxContexts[SharedData->CurrentFrame]->GetFrameFence();
 
 	FrameFence->Wait(DeviceObj);
 	FrameFence->Reset(DeviceObj);
-	SwapChainObj.AcquireFrame(DeviceObj, *SharedData->GfxContexts[SharedData->CurrentFrame]);
 	SharedData->Reset();
 	///*SharedData->CurrentFrame = */SwapChainObj.AcquireFrame(DeviceObj, FrameFence);
 }

@@ -90,7 +90,11 @@ void CommandsTask::DoExecute()
 
 	static bool once = false;
 
-	if (once && !PendingQueue.size())
+	uint32_t PendingCommandsCount = 0u;
+	for (uint32_t ThreadIndex = 0; ThreadIndex < Commands.size(); ++ThreadIndex)
+		PendingCommandsCount += Commands[ThreadIndex].size();
+
+	if (once && !PendingQueue.size() && !PendingCommandsCount)
 		return;
 
 	//GCommandQueueObj->Queue->Reset(SharedData->CurrentFrame);
@@ -113,6 +117,7 @@ void CommandsTask::DoExecute()
 			EngineCommand* CurrentCommand = Commands[ThreadIndex][CommandIndex];
 			CurrentCommand->Execute(DeviceObj, Resources, *LoadingCommandList);
 		}
+		Commands[ThreadIndex].clear();
 	}
 
 	if (!once)
@@ -127,7 +132,7 @@ void CommandsTask::DoExecute()
 		}
 		ResourceTransitions[GRAPHIC_BUFFER_DEPTH].ResourceObj	= GBuffers->GetResource(GRAPHIC_BUFFER_DEPTH);
 		ResourceTransitions[GRAPHIC_BUFFER_DEPTH].Before		= TRANSITION_UNDEFINED;
-		ResourceTransitions[GRAPHIC_BUFFER_DEPTH].After			= TRANSITION_DEPTH_STENCIL_WRITE;
+		ResourceTransitions[GRAPHIC_BUFFER_DEPTH].After			= TransitionState(/*TRANSITION_DEPTH_STENCIL_READ |*/ TRANSITION_DEPTH_STENCIL_WRITE);
 		LoadingCommandList->Transition(nullptr, 0u, ResourceTransitions, GRAPHIC_BUFFER_COUNT);
 		once = true;
 	}
