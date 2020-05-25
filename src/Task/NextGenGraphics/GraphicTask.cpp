@@ -4,6 +4,7 @@
 #include "Macros/Macros.hpp"
 #include "NextGenGraphics/Device.hpp"
 #include "Core/StateSharedData.hpp"
+#include "NextGenGraphics/Context.hpp"
 #include "Graphics/CommandQueueFactory.hpp"
 #include "Graphics/CommandQueue.hpp"
 #include "Graphics/CommandList.hpp"
@@ -78,6 +79,9 @@ void GraphicTask::DoExecute()
 	Render(CommandListObj);
 
 	CommandListObj->EndRenderPass();
+	
+	Resource* CurrentBackBuffer = GetSharedData()->GfxContexts[GetSharedData()->CurrentFrame]->GetFrameBackBuffer();
+
 	CommandListObj->End();
 
 	_GraphicTaskData->GetSharedData()->RecordCommandList(CommandListObj);

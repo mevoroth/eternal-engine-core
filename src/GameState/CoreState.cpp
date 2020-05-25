@@ -3,6 +3,7 @@
 #include "GraphicsSettings.hpp"
 #include "Platform/WindowsProcess.hpp"
 #include "Window/Window.hpp"
+#include "NextGenGraphics/Types/DeviceType.hpp"
 #include "NextGenGraphics/DeviceFactory.hpp"
 #include "NextGenGraphics/Device.hpp"
 #include "NextGenGraphics/ShaderFactory.hpp"
@@ -60,6 +61,7 @@
 
 #ifdef ETERNAL_DEBUG
 #include "Task/Tools/AutoRecompileShaderTask.hpp"
+#include "include/RenderDoc.h"
 #endif
 
 using namespace Eternal::Resources;
@@ -93,9 +95,9 @@ namespace Eternal
 
 		void CoreState::Begin()
 		{
-			FilePath::Register(_Settings.ShaderIncludePath,	FilePath::SHADERS);
-			FilePath::Register(_Settings.SavePath,			FilePath::SAVES);
-			FilePath::Register(_Settings.TexturePath,		FilePath::TEXTURES);
+			FilePath::Register(_Settings.ShaderIncludePath,	FileType::SHADERS);
+			FilePath::Register(_Settings.SavePath,			FileType::SAVES);
+			FilePath::Register(_Settings.TexturePath,		FileType::TEXTURES);
 
 			_Time = CreateTime(TimeType::WIN);
 
@@ -122,8 +124,13 @@ namespace Eternal
 
 			_Window				= new Window(_hInstance, _nCmdShow, "ReShield", "EternalClass", 1280, 720);
 			_Window->Create(WindowsProcess::WindowProc);
+
+#ifdef ETERNAL_DEBUG
+			RenderDoc::Initialize();
+#endif
+
 			//*
-			_Device				= CreateDevice(D3D12, *_Window);
+			_Device				= CreateDevice(DeviceType::D3D12, *_Window);
 			/*/
 			_Device				= CreateDevice(VULKAN, *_Window);
 			/**/
@@ -154,8 +161,8 @@ namespace Eternal
 
 			_ImportTga = new ImportTga();
 
-			_TextureFactory = new TextureFactory();
-			_TextureFactory->RegisterTexturePath(_Settings.TexturePath);
+			//_TextureFactory = new TextureFactory();
+			//_TextureFactory->RegisterTexturePath(_Settings.TexturePath);
 
 			_SaveSystem = new Eternal::SaveSystem::SaveSystem();
 			//_SaveSystem->RegisterSavePath(_Settings.SavePath);
@@ -229,17 +236,16 @@ namespace Eternal
 			delete _KeyboardInput;
 			_KeyboardInput = nullptr;
 
-			delete _MultiChannelLog;
-			_MultiChannelLog = nullptr;
-
-			delete _ConsoleLog;
-			_ConsoleLog = nullptr;
-
-			delete _FileLog;
-			_FileLog = nullptr;
+			DeleteLog(_MultiChannelLog);
+			DeleteLog(_ConsoleLog);
+			DeleteLog(_FileLog);
 
 			delete _Time;
 			_Time = nullptr;
+
+#ifdef ETERNAL_DEBUG
+			RenderDoc::Release();
+#endif
 		}
 
 		void CoreState::_InitializePools()

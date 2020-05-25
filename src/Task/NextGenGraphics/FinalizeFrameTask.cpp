@@ -7,6 +7,7 @@
 #include "Graphics/SwapChain.hpp"
 #include "Graphics/Fence.hpp"
 #include "NextGenGraphics/Context.hpp"
+#include "Log/Log.hpp"
 
 using namespace Eternal::Task;
 
@@ -76,7 +77,9 @@ void FinalizeFrameTask::DoExecute()
 	CommandList** RecordedCommandLists	= SharedData->RecordedCommandLists[CurrentFrame];
 	int CommandListsCount				= SharedData->CommandListsCount[CurrentFrame]->Load();
 	//CommandQueue0->Queue->Submit(CurrentFrame, RecordedCommandLists, CommandListsCount > 1 ? 1 : CommandListsCount, *GfxContext->GetFrameFence(), SwapChainObj);
+	//Eternal::Log::Log::Get()->Write(Eternal::Log::Log::Warning, Eternal::Log::Log::Graphics, "FinalizeFrameTask Submit");
 	GraphicCommandQueue->Queue->Submit(*GfxContext, RecordedCommandLists, CommandListsCount);
+	//Eternal::Log::Log::Get()->Write(Eternal::Log::Log::Warning, Eternal::Log::Log::Graphics, "FinalizeFrameTask Signal");
 	GfxContext->GetFrameFence()->Signal(*MainGCommandQueue->Queue);
 	SwapChainObj.Present(DeviceObj, *GraphicCommandQueue->Queue, *GfxContext);
 

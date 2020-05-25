@@ -90,7 +90,7 @@ void CommandsTask::DoExecute()
 
 	static bool once = false;
 
-	uint32_t PendingCommandsCount = 0u;
+	size_t PendingCommandsCount = 0u;
 	for (uint32_t ThreadIndex = 0; ThreadIndex < Commands.size(); ++ThreadIndex)
 		PendingCommandsCount += Commands[ThreadIndex].size();
 

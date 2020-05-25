@@ -56,7 +56,7 @@ namespace Eternal
 	namespace GraphicData
 	{
 		class GraphicResources;
-		class GCommandQueue;
+		struct GCommandQueue;
 
 		class GraphicTaskConfigCollection;
 		class ContextCollection;

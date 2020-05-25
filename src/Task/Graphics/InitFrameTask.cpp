@@ -6,6 +6,9 @@
 #include "Graphics/SwapChain.hpp"
 #include "Core/StateSharedData.hpp"
 #include "NextGenGraphics/Context.hpp"
+#include "Log/Log.hpp"
+
+#include "include/RenderDoc.h"
 
 using namespace Eternal::Task;
 
@@ -64,6 +67,12 @@ InitFrameTask::~InitFrameTask()
 
 void InitFrameTask::DoSetup()
 {
+	static bool once = false;
+	if (!once)
+	{
+		RenderDoc::TriggerCapture();
+		once = true;
+	}
 }
 
 void InitFrameTask::DoExecute()
@@ -72,11 +81,13 @@ void InitFrameTask::DoExecute()
 	SwapChain& SwapChainObj		= _InitFrameTaskData->GetSwapChain();
 	StateSharedData* SharedData	= _InitFrameTaskData->GetSharedData();
 
-	SwapChainObj.AcquireFrame(DeviceObj, *SharedData->GfxContexts[SharedData->CurrentFrame]);
-
 	Fence* FrameFence = SharedData->GfxContexts[SharedData->CurrentFrame]->GetFrameFence();
 
+	SwapChainObj.AcquireFrame(DeviceObj, *SharedData->GfxContexts[SharedData->CurrentFrame]);
+
+	//Eternal::Log::Log::Get()->Write(Eternal::Log::Log::Warning, Eternal::Log::Log::Graphics, "InitFrameTask Wait");
 	FrameFence->Wait(DeviceObj);
+	//Eternal::Log::Log::Get()->Write(Eternal::Log::Log::Warning, Eternal::Log::Log::Graphics, "InitFrameTask Reset");
 	FrameFence->Reset(DeviceObj);
 	SharedData->Reset();
 	///*SharedData->CurrentFrame = */SwapChainObj.AcquireFrame(DeviceObj, FrameFence);

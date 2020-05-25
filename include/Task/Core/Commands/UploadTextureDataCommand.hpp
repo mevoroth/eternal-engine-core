@@ -13,8 +13,9 @@ namespace Eternal
 
 	namespace Core
 	{
-		struct UploadTextureDataCommand : public EngineCommand
+		class UploadTextureDataCommand : public EngineCommand
 		{
+		public:
 			Resource*	DestinationTexture	= nullptr;
 			void*		TextureData			= nullptr;
 			uint32_t	Width				= 0u;

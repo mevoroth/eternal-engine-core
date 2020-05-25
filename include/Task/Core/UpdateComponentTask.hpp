@@ -12,7 +12,7 @@ namespace Eternal
 		using namespace Eternal::Parallel;
 
 		template<class Pool>
-		class UpdateComponentTask : public Task
+		class UpdateComponentTask : public Parallel::Task
 		{
 		public:
 			UpdateComponentTask(_In_ Eternal::Time::Time* TimeObj, _In_ Pool* PoolObj)

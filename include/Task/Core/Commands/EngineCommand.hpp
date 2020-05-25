@@ -19,8 +19,9 @@ namespace Eternal
 		using namespace Eternal::GraphicData;
 		using namespace Eternal::Graphics;
 
-		struct EngineCommand
+		class EngineCommand
 		{
+		public:
 			virtual void Execute(_In_ Device& DeviceObj, _In_ GraphicResources* Resources, _In_ CommandList& CommandListObj) = 0;
 		};
 	}
