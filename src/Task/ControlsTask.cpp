@@ -23,7 +23,7 @@ void ControlsTask::DoExecute()
 	}
 }
 
-void ControlsTask::RegisterInput(_In_ Input* InputObj)
+void ControlsTask::RegisterInput(_In_ Eternal::Input::Input* InputObj)
 {
 	_Inputs.push_back(InputObj);
 }
