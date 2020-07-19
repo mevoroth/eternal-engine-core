@@ -1,6 +1,5 @@
 #include "GameData/MaterialGameData.hpp"
 
-#include "Macros/Macros.hpp"
 #include "Core/MaterialComponent.hpp"
 #include "GraphicData/Material.hpp"
 

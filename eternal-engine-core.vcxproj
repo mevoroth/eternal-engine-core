@@ -96,8 +96,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>ETERNAL_DEBUG;ETERNAL_ENABLE_D3D12;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
-      <ForcedIncludeFiles>sal.h</ForcedIncludeFiles>
-      <AdditionalIncludeDirectories>C:\Program Files\Autodesk\FBX\FBX SDK\2016.1.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>sal.h;CoreSettings.hpp</ForcedIncludeFiles>
+      <AdditionalIncludeDirectories>D:\Code\FBX\FBX SDK\2020.0.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
@@ -139,6 +139,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\CoreSettings.hpp" />
     <ClInclude Include="include\Core\CameraComponent.hpp" />
     <ClInclude Include="include\Core\CameraGameObject.hpp" />
     <ClInclude Include="include\Core\GraphicGameObject.hpp" />

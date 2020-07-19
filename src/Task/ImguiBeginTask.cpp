@@ -4,7 +4,6 @@
 #define VC_EXTRALEAN
 #define WIN32_EXTRA_LEAN
 #include <Windows.h>
-#include "Macros/Macros.hpp"
 #include "Input/Input.hpp"
 
 using namespace Eternal::Task;

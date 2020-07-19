@@ -3,8 +3,6 @@
 
 #include "GraphicsSettings.hpp"
 
-#include <cstdint>
-#include <vector>
 #include "Parallel/AtomicS32.hpp"
 
 namespace Eternal

@@ -1,7 +1,6 @@
 #ifndef _UPLOAD_TEXTURE_DATA_COMMAND_HPP_
 #define _UPLOAD_TEXTURE_DATA_COMMAND_HPP_
 
-#include <cstdint>
 #include "Task/Core/Commands/EngineCommand.hpp"
 
 namespace Eternal

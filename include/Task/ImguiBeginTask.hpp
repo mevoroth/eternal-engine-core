@@ -1,8 +1,6 @@
 #ifndef _IMGUI_BEGIN_TASK_HPP_
 #define _IMGUI_BEGIN_TASK_HPP_
 
-#include <vector>
-#include <cstdint>
 #include "Parallel/Task.hpp"
 #include "Input/Input.hpp"
 #include "imgui.h"

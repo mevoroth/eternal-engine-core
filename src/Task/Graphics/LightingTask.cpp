@@ -1,6 +1,5 @@
 #include "Task/Graphics/LightingTask.hpp"
 
-#include "Macros/Macros.hpp"
 #include "Types/Types.hpp"
 
 #include "Graphics/DepthStencil.hpp"

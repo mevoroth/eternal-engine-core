@@ -1,8 +1,6 @@
 #ifndef _GAME_OBJECT_HPP_
 #define _GAME_OBJECT_HPP_
 
-#include <vector>
-#include "Macros/Macros.hpp"
 #include "Time/Time.hpp"
 
 namespace Eternal

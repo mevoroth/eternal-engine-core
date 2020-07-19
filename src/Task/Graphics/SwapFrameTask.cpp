@@ -1,6 +1,5 @@
 #include "Task/Graphics/SwapFrameTask.hpp"
 
-#include "Macros/Macros.hpp"
 #include "Graphics/SwapChain.hpp"
 
 using namespace Eternal::Task;

@@ -1,12 +1,10 @@
 #include "Task/ImguiEndTask.hpp"
 
-#include <cstdint>
 #define VC_EXTRALEAN
 #define WIN32_LEAN_AND_MEAN
 #define WIN32_EXTRA_LEAN
-#include <windows.h>
+#include <Windows.h>
 
-#include "Macros/Macros.hpp"
 #include "imgui.h"
 #include "Imgui/D3D11ImguiVertexBuffer.hpp"
 #include "Graphics/Context.hpp"

@@ -1,7 +1,5 @@
 #include "Core/StateSharedData.hpp"
 
-#include "Macros/Macros.hpp"
-#include <cstdint>
 #include "Parallel/AtomicS32Factory.hpp"
 #include "Parallel/CpuCoreCount.hpp"
 

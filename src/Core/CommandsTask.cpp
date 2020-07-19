@@ -1,6 +1,5 @@
 #include "Task/Core/CommandsTask.hpp"
 
-#include <vector>
 #include "Graphics/Device.hpp"
 #include "Graphics/CommandQueue.hpp"
 #include "Graphics/CommandList.hpp"

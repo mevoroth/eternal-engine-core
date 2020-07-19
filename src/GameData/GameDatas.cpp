@@ -1,6 +1,5 @@
 #include "GameData/GameDatas.hpp"
 
-#include "Macros/Macros.hpp"
 #include "Log/Log.hpp"
 #include "GameData/GraphicGameObjectGameData.hpp"
 #include "GameData/GraphicGameObjectInstanceGameData.hpp"

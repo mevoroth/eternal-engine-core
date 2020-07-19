@@ -1,6 +1,5 @@
 #include "Task/NextGenGraphics/RenderObjectsTask.hpp"
 
-#include <vector>
 #include "Core/StateSharedData.hpp"
 #include "Core/GraphicGameObject.hpp"
 #include "Core/MeshComponent.hpp"

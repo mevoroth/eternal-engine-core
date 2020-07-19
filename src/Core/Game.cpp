@@ -1,7 +1,5 @@
 #include "Core/Game.hpp"
 
-#include "Macros/Macros.hpp"
-
 using namespace std;
 using namespace Eternal::Core;
 

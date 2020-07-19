@@ -1,6 +1,5 @@
 #include "Task/Graphics/InitFrameTask.hpp"
 
-#include "Macros/Macros.hpp"
 #include "Graphics/Device.hpp"
 #include "Graphics/Fence.hpp"
 #include "Graphics/SwapChain.hpp"

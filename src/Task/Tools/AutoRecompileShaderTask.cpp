@@ -1,12 +1,10 @@
 #include "Task/Tools/AutoRecompileShaderTask.hpp"
 
-#include "Macros/Macros.hpp"
 #define VC_EXTRALEAN
 #define WIN32_EXTRA_LEAN
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <string>
-#include <vector>
 #include "Graphics/ShaderFactory.hpp"
 
 using namespace Eternal::Task;

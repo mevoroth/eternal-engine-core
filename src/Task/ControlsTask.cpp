@@ -1,7 +1,5 @@
 #include "Task/ControlsTask.hpp"
 
-#include "Macros/Macros.hpp"
-
 #include "Input/Input.hpp"
 
 using namespace Eternal::Task;

@@ -1,6 +1,5 @@
 #include "Task/Core/GameStateTask.hpp"
 
-#include "Macros/Macros.hpp"
 #include "Core/GameState.hpp"
 #include "Core/StateSharedData.hpp"
 

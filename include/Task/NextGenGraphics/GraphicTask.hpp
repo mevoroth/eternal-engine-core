@@ -1,7 +1,6 @@
 #ifndef _GRAPHIC_TASK_HPP_
 #define _GRAPHIC_TASK_HPP_
 
-#include <cstdint>
 #include "Parallel/Task.hpp"
 
 namespace Eternal

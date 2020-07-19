@@ -1,8 +1,6 @@
 #ifndef _CONTROLS_TASK_HPP_
 #define _CONTROLS_TASK_HPP_
 
-#include <vector>
-
 #include "Parallel/Task.hpp"
 
 using namespace std;

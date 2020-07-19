@@ -1,7 +1,5 @@
 #include "Task/DebugTask.hpp"
 
-#include <vector>
-#include "Macros/Macros.hpp"
 #include "Graphics/Context.hpp"
 #include "Graphics/ShaderFactory.hpp"
 #include "Graphics/Shader.hpp"

@@ -164,6 +164,7 @@
     <ClInclude Include="include\Task\Core\Commands\UploadTextureDataCommand.hpp">
       <Filter>Task\Core\Commands</Filter>
     </ClInclude>
+    <ClInclude Include="include\CoreSettings.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Game.cpp">

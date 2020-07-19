@@ -1,7 +1,5 @@
 #include "Task/NextGenGraphics/GraphicTask.hpp"
 
-#include <vector>
-#include "Macros/Macros.hpp"
 #include "NextGenGraphics/Device.hpp"
 #include "Core/StateSharedData.hpp"
 #include "NextGenGraphics/Context.hpp"

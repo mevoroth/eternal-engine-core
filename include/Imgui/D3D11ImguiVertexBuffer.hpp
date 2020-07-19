@@ -3,8 +3,6 @@
 
 #include "d3d11/D3D11VertexBuffer.hpp"
 
-#include <vector>
-
 #include "imgui.h"
 
 namespace Eternal

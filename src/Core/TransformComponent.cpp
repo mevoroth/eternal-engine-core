@@ -1,6 +1,5 @@
 #include "Core/TransformComponent.hpp"
 
-#include "Macros/Macros.hpp"
 #include "Transform/Transform.hpp"
 #include "Resources/Pool.hpp"
 

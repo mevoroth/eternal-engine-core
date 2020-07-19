@@ -1,6 +1,5 @@
 #include "GameData/TransformGameData.hpp"
 
-#include "Macros/Macros.hpp"
 #include "Types/Types.hpp"
 #include "Core/TransformComponent.hpp"
 #include "include/json/json.h"

@@ -1,7 +1,6 @@
 #ifndef _DEBUG_TASK_HPP_
 #define _DEBUG_TASK_HPP_
 
-#include <vector>
 #include "Parallel/Task.hpp"
 #include "Types/Types.hpp"
 

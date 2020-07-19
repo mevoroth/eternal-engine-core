@@ -1,6 +1,5 @@
 #include "Platform/WindowsProcess.hpp"
 
-#include "Macros/Macros.hpp"
 #include "Input/Input.hpp"
 
 Eternal::Input::Input* Eternal::Platform::WindowsProcess::_InputHandler = nullptr;

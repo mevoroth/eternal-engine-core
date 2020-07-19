@@ -1,6 +1,5 @@
 #include "Task/Graphics/CompositingTask.hpp"
 
-#include "Macros/Macros.hpp"
 #include "Graphics/Renderer.hpp"
 #include "Graphics/Context.hpp"
 #include "Graphics/RenderTarget.hpp"
