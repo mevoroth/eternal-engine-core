@@ -14,7 +14,7 @@ GraphicGameObjectGameData::GraphicGameObjectGameData(_In_ GraphicGameObject& Gam
 void GraphicGameObjectGameData::Prepare(void* Parent)
 {
 	Json::Value& GameObjectNode = *(Json::Value*)Parent;
-	ETERNAL_ASSERT(false); // IMPLEMENTATION CHANGED OUT OF DATE
+	ETERNAL_BREAK(); // IMPLEMENTATION CHANGED OUT OF DATE
 	//TransformGameData TransformComponentObject(*_GameObject.GetTransformComponent());
 	//TransformComponentObject.Prepare(&GameObjectNode["Transform"]);
 }

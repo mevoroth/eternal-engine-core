@@ -64,7 +64,7 @@ void AutoRecompileShaderTask::DoExecute()
 	//		else
 	//		{
 	//			OutputDebugString("ok");
-	//			ETERNAL_ASSERT(false);
+	//			ETERNAL_BREAK();
 	//		}
 	//	}
 	//}

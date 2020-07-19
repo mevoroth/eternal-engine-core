@@ -70,6 +70,6 @@ Eternal::SaveSystem::GameData* GameDatas::FindLoader(_In_ const void* Serialized
 	}
 	Log::Log::Get()->Write(Log::Log::Error, Log::Log::Save, "[GameDatas::FindLoader][1/2]No loader found");
 	Log::Log::Get()->Write(Log::Log::Error, Log::Log::Save, "[GameDatas::FindLoader][2/2]Data might be corrupted");
-	ETERNAL_ASSERT(false); // Unknown type
+	ETERNAL_BREAK(); // Unknown type
 	return nullptr;
 }

@@ -60,7 +60,7 @@ void FinalizeFrameTask::DoSetup()
 
 void FinalizeFrameTask::DoExecute()
 {
-	//ETERNAL_ASSERT(false);
+	//ETERNAL_BREAK();
 	StateSharedData* SharedData			= _FinalizeFrameTaskData->GetSharedData();
 	uint32_t CurrentFrame				= SharedData->CurrentFrame;
 	GCommandQueue* MainGCommandQueue	= _FinalizeFrameTaskData->GetGraphicResources()->GetCommandQueues()->Get(COMMAND_QUEUE_GRAPHIC);

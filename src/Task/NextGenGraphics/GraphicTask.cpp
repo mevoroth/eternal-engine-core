@@ -63,7 +63,7 @@ void GraphicTask::DoExecute()
 	if (!IsRendered())
 		return;
 
-	//ETERNAL_ASSERT(false);
+	//ETERNAL_BREAK();
 	//CommandList* CommandListObj = _GraphicTaskData->GetCommandQueue()->Pop();
 	CommandList* CommandListObj = _GraphicTaskData->GetCommandList();
 	//CommandAllocator* CommandAllocatorObj = _GraphicTaskData->GetCommandQueue()->GetCommandAllocator(GetSharedData()->CurrentFrame);

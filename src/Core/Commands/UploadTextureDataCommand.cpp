@@ -58,7 +58,7 @@ void UploadTextureDataCommand::Execute(_In_ Device& DeviceObj, _In_ GraphicResou
 	} break;
 
 	default:
-		ETERNAL_ASSERT(false);
+		ETERNAL_BREAK();
 		break;
 	}
 }

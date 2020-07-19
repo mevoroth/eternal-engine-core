@@ -83,7 +83,7 @@ LightComponent* LightGameObject::GetLightComponent()
 
 LightGameObjectInstance::LightGameObjectInstance()
 {
-	ETERNAL_ASSERT(false); // Doesn't make sense to implement light instance
+	ETERNAL_BREAK(); // Doesn't make sense to implement light instance
 }
 
 void LightGameObjectInstance::Begin()

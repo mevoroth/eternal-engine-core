@@ -37,7 +37,7 @@ namespace Eternal
 
 			void RemoveInstance(_In_ GameObjectInstanceType* Instance)
 			{
-				ETERNAL_ASSERT(false); // Not implemented
+				ETERNAL_BREAK(); // Not implemented
 			}
 
 			size_t GetInstanceCount() const
