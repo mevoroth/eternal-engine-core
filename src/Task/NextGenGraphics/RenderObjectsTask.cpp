@@ -3,7 +3,7 @@
 #include "Core/StateSharedData.hpp"
 #include "Core/GraphicGameObject.hpp"
 #include "Core/MeshComponent.hpp"
-#include "Graphics_deprecated/CommandList.hpp"
+#include "Graphics/CommandList.hpp"
 #include "Graphics_deprecated/RootSignature.hpp"
 #include "Graphics_deprecated/RootSignatureFactory.hpp"
 #include "Graphics_deprecated/InputLayout.hpp"
@@ -122,37 +122,37 @@ RenderObjectsTask::RenderObjectsTask(_In_ Device& DeviceObj, _In_ GraphicResourc
 
 static void RenderObjectsTask_RenderSubMeshes(_Inout_ CommandList* CommandListObj, _In_ Mesh& MeshObj)
 {
-	if (MeshObj.GetVerticesCount())
-	{
-		Resource* VertexBuffer = MeshObj.GetVerticesBuffer();
-		CommandListObj->SetIndicesBuffer(MeshObj.GetIndicesBuffer());
-		CommandListObj->SetVerticesBuffers(0, 1, &VertexBuffer);
-		CommandListObj->DrawIndexed(MeshObj.GetIndicesCount(), 0, 0);
-	}
+	//if (MeshObj.GetVerticesCount())
+	//{
+	//	Resource* VertexBuffer = MeshObj.GetVerticesBuffer();
+	//	CommandListObj->SetIndicesBuffer(MeshObj.GetIndicesBuffer());
+	//	CommandListObj->SetVerticesBuffers(0, 1, &VertexBuffer);
+	//	CommandListObj->DrawIndexed(MeshObj.GetIndicesCount(), 0, 0);
+	//}
 
-	for (uint32_t SubMeshIndex = 0; SubMeshIndex < MeshObj.GetSubMeshesCount(); ++SubMeshIndex)
-	{
-		RenderObjectsTask_RenderSubMeshes(CommandListObj, MeshObj.GetSubMesh(SubMeshIndex));
-	}
+	//for (uint32_t SubMeshIndex = 0; SubMeshIndex < MeshObj.GetSubMeshesCount(); ++SubMeshIndex)
+	//{
+	//	RenderObjectsTask_RenderSubMeshes(CommandListObj, MeshObj.GetSubMesh(SubMeshIndex));
+	//}
 }
 
 void RenderObjectsTask::Render(_Inout_ CommandList* CommandListObj)
 {
-	vector<GraphicGameObject*>& GameObjects	= GetSharedData()->GraphicGameObjects;
-	RootSignature* RootSignatureObj			= _RenderObjectsTaskData->GetRootSignature();
-	CommandListObj->BindPipelineInput(*RootSignatureObj, nullptr, 0);
-	
-	for (uint32_t GameObjectIndex = 0; GameObjectIndex < GameObjects.size(); ++GameObjectIndex)
-	{
-		Mesh* CurrentMesh = GameObjects[GameObjectIndex]->GetMeshComponent()->GetMesh();
-		//Resource* VertexBufferObj = CurrentMesh->GetVerticesBuffer();
+	//vector<GraphicGameObject*>& GameObjects	= GetSharedData()->GraphicGameObjects;
+	//RootSignature* RootSignatureObj			= _RenderObjectsTaskData->GetRootSignature();
+	//CommandListObj->BindPipelineInput(*RootSignatureObj, nullptr, 0);
+	//
+	//for (uint32_t GameObjectIndex = 0; GameObjectIndex < GameObjects.size(); ++GameObjectIndex)
+	//{
+	//	Mesh* CurrentMesh = GameObjects[GameObjectIndex]->GetMeshComponent()->GetMesh();
+	//	//Resource* VertexBufferObj = CurrentMesh->GetVerticesBuffer();
 
-		//CommandListObj->SetIndicesBuffer(CurrentMesh->GetIndicesBuffer());
-		//CommandListObj->SetVerticesBuffers(0, 1, &VertexBufferObj);
-		////CommandListObj->BindPipelineInput()
-		//CommandListObj->DrawIndexed(CurrentMesh->GetIndicesCount(), 0, 0);
-		RenderObjectsTask_RenderSubMeshes(CommandListObj, *CurrentMesh);
-	}
+	//	//CommandListObj->SetIndicesBuffer(CurrentMesh->GetIndicesBuffer());
+	//	//CommandListObj->SetVerticesBuffers(0, 1, &VertexBufferObj);
+	//	////CommandListObj->BindPipelineInput()
+	//	//CommandListObj->DrawIndexed(CurrentMesh->GetIndicesCount(), 0, 0);
+	//	RenderObjectsTask_RenderSubMeshes(CommandListObj, *CurrentMesh);
+	//}
 }
 
 Viewport* RenderObjectsTask::GetViewport()

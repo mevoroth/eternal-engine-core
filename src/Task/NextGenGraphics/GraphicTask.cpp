@@ -3,10 +3,9 @@
 #include "NextGenGraphics/Device.hpp"
 #include "Core/StateSharedData.hpp"
 #include "NextGenGraphics/Context.hpp"
-#include "Graphics_deprecated/CommandQueueFactory.hpp"
-#include "Graphics_deprecated/CommandQueue.hpp"
-#include "Graphics_deprecated/CommandList.hpp"
-#include "Graphics_deprecated/CommandQueue.hpp"
+#include "Graphics/CommandQueueFactory.hpp"
+#include "Graphics/CommandQueue.hpp"
+#include "Graphics/CommandList.hpp"
 #include "Graphics_deprecated/CommandListFactory.hpp"
 #include "GraphicData/GraphicResources.hpp"
 #include "GraphicData/CommandQueues.hpp"
@@ -27,9 +26,9 @@ namespace Eternal
 			GraphicTaskData(_In_ Device& DeviceObj, _In_ GraphicResources* Resources, _In_ StateSharedData* SharedData)
 				: _SharedData(SharedData)
 			{
-				_CommandLists.resize(FRAME_LAG);
-				for (uint32_t CommandListIndex = 0; CommandListIndex < _CommandLists.size(); ++CommandListIndex)
-					_CommandLists[CommandListIndex] = CreateCommandList(DeviceObj, COMMAND_LIST_TYPE_GRAPHIC);
+				//_CommandLists.resize(FRAME_LAG);
+				//for (uint32_t CommandListIndex = 0; CommandListIndex < _CommandLists.size(); ++CommandListIndex)
+				//	_CommandLists[CommandListIndex] = CreateCommandList(DeviceObj, COMMAND_LIST_TYPE_GRAPHIC);
 			}
 
 			CommandList*		GetCommandList()	{ return _CommandLists[_SharedData->CurrentFrame]; }
@@ -60,29 +59,29 @@ void GraphicTask::DoSetup()
 
 void GraphicTask::DoExecute()
 {
-	if (!IsRendered())
-		return;
+	//if (!IsRendered())
+	//	return;
 
-	//ETERNAL_BREAK();
-	//CommandList* CommandListObj = _GraphicTaskData->GetCommandQueue()->Pop();
-	CommandList* CommandListObj = _GraphicTaskData->GetCommandList();
-	//CommandAllocator* CommandAllocatorObj = _GraphicTaskData->GetCommandQueue()->GetCommandAllocator(GetSharedData()->CurrentFrame);
-	const Viewport& ViewportObj = *GetViewport();
+	////ETERNAL_BREAK();
+	////CommandList* CommandListObj = _GraphicTaskData->GetCommandQueue()->Pop();
+	//CommandList* CommandListObj = _GraphicTaskData->GetCommandList();
+	////CommandAllocator* CommandAllocatorObj = _GraphicTaskData->GetCommandQueue()->GetCommandAllocator(GetSharedData()->CurrentFrame);
+	//const Viewport& ViewportObj = *GetViewport();
 
-	CommandListObj->Begin(*GetPipeline());
-	CommandListObj->BeginRenderPass(*GetRenderPass());
-	CommandListObj->SetViewport(ViewportObj);
-	CommandListObj->SetScissorRectangle(ViewportObj);
+	//CommandListObj->Begin(*GetPipeline());
+	//CommandListObj->BeginRenderPass(*GetRenderPass());
+	//CommandListObj->SetViewport(ViewportObj);
+	//CommandListObj->SetScissorRectangle(ViewportObj);
 
-	Render(CommandListObj);
+	//Render(CommandListObj);
 
-	CommandListObj->EndRenderPass();
-	
-	Resource* CurrentBackBuffer = GetSharedData()->GfxContexts[GetSharedData()->CurrentFrame]->GetFrameBackBuffer();
+	//CommandListObj->EndRenderPass();
+	//
+	////Resource* CurrentBackBuffer = GetSharedData()->GfxContexts[GetSharedData()->CurrentFrame]->GetFrameBackBuffer();
 
-	CommandListObj->End();
+	//CommandListObj->End();
 
-	_GraphicTaskData->GetSharedData()->RecordCommandList(CommandListObj);
+	//_GraphicTaskData->GetSharedData()->RecordCommandList(CommandListObj);
 }
 
 void GraphicTask::DoReset()

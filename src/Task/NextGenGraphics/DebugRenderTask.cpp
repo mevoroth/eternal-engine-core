@@ -15,7 +15,7 @@
 #include "Graphics_deprecated/RootSignature.hpp"
 #include "Graphics_deprecated/RootSignatureFactory.hpp"
 #include "Graphics_deprecated/SwapChain.hpp"
-#include "Graphics_deprecated/CommandList.hpp"
+#include "Graphics/CommandList.hpp"
 #include "Graphics_deprecated/DescriptorHeapFactory.hpp"
 #include "Graphics_deprecated/DescriptorHeap.hpp"
 #include "Graphics_deprecated/Heap.hpp"
@@ -42,45 +42,45 @@ namespace Eternal
 		public:
 			DebugRenderTaskData(_In_ Device& DeviceObj, _In_ SwapChain& SwapChainObj, _In_ GraphicResources* Resources, _In_ StateSharedData* SharedData)
 			{
-				_TextureHeap	= CreateHeap(DeviceObj, HEAP_TYPE_TEXTURE, 1, true, false, false, false);
-				_Texture		= CreateResource(DeviceObj, *_TextureHeap, L"Test Texture", RESOURCE_DIMENSION_TEXTURE_2D, FORMAT_BGRA8888, (TextureType)(TEXTURE_READ | TEXTURE_COPY_WRITE), 1024, 1024, 1, 1, TRANSITION_UNDEFINED);
+				//_TextureHeap	= CreateHeap(DeviceObj, HEAP_TYPE_TEXTURE, 1, true, false, false, false);
+				//_Texture		= CreateResource(DeviceObj, *_TextureHeap, L"Test Texture", RESOURCE_DIMENSION_TEXTURE_2D, FORMAT_BGRA8888, (TextureType)(TEXTURE_READ | TEXTURE_COPY_WRITE), 1024, 1024, 1, 1, TRANSITION_UNDEFINED);
 
-				uint32_t Height, Width;
-				uint8_t* TextureData = Eternal::Import::ImportTga::Get()->Import(Eternal::File::FilePath::Find("fzero.tga", Eternal::File::FileType::TEXTURES), Height, Width);
-				UploadTextureDataCommand* UploadCommand = new UploadTextureDataCommand;
-				UploadCommand->DestinationTexture	= _Texture;
-				UploadCommand->TextureData			= TextureData;
-				UploadCommand->Width				= Width;
-				UploadCommand->Height				= Height;
-				SharedData->EngineCommands[SharedData->CurrentFrame][0].push_back(UploadCommand);
+				//uint32_t Height, Width;
+				//uint8_t* TextureData = Eternal::Import::ImportTga::Get()->Import(Eternal::File::FilePath::Find("fzero.tga", Eternal::File::FileType::TEXTURES), Height, Width);
+				//UploadTextureDataCommand* UploadCommand = new UploadTextureDataCommand;
+				//UploadCommand->DestinationTexture	= _Texture;
+				//UploadCommand->TextureData			= TextureData;
+				//UploadCommand->Width				= Width;
+				//UploadCommand->Height				= Height;
+				//SharedData->EngineCommands[SharedData->CurrentFrame][0].push_back(UploadCommand);
 
-				vector<RootSignatureParameter> TextureParameters[2];
-				RootSignatureParameter TexParam = { RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE, RootSignatureAccess::ROOT_SIGNATURE_ACCESS_IA_VS_PS, 0 };
-				RootSignatureParameter SamParam = { RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_SAMPLER, RootSignatureAccess::ROOT_SIGNATURE_ACCESS_IA_VS_PS, 0 };
-				TextureParameters[0].push_back(TexParam);
-				TextureParameters[1].push_back(SamParam);
+				//vector<RootSignatureParameter> TextureParameters[2];
+				//RootSignatureParameter TexParam = { RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE, RootSignatureAccess::ROOT_SIGNATURE_ACCESS_IA_VS_PS, 0 };
+				//RootSignatureParameter SamParam = { RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_SAMPLER, RootSignatureAccess::ROOT_SIGNATURE_ACCESS_IA_VS_PS, 0 };
+				//TextureParameters[0].push_back(TexParam);
+				//TextureParameters[1].push_back(SamParam);
 
-				_TextureDescriptorHeap = CreateDescriptorHeap(DeviceObj, TextureParameters[0].data(), uint32_t(TextureParameters[0].size()));
-				TexView = _Texture->CreateView(DeviceObj, *_TextureDescriptorHeap, TEXTURE_VIEW_TYPE_2D, FORMAT_BGRA8888);
-				TexDescriptorTable = _TextureDescriptorHeap->CreateView(DeviceObj);
-				TexDescriptorTable->SetResource(0, TexView);
-				TexDescriptorTable->Update(DeviceObj);
+				//_TextureDescriptorHeap = CreateDescriptorHeap(DeviceObj, TextureParameters[0].data(), uint32_t(TextureParameters[0].size()));
+				//TexView = _Texture->CreateView(DeviceObj, *_TextureDescriptorHeap, TEXTURE_VIEW_TYPE_2D, FORMAT_BGRA8888);
+				//TexDescriptorTable = _TextureDescriptorHeap->CreateView(DeviceObj);
+				//TexDescriptorTable->SetResource(0, TexView);
+				//TexDescriptorTable->Update(DeviceObj);
 
-				_SamplerDescriptorHeap = CreateDescriptorHeap(DeviceObj, TextureParameters[1].data(), uint32_t(TextureParameters[1].size()));
-				_Sampler = CreateSampler(DeviceObj, *_SamplerDescriptorHeap, true, true, true, false, ADDRESS_MODE_WRAP, ADDRESS_MODE_WRAP, ADDRESS_MODE_WRAP);
-				SamDescriptorTable = _SamplerDescriptorHeap->CreateView(DeviceObj);
-				SamDescriptorTable->SetResource(0, _Sampler);
-				SamDescriptorTable->Update(DeviceObj);
+				//_SamplerDescriptorHeap = CreateDescriptorHeap(DeviceObj, TextureParameters[1].data(), uint32_t(TextureParameters[1].size()));
+				//_Sampler = CreateSampler(DeviceObj, *_SamplerDescriptorHeap, true, true, true, false, ADDRESS_MODE_WRAP, ADDRESS_MODE_WRAP, ADDRESS_MODE_WRAP);
+				//SamDescriptorTable = _SamplerDescriptorHeap->CreateView(DeviceObj);
+				//SamDescriptorTable->SetResource(0, _Sampler);
+				//SamDescriptorTable->Update(DeviceObj);
 
-				_Viewport		= &SwapChainObj.GetMainViewport();
-				_VS				= Resources->GetShaders()->Get(POST_PROCESS_VS);
-				_PS				= Resources->GetShaders()->Get(DEBUG_RENDER_PS);
-				_InputLayout	= CreateInputLayout(DeviceObj, nullptr, 0);
-				_RootSignature	= CreateRootSignature(DeviceObj, TextureParameters, ETERNAL_ARRAYSIZE(TextureParameters), RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS);
-				//_RootSignature	= CreateRootSignature(DeviceObj);
-				_Pipeline		= CreatePipeline(DeviceObj, *_RootSignature, *_InputLayout, SwapChainObj.GetMainRenderPass(), *GetVS(), *GetPS(), GetDepthTest(), GetStencilTest(), SwapChainObj.GetMainViewport());
-				
-				//CreateRenderPass(DeviceObj, *_Viewport, )
+				//_Viewport		= &SwapChainObj.GetMainViewport();
+				//_VS				= Resources->GetShaders()->Get(POST_PROCESS_VS);
+				//_PS				= Resources->GetShaders()->Get(DEBUG_RENDER_PS);
+				//_InputLayout	= CreateInputLayout(DeviceObj, nullptr, 0);
+				//_RootSignature	= CreateRootSignature(DeviceObj, TextureParameters, ETERNAL_ARRAYSIZE(TextureParameters), RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS);
+				////_RootSignature	= CreateRootSignature(DeviceObj);
+				//_Pipeline		= CreatePipeline(DeviceObj, *_RootSignature, *_InputLayout, SwapChainObj.GetMainRenderPass(), *GetVS(), *GetPS(), GetDepthTest(), GetStencilTest(), SwapChainObj.GetMainViewport());
+				//
+				////CreateRenderPass(DeviceObj, *_Viewport, )
 			}
 			
 			const StencilTest&	GetStencilTest()	const	{ return _StencilTest; }
@@ -151,24 +151,24 @@ bool DebugRenderTask::IsRendered() const
 
 void DebugRenderTask::Render(_Inout_ CommandList* CommandListObj)
 {
-	Resource* CurrentBackBuffer = GetSharedData()->GfxContexts[GetSharedData()->CurrentFrame]->GetFrameBackBuffer();
-	ResourceTransition TransitionBefore(CurrentBackBuffer, TRANSITION_PRESENT, TRANSITION_RENDER_TARGET_WRITE);
-	ResourceTransition TransitionAfter(CurrentBackBuffer, TRANSITION_RENDER_TARGET_WRITE, TRANSITION_PRESENT);
+	//Resource* CurrentBackBuffer = nullptr;// GetSharedData()->GfxContexts[GetSharedData()->CurrentFrame]->GetFrameBackBuffer();
+	//ResourceTransition TransitionBefore(CurrentBackBuffer, TRANSITION_PRESENT, TRANSITION_RENDER_TARGET_WRITE);
+	//ResourceTransition TransitionAfter(CurrentBackBuffer, TRANSITION_RENDER_TARGET_WRITE, TRANSITION_PRESENT);
 
-	DescriptorHeap* TestTex = _DebugRenderTaskData->GetTextureDescriptorHeap();
+	//DescriptorHeap* TestTex = _DebugRenderTaskData->GetTextureDescriptorHeap();
 
-	DescriptorHeap* DescriptorHeaps[] =
-	{
-		_DebugRenderTaskData->GetTextureDescriptorHeap(),
-		_DebugRenderTaskData->GetSamplerDescriptorHeap()
-	};
+	//DescriptorHeap* DescriptorHeaps[] =
+	//{
+	//	_DebugRenderTaskData->GetTextureDescriptorHeap(),
+	//	_DebugRenderTaskData->GetSamplerDescriptorHeap()
+	//};
 
-	CommandListObj->BindPipelineInput(*_DebugRenderTaskData->GetRootSignature(), DescriptorHeaps, ETERNAL_ARRAYSIZE(DescriptorHeaps));
-	CommandListObj->BindDescriptorTable(0, *_DebugRenderTaskData->TexDescriptorTable);
-	CommandListObj->BindDescriptorTable(1, *_DebugRenderTaskData->SamDescriptorTable);
-	//CommandListObj->Transition(nullptr, 0u, &TransitionBefore, 1);
-	CommandListObj->DrawPrimitive(6);
-	CommandListObj->Transition(nullptr, 0u, &TransitionAfter, 1);
+	//CommandListObj->BindPipelineInput(*_DebugRenderTaskData->GetRootSignature(), DescriptorHeaps, ETERNAL_ARRAYSIZE(DescriptorHeaps));
+	//CommandListObj->BindDescriptorTable(0, *_DebugRenderTaskData->TexDescriptorTable);
+	//CommandListObj->BindDescriptorTable(1, *_DebugRenderTaskData->SamDescriptorTable);
+	////CommandListObj->Transition(nullptr, 0u, &TransitionBefore, 1);
+	//CommandListObj->DrawPrimitive(6);
+	//CommandListObj->Transition(nullptr, 0u, &TransitionAfter, 1);
 }
 
 const Viewport* DebugRenderTask::GetViewport()
@@ -183,5 +183,5 @@ Pipeline* DebugRenderTask::GetPipeline()
 
 RenderPass* DebugRenderTask::GetRenderPass()
 {
-	return GetSharedData()->GfxContexts[GetSharedData()->CurrentFrame]->GetFrameRenderPass();
+	return nullptr;// GetSharedData()->GfxContexts[GetSharedData()->CurrentFrame]->GetFrameRenderPass();
 }
