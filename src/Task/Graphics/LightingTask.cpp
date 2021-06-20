@@ -12,7 +12,7 @@
 #include "Graphics/ConstantFactory.hpp"
 #include "Graphics/Resource.hpp"
 #include "Graphics/Viewport.hpp"
-#include "Graphics/RenderTarget.hpp"
+//#include "Graphics/RenderTarget.hpp"
 #include "GraphicData/RenderTargetCollection.hpp"
 #include "GraphicData/ContextCollection.hpp"
 #include "GraphicData/SamplerCollection.hpp"

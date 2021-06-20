@@ -81,7 +81,7 @@ void FinalizeFrameTask::DoExecute()
 	GraphicCommandQueue->Queue->Submit(*GfxContext, RecordedCommandLists, CommandListsCount);
 	//Eternal::Log::Log::Get()->Write(Eternal::Log::Log::Warning, Eternal::Log::Log::Graphics, "FinalizeFrameTask Signal");
 	GfxContext->GetFrameFence()->Signal(*MainGCommandQueue->Queue);
-	SwapChainObj.Present(DeviceObj, *GraphicCommandQueue->Queue, *GfxContext);
+	//SwapChainObj.Present(DeviceObj, *GraphicCommandQueue->Queue, *GfxContext);
 
 	_FinalizeFrameTaskData->GetSharedData()->CurrentFrame = (_FinalizeFrameTaskData->GetSharedData()->CurrentFrame + 1) % FRAME_LAG;
 }

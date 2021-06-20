@@ -180,28 +180,28 @@ void DebugTask::DoExecute()
 
 void DebugTask::_DrawGizmo()
 {
-	RenderTarget* NullRenderTarget = nullptr;
+	//RenderTarget* NullRenderTarget = nullptr;
 
-	Context& ContextObj = _DebugTaskData->GetContexts().Get();
+	//Context& ContextObj = _DebugTaskData->GetContexts().Get();
 
-	_DebugTaskData->GetFrameConstants()->GetAsResource()->Lock(ContextObj, Resource::LOCK_WRITE_DISCARD);
-	_DebugTaskData->GetFrameConstants()->GetAsResource()->Unlock(ContextObj);
+	//_DebugTaskData->GetFrameConstants()->GetAsResource()->Lock(ContextObj, Resource::LOCK_WRITE_DISCARD);
+	//_DebugTaskData->GetFrameConstants()->GetAsResource()->Unlock(ContextObj);
 
-	ContextObj.SetTopology(Context::TRIANGLELIST);
-	ContextObj.BindShader<Context::VERTEX>(_DebugTaskData->GetVS());
-	ContextObj.BindShader<Context::PIXEL>(_DebugTaskData->GetPS());
+	//ContextObj.SetTopology(Context::TRIANGLELIST);
+	//ContextObj.BindShader<Context::VERTEX>(_DebugTaskData->GetVS());
+	//ContextObj.BindShader<Context::PIXEL>(_DebugTaskData->GetPS());
 
-	ContextObj.BindConstant<Context::VERTEX>(0, _DebugTaskData->GetFrameConstants());
+	//ContextObj.BindConstant<Context::VERTEX>(0, _DebugTaskData->GetFrameConstants());
 
-	ContextObj.SetRenderTargets(_DebugTaskData->GetRenderTargets().GetRenderTargets(), _DebugTaskData->GetRenderTargets().GetRenderTargetsCount());
-	ContextObj.DrawIndexed(_DebugTaskData->GetVertices(), _DebugTaskData->GetIndices());
-	ContextObj.SetRenderTargets(&NullRenderTarget, 1);
+	//ContextObj.SetRenderTargets(_DebugTaskData->GetRenderTargets().GetRenderTargets(), _DebugTaskData->GetRenderTargets().GetRenderTargetsCount());
+	//ContextObj.DrawIndexed(_DebugTaskData->GetVertices(), _DebugTaskData->GetIndices());
+	//ContextObj.SetRenderTargets(&NullRenderTarget, 1);
 
-	ContextObj.UnbindConstant<Context::VERTEX>(0);
+	//ContextObj.UnbindConstant<Context::VERTEX>(0);
 
-	ContextObj.UnbindShader<Context::VERTEX>();
-	ContextObj.UnbindShader<Context::PIXEL>();
-	ContextObj.SetTopology(Context::TRIANGLELIST);
+	//ContextObj.UnbindShader<Context::VERTEX>();
+	//ContextObj.UnbindShader<Context::PIXEL>();
+	//ContextObj.SetTopology(Context::TRIANGLELIST);
 
-	_DebugTaskData->GetContexts().Release(ContextObj);
+	//_DebugTaskData->GetContexts().Release(ContextObj);
 }

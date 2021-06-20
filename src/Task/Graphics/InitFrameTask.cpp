@@ -76,20 +76,20 @@ void InitFrameTask::DoSetup()
 
 void InitFrameTask::DoExecute()
 {
-	Device& DeviceObj			= _InitFrameTaskData->GetDevice();
-	SwapChain& SwapChainObj		= _InitFrameTaskData->GetSwapChain();
-	StateSharedData* SharedData	= _InitFrameTaskData->GetSharedData();
+	//Device& DeviceObj			= _InitFrameTaskData->GetDevice();
+	//SwapChain& SwapChainObj		= _InitFrameTaskData->GetSwapChain();
+	//StateSharedData* SharedData	= _InitFrameTaskData->GetSharedData();
 
-	Fence* FrameFence = SharedData->GfxContexts[SharedData->CurrentFrame]->GetFrameFence();
+	//Fence* FrameFence = SharedData->GfxContexts[SharedData->CurrentFrame]->GetFrameFence();
 
-	SwapChainObj.AcquireFrame(DeviceObj, *SharedData->GfxContexts[SharedData->CurrentFrame]);
+	//SwapChainObj.AcquireFrame(DeviceObj, *SharedData->GfxContexts[SharedData->CurrentFrame]);
 
-	//Eternal::Log::Log::Get()->Write(Eternal::Log::Log::Warning, Eternal::Log::Log::Graphics, "InitFrameTask Wait");
-	FrameFence->Wait(DeviceObj);
-	//Eternal::Log::Log::Get()->Write(Eternal::Log::Log::Warning, Eternal::Log::Log::Graphics, "InitFrameTask Reset");
-	FrameFence->Reset(DeviceObj);
-	SharedData->Reset();
-	///*SharedData->CurrentFrame = */SwapChainObj.AcquireFrame(DeviceObj, FrameFence);
+	////Eternal::Log::Log::Get()->Write(Eternal::Log::Log::Warning, Eternal::Log::Log::Graphics, "InitFrameTask Wait");
+	//FrameFence->Wait(DeviceObj);
+	////Eternal::Log::Log::Get()->Write(Eternal::Log::Log::Warning, Eternal::Log::Log::Graphics, "InitFrameTask Reset");
+	//FrameFence->Reset(DeviceObj);
+	//SharedData->Reset();
+	/////*SharedData->CurrentFrame = */SwapChainObj.AcquireFrame(DeviceObj, FrameFence);
 }
 
 void InitFrameTask::DoReset()

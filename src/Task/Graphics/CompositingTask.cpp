@@ -2,7 +2,7 @@
 
 #include "Graphics/Renderer.hpp"
 #include "Graphics/Context.hpp"
-#include "Graphics/RenderTarget.hpp"
+//#include "Graphics/RenderTarget.hpp"
 #include "Graphics/ShaderFactory.hpp"
 #include "GraphicData/ContextCollection.hpp"
 #include "GraphicData/RenderTargetCollection.hpp"
