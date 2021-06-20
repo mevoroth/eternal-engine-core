@@ -3,9 +3,9 @@
 #include "Core/StateSharedData.hpp"
 #include "GraphicData/GraphicResources.hpp"
 #include "GraphicData/CommandQueues.hpp"
-#include "Graphics/CommandQueue.hpp"
-#include "Graphics/SwapChain.hpp"
-#include "Graphics/Fence.hpp"
+#include "Graphics_deprecated/CommandQueue.hpp"
+#include "Graphics_deprecated/SwapChain.hpp"
+#include "Graphics_deprecated/Fence.hpp"
 #include "NextGenGraphics/Context.hpp"
 #include "Log/Log.hpp"
 
