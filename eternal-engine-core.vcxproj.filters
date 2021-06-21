@@ -28,9 +28,6 @@
     <Filter Include="Task\Tools">
       <UniqueIdentifier>{85b89528-88a3-4b05-b7db-c22923bc8480}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Task\NextGenGraphics">
-      <UniqueIdentifier>{cddc970c-fb5c-4f58-8a53-e4ca0c205f22}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Task\Core\Commands">
       <UniqueIdentifier>{8c892df6-d3d7-45c1-8ffd-7f6ed1f36117}</UniqueIdentifier>
     </Filter>
@@ -140,23 +137,11 @@
     <ClInclude Include="include\Core\ShadowComponent.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="include\Task\NextGenGraphics\RenderObjectsTask.hpp">
-      <Filter>Task\NextGenGraphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Task\NextGenGraphics\GraphicTask.hpp">
-      <Filter>Task\NextGenGraphics</Filter>
-    </ClInclude>
     <ClInclude Include="include\GameData\MaterialGameData.hpp">
       <Filter>GameData</Filter>
     </ClInclude>
-    <ClInclude Include="include\Task\NextGenGraphics\FinalizeFrameTask.hpp">
-      <Filter>Task\NextGenGraphics</Filter>
-    </ClInclude>
     <ClInclude Include="include\Task\Core\CommandsTask.hpp">
       <Filter>Task\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Task\NextGenGraphics\DebugRenderTask.hpp">
-      <Filter>Task\NextGenGraphics</Filter>
     </ClInclude>
     <ClInclude Include="include\Task\Core\Commands\EngineCommand.hpp">
       <Filter>Task\Core\Commands</Filter>
@@ -252,26 +237,14 @@
     <ClCompile Include="src\GameData\GraphicGameObjectInstanceGameData.cpp">
       <Filter>GameData</Filter>
     </ClCompile>
-    <ClCompile Include="src\Task\NextGenGraphics\RenderObjectsTask.cpp">
-      <Filter>Task\NextGenGraphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Task\NextGenGraphics\GraphicTask.cpp">
-      <Filter>Task\NextGenGraphics</Filter>
-    </ClCompile>
     <ClCompile Include="src\GameData\MaterialGameData.cpp">
       <Filter>GameData</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Task\NextGenGraphics\FinalizeFrameTask.cpp">
-      <Filter>Task\NextGenGraphics</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\StateSharedData.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\CommandsTask.cpp">
       <Filter>Task\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Task\NextGenGraphics\DebugRenderTask.cpp">
-      <Filter>Task\NextGenGraphics</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\Commands\UploadTextureDataCommand.cpp">
       <Filter>Task\Core\Commands</Filter>

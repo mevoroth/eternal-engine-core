@@ -192,10 +192,6 @@
     </ClInclude>
     <ClInclude Include="include\Task\ImguiBeginTask.hpp" />
     <ClInclude Include="include\Task\ImguiEndTask.hpp" />
-    <ClInclude Include="include\Task\NextGenGraphics\DebugRenderTask.hpp" />
-    <ClInclude Include="include\Task\NextGenGraphics\FinalizeFrameTask.hpp" />
-    <ClInclude Include="include\Task\NextGenGraphics\GraphicTask.hpp" />
-    <ClInclude Include="include\Task\NextGenGraphics\RenderObjectsTask.hpp" />
     <ClInclude Include="include\Task\TimeTask.hpp" />
     <ClInclude Include="include\Task\Tools\AutoRecompileShaderTask.hpp" />
   </ItemGroup>
@@ -240,10 +236,6 @@
     <ClCompile Include="src\Task\ImguiBeginTask.cpp" />
     <ClCompile Include="src\Task\ImguiEndTask.cpp" />
     <ClCompile Include="src\Task\ControlsTask.cpp" />
-    <ClCompile Include="src\Task\NextGenGraphics\FinalizeFrameTask.cpp" />
-    <ClCompile Include="src\Task\NextGenGraphics\RenderObjectsTask.cpp" />
-    <ClCompile Include="src\Task\NextGenGraphics\GraphicTask.cpp" />
-    <ClCompile Include="src\Task\NextGenGraphics\DebugRenderTask.cpp" />
     <ClCompile Include="src\Task\Task\GameStateTask.cpp" />
     <ClCompile Include="src\Task\TimeTask.cpp" />
     <ClCompile Include="src\Task\Tools\AutoRecompileShaderTask.cpp" />
