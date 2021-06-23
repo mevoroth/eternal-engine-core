@@ -12,12 +12,12 @@
 //#include "Graphics/ShaderFactory.hpp"
 //#include "Graphics/ShaderFactoryFactory.hpp"
 #include "Graphics_deprecated/ContextFactory.hpp"
-#include "Graphics_deprecated/CommandQueueFactory.hpp"
-#include "Graphics_deprecated/SwapChain.hpp"
-#include "Graphics_deprecated/SwapChainFactory.hpp"
-#include "Graphics_deprecated/Format.hpp"
-#include "Graphics_deprecated/Fence.hpp"
-#include "Graphics_deprecated/FenceFactory.hpp"
+#include "Graphics/CommandQueueFactory.hpp"
+#include "Graphics/SwapChain.hpp"
+#include "Graphics/SwapChainFactory.hpp"
+#include "Graphics/Format.hpp"
+#include "Graphics/Fence.hpp"
+#include "Graphics/FenceFactory.hpp"
 #include "Input/InputFactory.hpp"
 #include "Time/TimeFactory.hpp"
 #include "Log/LogFactory.hpp"
@@ -35,9 +35,6 @@
 //#include "Task/Graphics/RenderObjectsTask.hpp"
 //#include "Task/Graphics/LightingTask.hpp"
 //#include "Task/Graphics/CompositingTask.hpp"
-#include "Task/NextGenGraphics/RenderObjectsTask.hpp"
-#include "Task/NextGenGraphics/DebugRenderTask.hpp"
-#include "Task/NextGenGraphics/FinalizeFrameTask.hpp"
 #include "Resources/Pool.hpp"
 #include "Resources/TextureFactory.hpp"
 #include "Core/StateSharedData.hpp"
@@ -140,7 +137,7 @@ namespace Eternal
 
 			//_MainCommandQueue	= CreateCommandQueue(*_Device, FRAME_LAG);
 			_MainCommandQueue	= _GraphicResources->GetCommandQueues()->Get(COMMAND_QUEUE_GRAPHIC);
-			_SwapChain			= CreateSwapChain(*_Device, *_Window, *_MainCommandQueue->Queue);
+			//_SwapChain			= CreateSwapChain(*_Device, *_Window, *_MainCommandQueue->Queue);
 			_FrameFence			= CreateFence(*_Device);
 			_MainCommandQueue->QueueFence	=	_FrameFence; // HACK
 
@@ -314,38 +311,6 @@ namespace Eternal
 			InitFrameTaskObj->SetTaskName("Init Frame Task");
 			_InitFrameTask = InitFrameTaskObj;
 			
-			//RenderObjectsTask* OpaqueTaskObj = new RenderOpaqueObjectsTask(_GraphictaskConfigCollection->GetGraphicTaskConfig(GraphicTaskConfigCollection::OPAQUE_TASK),
-			//	*_ContextCollection, *_OpaqueRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection, GetSharedData());
-			//OpaqueTaskObj->SetTaskName("Opaque Task (Render Objects)");
-			//_OpaqueTask = OpaqueTaskObj;
-
-			//RenderObjectsTask* ShadowTaskObj = new RenderObjectsShadowTask(_GraphictaskConfigCollection->GetGraphicTaskConfig(GraphicTaskConfigCollection::SHADOW_TASK),
-			//	*_ContextCollection, *_ShadowRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection, GetSharedData());
-			//ShadowTaskObj->SetTaskName("Shadow Task (Render Objects)");
-			//_ShadowTask = ShadowTaskObj;
-
-			//LightingTask* LightingTaskObj = new LightingTask(*_ContextCollection, *_OpaqueRenderTargets, *_ShadowRenderTargets, *_LightRenderTargets, *_SamplerCollection, *_ViewportCollection, GetSharedData());
-			//LightingTaskObj->SetTaskName("Lighting Task");
-			//_LightingTask = LightingTaskObj;
-
-			//CompositingTask* CompositingTaskObj = new CompositingTask(*_ContextCollection, *_OpaqueRenderTargets, *_LightRenderTargets, *_SamplerCollection, *_ViewportCollection, *_BlendStateCollection);
-			//CompositingTaskObj->SetTaskName("Compositing Task");
-			//_CompositingTask = CompositingTaskObj;
-
-#pragma region NextGenGraphics
-			RenderOpaqueObjectsTask* OpaqueTaskObj = new RenderOpaqueObjectsTask(*_Device, _GraphicResources, GetSharedData());
-			OpaqueTaskObj->SetTaskName("Render Object Task (Opaque Task)");
-			//_OpaqueTask = OpaqueTaskObj;
-
-			DebugRenderTask* DebugRenderTaskObj = new DebugRenderTask(*_Device, *_SwapChain, _GraphicResources, GetSharedData());
-			DebugRenderTaskObj->SetTaskName("Debug Render Task");
-			_OpaqueTask = DebugRenderTaskObj;
-
-			FinalizeFrameTask* FinalizeFrameTaskObj = new FinalizeFrameTask(*_Device, *_SwapChain, *_FrameFence, _GraphicResources, GetSharedData());
-			FinalizeFrameTaskObj->SetTaskName("Finalize Frame Task");
-			_FinalizeFrameTask = FinalizeFrameTaskObj;
-#pragma endregion NextGenGraphics
-
 			AutoRecompileShaderTask* AutoRecompileShaderTaskObj = new AutoRecompileShaderTask();
 			AutoRecompileShaderTaskObj->SetTaskName("Auto Recompile Shader Task");
 			AutoRecompileShaderTaskObj->SetFrameConstraint(false);
