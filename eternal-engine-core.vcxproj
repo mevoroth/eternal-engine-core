@@ -190,8 +190,12 @@
     <ClInclude Include="include\Task\Graphics\SwapFrameTask.hpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>
-    <ClInclude Include="include\Task\ImguiBeginTask.hpp" />
-    <ClInclude Include="include\Task\ImguiEndTask.hpp" />
+    <ClInclude Include="include\Task\ImguiBeginTask.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="include\Task\ImguiEndTask.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="include\Task\TimeTask.hpp" />
     <ClInclude Include="include\Task\Tools\AutoRecompileShaderTask.hpp" />
   </ItemGroup>
@@ -233,8 +237,12 @@
     <ClCompile Include="src\Task\Graphics\SwapFrameTask.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\Task\ImguiBeginTask.cpp" />
-    <ClCompile Include="src\Task\ImguiEndTask.cpp" />
+    <ClCompile Include="src\Task\ImguiBeginTask.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\Task\ImguiEndTask.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\Task\ControlsTask.cpp" />
     <ClCompile Include="src\Task\Task\GameStateTask.cpp" />
     <ClCompile Include="src\Task\TimeTask.cpp" />
