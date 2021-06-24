@@ -13,26 +13,26 @@ using namespace Eternal::Graphics;
 AutoRecompileShaderTask::AutoRecompileShaderTask()
 {
 	return;
-	vector<string>& ShaderPaths = ShaderFactory::Get()->GetShaderPaths();
-	_FilesWatchHandlesCount = ShaderPaths.size();
-	_FilesWatchHandles = new void*[_FilesWatchHandlesCount];
-	_DirectoryHandles = new void*[_FilesWatchHandlesCount];
+	//vector<string>& ShaderPaths = ShaderFactory::Get()->GetShaderPaths();
+	//_FilesWatchHandlesCount = ShaderPaths.size();
+	//_FilesWatchHandles = new void*[_FilesWatchHandlesCount];
+	//_DirectoryHandles = new void*[_FilesWatchHandlesCount];
 
-	for (int ShaderPathIndex = 0; ShaderPathIndex < ShaderPaths.size(); ++ShaderPathIndex)
-	{
-		//_FilesWatchHandles[ShaderPathIndex] = FindFirstChangeNotification(
-		//	(ShaderPaths[ShaderPathIndex]).c_str(),
-		//	FALSE,
-		//	FILE_NOTIFY_CHANGE_LAST_WRITE
-		//);
-		//ETERNAL_ASSERT(_FilesWatchHandles[ShaderPathIndex] != INVALID_HANDLE_VALUE);
-		_DirectoryHandles[ShaderPathIndex] = CreateFile((ShaderPaths[ShaderPathIndex]).c_str(), FILE_LIST_DIRECTORY, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
-		ETERNAL_ASSERT(_DirectoryHandles[ShaderPathIndex] != INVALID_HANDLE_VALUE);
-		DWORD LastError = GetLastError();
+	//for (int ShaderPathIndex = 0; ShaderPathIndex < ShaderPaths.size(); ++ShaderPathIndex)
+	//{
+	//	//_FilesWatchHandles[ShaderPathIndex] = FindFirstChangeNotification(
+	//	//	(ShaderPaths[ShaderPathIndex]).c_str(),
+	//	//	FALSE,
+	//	//	FILE_NOTIFY_CHANGE_LAST_WRITE
+	//	//);
+	//	//ETERNAL_ASSERT(_FilesWatchHandles[ShaderPathIndex] != INVALID_HANDLE_VALUE);
+	//	_DirectoryHandles[ShaderPathIndex] = CreateFile((ShaderPaths[ShaderPathIndex]).c_str(), FILE_LIST_DIRECTORY, FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, nullptr);
+	//	ETERNAL_ASSERT(_DirectoryHandles[ShaderPathIndex] != INVALID_HANDLE_VALUE);
+	//	DWORD LastError = GetLastError();
 
-		char ErrorMessage[1024];
-		sprintf_s(ErrorMessage, "Error: %d\n", LastError);
-	}
+	//	char ErrorMessage[1024];
+	//	sprintf_s(ErrorMessage, "Error: %d\n", LastError);
+	//}
 }
 
 AutoRecompileShaderTask::~AutoRecompileShaderTask()

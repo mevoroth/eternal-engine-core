@@ -10,6 +10,7 @@ namespace Eternal
 		class GameState
 		{
 		public:
+			virtual ~GameState() {}
 			virtual void Begin() = 0;
 			virtual void Update() = 0;
 			virtual GameState* NextState() = 0;
