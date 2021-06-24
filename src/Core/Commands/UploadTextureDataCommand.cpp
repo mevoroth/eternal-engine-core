@@ -2,7 +2,7 @@
 #include "Graphics/Types/DeviceType.hpp"
 #include "Graphics/CommandList.hpp"
 #include "Graphics/Device.hpp"
-#include "NextGenGraphics/Resource.hpp"
+#include "Graphics/Resource.hpp"
 #include "Container/FreeList.hpp"
 #include "GraphicData/GraphicResources.hpp"
 #include "GraphicData/UploadBuffers.hpp"
