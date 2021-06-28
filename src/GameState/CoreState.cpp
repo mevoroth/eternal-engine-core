@@ -7,11 +7,6 @@
 #include "Graphics/DeviceFactory.hpp"
 #include "Graphics/Device.hpp"
 #include "Graphics/ShaderFactory.hpp"
-//#include "Graphics/RendererFactory.hpp"
-//#include "Graphics/Renderer.hpp"
-//#include "Graphics/ShaderFactory.hpp"
-//#include "Graphics/ShaderFactoryFactory.hpp"
-#include "Graphics_deprecated/ContextFactory.hpp"
 #include "Graphics/CommandQueueFactory.hpp"
 #include "Graphics/SwapChain.hpp"
 #include "Graphics/SwapChainFactory.hpp"
@@ -141,10 +136,10 @@ namespace Eternal
 			_FrameFence			= CreateFence(*_Device);
 			_MainCommandQueue->QueueFence	=	_FrameFence; // HACK
 
-			for (uint32_t ContextIndex = 0; ContextIndex < ETERNAL_ARRAYSIZE(GetSharedData()->GfxContexts); ++ContextIndex)
-			{
-				GetSharedData()->GfxContexts[ContextIndex] = CreateContext(*_Device);
-			}
+			//for (uint32_t ContextIndex = 0; ContextIndex < ETERNAL_ARRAYSIZE(GetSharedData()->GfxContexts); ++ContextIndex)
+			//{
+			//	GetSharedData()->GfxContexts[ContextIndex] = CreateContext(*_Device);
+			//}
 
 			//_Device = CreateDevice(WINDOWS, WindowsProcess::WindowProc, _hInstance, _nCmdShow, "ReShield", "EternalClass");
 			//_Renderer = CreateRenderer(RENDERER_D3D11);
