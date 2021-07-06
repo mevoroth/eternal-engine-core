@@ -54,9 +54,6 @@
     <ClInclude Include="include\Task\ImguiEndTask.hpp">
       <Filter>Task</Filter>
     </ClInclude>
-    <ClInclude Include="include\Imgui\D3D11ImguiVertexBuffer.hpp">
-      <Filter>Imgui</Filter>
-    </ClInclude>
     <ClInclude Include="include\Task\ControlsTask.hpp">
       <Filter>Task</Filter>
     </ClInclude>
@@ -150,6 +147,9 @@
       <Filter>Task\Core\Commands</Filter>
     </ClInclude>
     <ClInclude Include="include\CoreSettings.hpp" />
+    <ClInclude Include="include\Imgui\Imgui.hpp">
+      <Filter>Imgui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Game.cpp">
@@ -249,16 +249,8 @@
     <ClCompile Include="src\Core\Commands\UploadTextureDataCommand.cpp">
       <Filter>Task\Core\Commands</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="shaders\Imgui\imgui.vs.hlsl">
+    <ClCompile Include="src\Imgui\Imgui.cpp">
       <Filter>Imgui</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\Imgui\imgui.ps.hlsl">
-      <Filter>Imgui</Filter>
-    </FxCompile>
-    <FxCompile Include="shaders\Imgui\imgui.common.hlsl">
-      <Filter>Imgui</Filter>
-    </FxCompile>
+    </ClCompile>
   </ItemGroup>
 </Project>

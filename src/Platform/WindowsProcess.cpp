@@ -52,7 +52,6 @@ namespace Eternal
 
 			Map(VK_MULTIPLY, Eternal::Input::Input::KPMUL);
 			Map(VK_ADD, Eternal::Input::Input::KPPLUS);
-			//Map(VK_SEPARATOR, Input::KP
 			Map(VK_SUBTRACT, Eternal::Input::Input::KPMINUS);
 			Map(VK_DECIMAL, Eternal::Input::Input::KPPERIOD);
 			Map(VK_DIVIDE, Eternal::Input::Input::KPDIV);

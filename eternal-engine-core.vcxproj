@@ -165,7 +165,7 @@
     <ClInclude Include="include\GameData\MeshGameData.hpp" />
     <ClInclude Include="include\GameData\TransformGameData.hpp" />
     <ClInclude Include="include\GameState\CoreState.hpp" />
-    <ClInclude Include="include\Imgui\D3D11ImguiVertexBuffer.hpp" />
+    <ClInclude Include="include\Imgui\Imgui.hpp" />
     <ClInclude Include="include\Platform\WindowsProcess.hpp" />
     <ClInclude Include="include\GamePools.hpp" />
     <ClInclude Include="include\Task\ControlsTask.hpp" />
@@ -220,6 +220,7 @@
     <ClCompile Include="src\GameData\MeshGameData.cpp" />
     <ClCompile Include="src\GameData\TransformGameData.cpp" />
     <ClCompile Include="src\GameState\CoreState.cpp" />
+    <ClCompile Include="src\Imgui\Imgui.cpp" />
     <ClCompile Include="src\Platform\WindowsProcess.cpp" />
     <ClCompile Include="src\Task\DebugTask.cpp" />
     <ClCompile Include="src\Task\Graphics\CompositingTask.cpp">
@@ -247,17 +248,6 @@
     <ClCompile Include="src\Task\Task\GameStateTask.cpp" />
     <ClCompile Include="src\Task\TimeTask.cpp" />
     <ClCompile Include="src\Task\Tools\AutoRecompileShaderTask.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <FxCompile Include="shaders\Imgui\imgui.common.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="shaders\Imgui\imgui.ps.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </FxCompile>
-    <FxCompile Include="shaders\Imgui\imgui.vs.hlsl">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
