@@ -102,14 +102,14 @@ namespace Eternal
 			};
 			_MultiChannelLog = CreateMultiChannelLog(Logs, ETERNAL_ARRAYSIZE(Logs));
 
-			_PadInput		= CreateInput(XINPUT);
+			_PadInput		= CreateInput(InputType::XINPUT);
 			_KeyboardInput	= CreateInput(InputType::WIN);
 			Eternal::Input::Input* Inputs[] =
 			{
 				_PadInput,
 				_KeyboardInput
 			};
-			_MultiInput = CreateMultiInput(Inputs, ETERNAL_ARRAYSIZE(Inputs));
+			//_MultiInput = CreateMultiInput(Inputs, ETERNAL_ARRAYSIZE(Inputs));
 
 			WindowsProcess::SetInputHandler(_KeyboardInput);
 			_WindowsProcess		= new WindowsProcess();
