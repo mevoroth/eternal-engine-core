@@ -158,7 +158,8 @@ namespace Eternal
 				*_ImguiInputLayout,
 				*_ImguiRenderPasses[0],
 				*_ImguiVS,
-				*_ImguiPS
+				*_ImguiPS,
+				Rasterizer(FrontFace::FRONT_FACE_CLOCKWISE)
 			);
 			_ImguiPipeline			= CreatePipeline(InContext, ImguiPipelineCreateInformation);
 
@@ -222,12 +223,12 @@ namespace Eternal
 				TextureCreateInformation(
 					ResourceDimension::RESOURCE_DIMENSION_TEXTURE_2D,
 					Format::FORMAT_RGBA8888_UNORM,
-					TextureResourceUsage::TEXTURE_RESOURCE_USAGE_SHADER_RESOURCE,
+					TextureResourceUsage::TEXTURE_RESOURCE_USAGE_SHADER_RESOURCE | TextureResourceUsage::TEXTURE_RESOURCE_USAGE_COPY_WRITE,
 					_ImguiFontMetaData.Width,
 					_ImguiFontMetaData.Height
 				),
 				ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_MEMORY,
-				TransitionState::TRANSITION_PIXEL_SHADER_READ
+				TransitionState::TRANSITION_COPY_WRITE
 			);
 			_ImguiFontTexture			= CreateTexture(ImguiFontCreateInformation);
 			ViewMetaData ImguiFontViewMetaData;
@@ -255,11 +256,62 @@ namespace Eternal
 			ImGui::Render();
 		}
 
-		CommandList* Imgui::Render(_In_ GraphicsContext& InContext)
+		void Imgui::Render(_In_ GraphicsContext& InContext)
+		{
+			_UploadFontTexture(InContext);
+			_Render(InContext);
+		}
+
+		void Imgui::_UploadFontTexture(_In_ GraphicsContext& InContext)
+		{
+			if (_ImguiFontMetaData.Pixels)
+			{
+				//////////////////////////////////////////////////////////////////////////
+				// Upload buffer
+				std::string UploadTextureName = "ImguiFontTextureUploadBuffer";
+				const uint32_t UploadBufferSize = _ImguiFontMetaData.Width * _ImguiFontMetaData.Height * _ImguiFontMetaData.BytesPerPixel;
+				BufferResourceCreateInformation UploadBufferTextureInformation(
+					InContext.GetDevice(),
+					UploadTextureName,
+					BufferCreateInformation(
+						Format::FORMAT_RGBA8888_UNORM,
+						BufferResourceUsage::BUFFER_RESOURCE_USAGE_COPY_READ,
+						UploadBufferSize
+					),
+					ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
+				);
+				Resource* ImguiFontUploadTexture = CreateBuffer(UploadBufferTextureInformation);
+
+				//////////////////////////////////////////////////////////////////////////
+				// Map
+				MapRange UploadBufferMapRange(UploadBufferSize);
+				void* UploadTextureDataPtr = ImguiFontUploadTexture->Map(UploadBufferMapRange);
+				memcpy(UploadTextureDataPtr, _ImguiFontMetaData.Pixels, UploadBufferSize);
+				ImguiFontUploadTexture->Unmap(UploadBufferMapRange);
+
+				CommandList* UploadFontCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC);
+
+				UploadFontCommandList->Begin(InContext);
+				CopyRegion ImguiFontCopyRegion(
+					TextureFromBufferRegion(
+						Extent3D(_ImguiFontMetaData.Width, _ImguiFontMetaData.Height),
+						UploadBufferSize
+					)
+				);
+				UploadFontCommandList->CopyResource(*_ImguiFontTexture, *ImguiFontUploadTexture, ImguiFontCopyRegion);
+				ResourceTransition TransitionToShaderRead(_ImguiFontTexture, TransitionState::TRANSITION_PIXEL_SHADER_READ);
+				UploadFontCommandList->Transition(&TransitionToShaderRead, 1);
+				UploadFontCommandList->End();
+
+				_ImguiFontMetaData.Pixels = nullptr;
+			}
+		}
+
+		void Imgui::_Render(_In_ GraphicsContext& InContext)
 		{
 			ImDrawData* ImguiDrawData = ImGui::GetDrawData();
 			if (ImguiDrawData->DisplaySize.x <= 0 || ImguiDrawData->DisplaySize.y <= 0)
-				return nullptr;
+				return;
 
 			ImguiRenderContext RenderContext;
 
@@ -299,8 +351,6 @@ namespace Eternal
 			(*_ImguiIndexBuffer)->Unmap(IndicesMapRange);
 
 			RenderContext.Clear();
-
-			return ImguiCommandList;
 		}
 
 		void Imgui::_Map(_In_ const Input::Input::Key& EternalKey, _In_ const ImGuiKey_& ImguiKey)

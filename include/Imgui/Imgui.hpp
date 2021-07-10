@@ -27,13 +27,15 @@ namespace Eternal
 			void Begin();
 			void End();
 
-			CommandList* Render(_In_ GraphicsContext& InContext);
+			void Render(_In_ GraphicsContext& InContext);
 
 		private:
 			void _Map(_In_ const Input::Input::Key& EternalKey, _In_ const ImGuiKey_& ImguiKey);
 			void _ProcessInputCharacter(_In_ const ImWchar& ImguiKey, _In_ const Input::Input::Key& KeyName);
 			void _ProcessInputCharacterRange(_In_ const ImWchar& ImguiKeyStart, _In_ const Input::Input::Key& KeyNameStart, _In_ uint32_t Range);
 			void _UpdateInputs();
+			void _Render(_In_ GraphicsContext& InContext);
+			void _UploadFontTexture(_In_ GraphicsContext& InContext);
 
 			void _ImGui_FillBuffers(_In_ ImDrawData* DrawData, _In_ ImguiRenderContext& InImguiContext);
 			void _ImGui_SetupRenderState(_In_ ImDrawData* InDrawData, _In_ ImguiRenderContext& InImguiContext, _In_ GraphicsContext& InContext, _In_ CommandList* InImguiCommandList);
