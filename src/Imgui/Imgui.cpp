@@ -150,6 +150,7 @@ namespace Eternal
 					RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_SAMPLER,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
 				}
 			);
+			ImguiRootSignatureInformation.HasInputAssembler = true;
 			_ImguiRootSignature		= CreateRootSignature(InContext, ImguiRootSignatureInformation);
 			_ImguiDescriptorTable	= _ImguiRootSignature->CreateRootDescriptorTable(InContext);
 
@@ -193,7 +194,8 @@ namespace Eternal
 				BufferCreateInformation(
 					Format::FORMAT_UNKNOWN,
 					BufferResourceUsage::BUFFER_RESOURCE_USAGE_VERTEX_BUFFER,
-					sizeof(ImDrawVert) * ImguiMaxVertices
+					sizeof(ImDrawVert) * ImguiMaxVertices,
+					sizeof(ImDrawVert)
 				),
 				ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
 			);
@@ -289,7 +291,7 @@ namespace Eternal
 				memcpy(UploadTextureDataPtr, _ImguiFontMetaData.Pixels, UploadBufferSize);
 				ImguiFontUploadTexture->Unmap(UploadBufferMapRange);
 
-				CommandList* UploadFontCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC);
+				CommandList* UploadFontCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "CopyImguiFontFromCPUToGPU");
 
 				UploadFontCommandList->Begin(InContext);
 				CopyRegion ImguiFontCopyRegion(
@@ -325,7 +327,7 @@ namespace Eternal
 
 			_ImGui_FillBuffers(ImguiDrawData, RenderContext);
 
-			CommandList* ImguiCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC);
+			CommandList* ImguiCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "RenderImgui");
 
 			ResourceTransition Transitions[] =
 			{
@@ -335,7 +337,7 @@ namespace Eternal
 
 			ImguiCommandList->Begin(InContext);
 			{
-				ResourceTransitionScope ScopedTransitions(*ImguiCommandList, Transitions, ETERNAL_ARRAYSIZE(Transitions));
+				//ResourceTransitionScope ScopedTransitions(*ImguiCommandList, Transitions, ETERNAL_ARRAYSIZE(Transitions));
 
 				ImguiCommandList->BeginRenderPass(*_ImguiRenderPasses[InContext.GetCurrentFrameIndex()]);
 				ImguiCommandList->SetGraphicsPipeline(*_ImguiPipeline);
@@ -448,7 +450,8 @@ namespace Eternal
 				ProjectionConstantsMetaData
 			);
 			View* ProjectionConstantsView = CreateConstantBufferView(ProjectionConstantsBufferViewCreateInformation);
-			_ImguiDescriptorTable->SetDescriptor(0, ProjectionConstantsView);
+			if (_PreviousDrawCount > 0)
+				_ImguiDescriptorTable->SetDescriptor(0, ProjectionConstantsView);
 			InContext.DelayedDelete(ProjectionConstantsView);
 			
 			++InImguiContext.ImguiProjectionCount;
@@ -465,9 +468,12 @@ namespace Eternal
 			if (ViewportWidth <= 0 || ViewportHeight <= 0)
 				return;
 
-			_ImguiDescriptorTable->SetDescriptor(2, _ImguiBilinearSampler);
+			if (_PreviousDrawCount > 0)
+				_ImguiDescriptorTable->SetDescriptor(2, _ImguiBilinearSampler);
 
 			_ImGui_SetupRenderState(InDrawData, InImguiContext, InContext, InImguiCommandList);
+
+			_PreviousDrawCount = 0;
 
 			int GlobalVertexOffset = 0;
 			int GlobalIndexOffset = 0;
@@ -524,6 +530,7 @@ namespace Eternal
 								ImguiCommand->IdxOffset + GlobalIndexOffset,
 								ImguiCommand->VtxOffset + GlobalVertexOffset
 							);
+							++_PreviousDrawCount;
 						}
 					}
 				}

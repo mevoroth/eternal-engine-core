@@ -53,6 +53,7 @@ namespace Eternal
 			Input::Input*				_Input = nullptr;
 
 			ImguiFontMetaData			_ImguiFontMetaData;
+			uint32_t					_PreviousDrawCount = 1;
 
 			// Graphics resources
 			array<RenderPass*, GraphicsContext::FrameBufferingCount>	_ImguiRenderPasses;
