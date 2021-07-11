@@ -31,6 +31,9 @@
     <Filter Include="Task\Core\Commands">
       <UniqueIdentifier>{8c892df6-d3d7-45c1-8ffd-7f6ed1f36117}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Optick">
+      <UniqueIdentifier>{9e21378b-92ce-42f1-9e33-199be084c744}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Game.hpp">
@@ -150,6 +153,9 @@
     <ClInclude Include="include\Imgui\Imgui.hpp">
       <Filter>Imgui</Filter>
     </ClInclude>
+    <ClInclude Include="include\Optick\Optick.hpp">
+      <Filter>Optick</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Game.cpp">
@@ -251,6 +257,9 @@
     </ClCompile>
     <ClCompile Include="src\Imgui\Imgui.cpp">
       <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Optick\Optick.cpp">
+      <Filter>Optick</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
