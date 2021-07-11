@@ -19,11 +19,13 @@ namespace Eternal
 			static void ExecuteMessageLoop();
 			static void SetInputHandler(_In_ Eternal::Input::Input* InputHandler);
 			static void Map(_In_ uint32_t WindowsKey, _In_ const Eternal::Input::Input::Key& KeyName);
+			static void SetIsRunning(_In_ bool* InIsRunning) { _IsRunning = InIsRunning; }
 
 			WindowsProcess();
 
 		private:
-			static Eternal::Input::Input* _InputHandler;
+			static Eternal::Input::Input*	_InputHandler;
+			static bool*					_IsRunning;
 
 			static void MapRange(_In_ uint32_t WindowsKeyStart, _In_ const Eternal::Input::Input::Key& KeyNameStart, _In_ uint32_t Range);
 		};

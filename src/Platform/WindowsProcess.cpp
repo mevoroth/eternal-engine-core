@@ -9,6 +9,8 @@ namespace Eternal
 {
 	namespace Platform
 	{
+		bool* WindowsProcess::_IsRunning = nullptr;
+
 		WindowsProcess::WindowsProcess()
 		{
 			for (uint32_t KeyIndex = 0; KeyIndex < ETERNAL_ARRAYSIZE(_KeyMapping); ++KeyIndex)
@@ -167,6 +169,8 @@ namespace Eternal
 			} break;
 
 			case WM_DESTROY:
+				if (_IsRunning)
+					*_IsRunning = false;
 				PostQuitMessage(0);
 				return 0;
 			}
