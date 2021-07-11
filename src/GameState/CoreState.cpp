@@ -114,7 +114,15 @@ namespace Eternal
 			WindowsProcess::SetInputHandler(_KeyboardInput);
 			_WindowsProcess		= new WindowsProcess();
 
-			_Window				= new Window(_hInstance, _nCmdShow, "ReShield", "EternalClass", 1280, 720);
+			_Window				= new Window(
+				WindowCreateInformation(
+					_hInstance,
+					_nCmdShow,
+					"ReShield",
+					"EternalClass",
+					1280, 720
+				)
+			);
 			_Window->Create(WindowsProcess::WindowProc);
 
 #ifdef ETERNAL_DEBUG
@@ -306,17 +314,21 @@ namespace Eternal
 			InitFrameTaskObj->SetTaskName("Init Frame Task");
 			_InitFrameTask = InitFrameTaskObj;
 			
+#ifdef ETERNAL_DEBUG
 			AutoRecompileShaderTask* AutoRecompileShaderTaskObj = new AutoRecompileShaderTask();
 			AutoRecompileShaderTaskObj->SetTaskName("Auto Recompile Shader Task");
 			AutoRecompileShaderTaskObj->SetFrameConstraint(false);
 			_AutoRecompileShaderTask = AutoRecompileShaderTaskObj;
+#endif
 		}
 
 		void CoreState::_ScheduleTasks()
 		{
 			TaskManager& Scheduler = *_TaskManager;
 			Scheduler().PushTask(_InitFrameTask);
+#ifdef ETERNAL_DEBUG
 			Scheduler().PushTask(_AutoRecompileShaderTask);
+#endif
 			Scheduler().PushTask(_ControlsTask);
 			Scheduler().PushTask(_TimeTask);
 			Scheduler().PushTask(_CommandsTask, _InitFrameTask);
