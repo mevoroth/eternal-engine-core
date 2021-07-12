@@ -12,6 +12,7 @@ namespace Eternal
 	namespace Imgui
 	{
 		using namespace Eternal::Graphics;
+		using namespace Eternal::InputSystem;
 
 		struct ImguiRenderContext;
 
@@ -22,7 +23,7 @@ namespace Eternal
 			static constexpr uint32_t ImguiMaxVertices		= 65536;
 			static constexpr uint32_t ImguiMaxIndices		= 65536;
 
-			Imgui(_In_ GraphicsContext& InContext, _In_ Input::Input* InInput);
+			Imgui(_In_ GraphicsContext& InContext, _In_ Input* InInput);
 
 			void Begin();
 			void End();
@@ -31,8 +32,8 @@ namespace Eternal
 
 		private:
 			void _Map(_In_ const Input::Input::Key& EternalKey, _In_ const ImGuiKey_& ImguiKey);
-			void _ProcessInputCharacter(_In_ const ImWchar& ImguiKey, _In_ const Input::Input::Key& KeyName);
-			void _ProcessInputCharacterRange(_In_ const ImWchar& ImguiKeyStart, _In_ const Input::Input::Key& KeyNameStart, _In_ uint32_t Range);
+			void _ProcessInputCharacter(_In_ const ImWchar& ImguiKey, _In_ const Input::Key& KeyName);
+			void _ProcessInputCharacterRange(_In_ const ImWchar& ImguiKeyStart, _In_ const Input::Key& KeyNameStart, _In_ uint32_t Range);
 			void _UpdateInputs();
 			void _Render(_In_ GraphicsContext& InContext);
 			void _UploadFontTexture(_In_ GraphicsContext& InContext);
@@ -50,7 +51,7 @@ namespace Eternal
 			};
 
 			vector<Input::Input::Key>	_MappedKeys;
-			Input::Input*				_Input = nullptr;
+			Input*						_Input = nullptr;
 
 			ImguiFontMetaData			_ImguiFontMetaData;
 			uint32_t					_PreviousDrawCount = 1;

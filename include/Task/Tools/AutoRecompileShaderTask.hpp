@@ -15,8 +15,6 @@ namespace Eternal
 			AutoRecompileShaderTask();
 			~AutoRecompileShaderTask();
 
-			virtual void DoSetup() override;
-			virtual void DoReset() override;
 			virtual void DoExecute() override;
 
 		private:

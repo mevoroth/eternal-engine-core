@@ -7,12 +7,6 @@
     <Filter Include="Task">
       <UniqueIdentifier>{7ea7735d-c6ae-4488-a5d0-170558f306f7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Imgui">
-      <UniqueIdentifier>{f339b2ac-a76d-4898-a14e-4afc92323b0f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Task\Graphics">
-      <UniqueIdentifier>{804f926b-aa6d-43e5-ac58-d4c332c5c027}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Task\Core">
       <UniqueIdentifier>{9c2d13e2-a9b7-4257-9dcc-55e8788d765a}</UniqueIdentifier>
     </Filter>
@@ -28,52 +22,16 @@
     <Filter Include="Task\Tools">
       <UniqueIdentifier>{85b89528-88a3-4b05-b7db-c22923bc8480}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Task\Core\Commands">
-      <UniqueIdentifier>{8c892df6-d3d7-45c1-8ffd-7f6ed1f36117}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Optick">
       <UniqueIdentifier>{9e21378b-92ce-42f1-9e33-199be084c744}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GameState\Imgui">
+      <UniqueIdentifier>{f339b2ac-a76d-4898-a14e-4afc92323b0f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Game.hpp">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\GameObject.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\GameState.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\GameComponent.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\TransformComponent.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Task\ImguiBeginTask.hpp">
-      <Filter>Task</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Task\ImguiEndTask.hpp">
-      <Filter>Task</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Task\ControlsTask.hpp">
-      <Filter>Task</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Task\DebugTask.hpp">
-      <Filter>Task</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\MeshComponent.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Task\TimeTask.hpp">
-      <Filter>Task</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Task\Core\UpdateComponentTask.hpp">
-      <Filter>Task\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Task\Core\GameStateTask.hpp">
-      <Filter>Task\Core</Filter>
     </ClInclude>
     <ClInclude Include="include\GameState\CoreState.hpp">
       <Filter>GameState</Filter>
@@ -85,27 +43,6 @@
       <Filter>GameData</Filter>
     </ClInclude>
     <ClInclude Include="include\GamePools.hpp" />
-    <ClInclude Include="include\Task\Graphics\SwapFrameTask.hpp">
-      <Filter>Task\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\GraphicGameObject.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Task\Graphics\CompositingTask.hpp">
-      <Filter>Task\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\MaterialComponent.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\LightComponent.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\CameraGameObject.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Core\CameraComponent.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="include\GameData\GraphicGameObjectGameData.hpp">
       <Filter>GameData</Filter>
     </ClInclude>
@@ -116,71 +53,32 @@
       <Filter>GameData</Filter>
     </ClInclude>
     <ClInclude Include="include\Core\StateSharedData.hpp" />
-    <ClInclude Include="include\Core\LightGameObject.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Task\Graphics\LightingTask.hpp">
-      <Filter>Task\Graphics</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Task\Graphics\InitFrameTask.hpp">
-      <Filter>Task\Graphics</Filter>
-    </ClInclude>
     <ClInclude Include="include\Task\Tools\AutoRecompileShaderTask.hpp">
       <Filter>Task\Tools</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Task\Graphics\RenderObjectsTask.hpp">
-      <Filter>Task\Graphics</Filter>
     </ClInclude>
     <ClInclude Include="include\GameData\GraphicGameObjectInstanceGameData.hpp">
       <Filter>GameData</Filter>
     </ClInclude>
-    <ClInclude Include="include\Core\ShadowComponent.hpp">
-      <Filter>Core</Filter>
-    </ClInclude>
     <ClInclude Include="include\GameData\MaterialGameData.hpp">
       <Filter>GameData</Filter>
     </ClInclude>
-    <ClInclude Include="include\Task\Core\CommandsTask.hpp">
-      <Filter>Task\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Task\Core\Commands\EngineCommand.hpp">
-      <Filter>Task\Core\Commands</Filter>
-    </ClInclude>
-    <ClInclude Include="include\Task\Core\Commands\UploadTextureDataCommand.hpp">
-      <Filter>Task\Core\Commands</Filter>
-    </ClInclude>
     <ClInclude Include="include\CoreSettings.hpp" />
     <ClInclude Include="include\Imgui\Imgui.hpp">
-      <Filter>Imgui</Filter>
+      <Filter>GameState\Imgui</Filter>
     </ClInclude>
     <ClInclude Include="include\Optick\Optick.hpp">
       <Filter>Optick</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\GameState.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\System.hpp">
+      <Filter>Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Game.cpp">
       <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\TransformComponent.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Task\ImguiBeginTask.cpp">
-      <Filter>Task</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Task\ImguiEndTask.cpp">
-      <Filter>Task</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Task\ControlsTask.cpp">
-      <Filter>Task</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Task\DebugTask.cpp">
-      <Filter>Task</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Task\TimeTask.cpp">
-      <Filter>Task</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Task\Task\GameStateTask.cpp">
-      <Filter>Task\Core</Filter>
     </ClCompile>
     <ClCompile Include="src\GameState\CoreState.cpp">
       <Filter>GameState</Filter>
@@ -190,30 +88,6 @@
     </ClCompile>
     <ClCompile Include="src\GameData\TransformGameData.cpp">
       <Filter>GameData</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\MeshComponent.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Task\Graphics\SwapFrameTask.cpp">
-      <Filter>Task\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\GraphicGameObject.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Task\Graphics\CompositingTask.cpp">
-      <Filter>Task\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\MaterialComponent.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\LightComponent.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\CameraGameObject.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\CameraComponent.cpp">
-      <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="src\GameData\GraphicGameObjectGameData.cpp">
       <Filter>GameData</Filter>
@@ -225,20 +99,8 @@
       <Filter>GameData</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\GameState.cpp" />
-    <ClCompile Include="src\Task\Graphics\LightingTask.cpp">
-      <Filter>Task\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Task\Graphics\InitFrameTask.cpp">
-      <Filter>Task\Graphics</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\LightGameObject.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
     <ClCompile Include="src\Task\Tools\AutoRecompileShaderTask.cpp">
       <Filter>Task\Tools</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Task\Graphics\RenderObjectsTask.cpp">
-      <Filter>Task\Graphics</Filter>
     </ClCompile>
     <ClCompile Include="src\GameData\GraphicGameObjectInstanceGameData.cpp">
       <Filter>GameData</Filter>
@@ -246,20 +108,14 @@
     <ClCompile Include="src\GameData\MaterialGameData.cpp">
       <Filter>GameData</Filter>
     </ClCompile>
-    <ClCompile Include="src\Core\StateSharedData.cpp">
-      <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\CommandsTask.cpp">
-      <Filter>Task\Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Core\Commands\UploadTextureDataCommand.cpp">
-      <Filter>Task\Core\Commands</Filter>
-    </ClCompile>
     <ClCompile Include="src\Imgui\Imgui.cpp">
-      <Filter>Imgui</Filter>
+      <Filter>GameState\Imgui</Filter>
     </ClCompile>
     <ClCompile Include="src\Optick\Optick.cpp">
       <Filter>Optick</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\System.cpp">
+      <Filter>Core</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

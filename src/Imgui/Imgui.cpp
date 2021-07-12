@@ -39,7 +39,7 @@ namespace Eternal
 			uint32_t					ImguiIndicesSize		= 0;
 		};
 
-		Imgui::Imgui(_In_ GraphicsContext& InContext, _In_ Input::Input* InInput)
+		Imgui::Imgui(_In_ GraphicsContext& InContext, _In_ Input* InInput)
 			: _Input(InInput)
 		{
 			using ImguiVertexStream = VertexStream<ImDrawVert>;
@@ -71,26 +71,26 @@ namespace Eternal
 
 			//io.Fonts->GetTexDataAsRGBA32(&Pixels, &Width, &Height);
 
-			_Map(Input::Input::TAB,			ImGuiKey_Tab);
-			_Map(Input::Input::LEFT,		ImGuiKey_LeftArrow);
-			_Map(Input::Input::RIGHT,		ImGuiKey_RightArrow);
-			_Map(Input::Input::UP,			ImGuiKey_UpArrow);
-			_Map(Input::Input::DOWN,		ImGuiKey_DownArrow);
-			_Map(Input::Input::PGUP,		ImGuiKey_PageUp);
-			_Map(Input::Input::PGDOWN,		ImGuiKey_PageDown);
-			_Map(Input::Input::HOME,		ImGuiKey_Home);
-			_Map(Input::Input::END,			ImGuiKey_End);
-			_Map(Input::Input::DEL,			ImGuiKey_Delete);
-			_Map(Input::Input::BACKSPACE,	ImGuiKey_Backspace);
-			_Map(Input::Input::RETURN,		ImGuiKey_Enter);
-			_Map(Input::Input::ESC,			ImGuiKey_Escape);
-			_Map(Input::Input::SPACE,		ImGuiKey_Space);
-			_Map(Input::Input::A,			ImGuiKey_A);
-			_Map(Input::Input::C,			ImGuiKey_C);
-			_Map(Input::Input::V,			ImGuiKey_V);
-			_Map(Input::Input::X,			ImGuiKey_X);
-			_Map(Input::Input::Y,			ImGuiKey_Y);
-			_Map(Input::Input::Z,			ImGuiKey_Z);
+			_Map(Input::TAB,		ImGuiKey_Tab);
+			_Map(Input::LEFT,		ImGuiKey_LeftArrow);
+			_Map(Input::RIGHT,		ImGuiKey_RightArrow);
+			_Map(Input::UP,			ImGuiKey_UpArrow);
+			_Map(Input::DOWN,		ImGuiKey_DownArrow);
+			_Map(Input::PGUP,		ImGuiKey_PageUp);
+			_Map(Input::PGDOWN,		ImGuiKey_PageDown);
+			_Map(Input::HOME,		ImGuiKey_Home);
+			_Map(Input::END,		ImGuiKey_End);
+			_Map(Input::DEL,		ImGuiKey_Delete);
+			_Map(Input::BACKSPACE,	ImGuiKey_Backspace);
+			_Map(Input::RETURN,		ImGuiKey_Enter);
+			_Map(Input::ESC,		ImGuiKey_Escape);
+			_Map(Input::SPACE,		ImGuiKey_Space);
+			_Map(Input::A,			ImGuiKey_A);
+			_Map(Input::C,			ImGuiKey_C);
+			_Map(Input::V,			ImGuiKey_V);
+			_Map(Input::X,			ImGuiKey_X);
+			_Map(Input::Y,			ImGuiKey_Y);
+			_Map(Input::Z,			ImGuiKey_Z);
 
 			IO.ImeWindowHandle = InContext.GetWindow().GetWindowHandler();
 
@@ -355,20 +355,20 @@ namespace Eternal
 			RenderContext.Clear();
 		}
 
-		void Imgui::_Map(_In_ const Input::Input::Key& EternalKey, _In_ const ImGuiKey_& ImguiKey)
+		void Imgui::_Map(_In_ const Input::Key& EternalKey, _In_ const ImGuiKey_& ImguiKey)
 		{
 			ImGui::GetIO().KeyMap[ImguiKey] = EternalKey;
 			_MappedKeys.push_back(EternalKey);
 		}
 
-		void Imgui::_ProcessInputCharacter(_In_ const ImWchar& ImguiKey, _In_ const Input::Input::Key& KeyName)
+		void Imgui::_ProcessInputCharacter(_In_ const ImWchar& ImguiKey, _In_ const Input::Key& KeyName)
 		{
 			ImGuiIO& IO = ImGui::GetIO();
-			if (Input::Input::Get()->IsPressed(KeyName))
+			if (_Input->IsPressed(KeyName))
 				IO.AddInputCharacter(ImguiKey);
 		}
 
-		void Imgui::_ProcessInputCharacterRange(_In_ const ImWchar& ImguiKeyStart, _In_ const Input::Input::Key& KeyNameStart, _In_ uint32_t Range)
+		void Imgui::_ProcessInputCharacterRange(_In_ const ImWchar& ImguiKeyStart, _In_ const Input::Key& KeyNameStart, _In_ uint32_t Range)
 		{
 			ImGuiIO& IO = ImGui::GetIO();
 			for (uint32_t KeyIndex = 0; KeyIndex < Range; ++KeyIndex)

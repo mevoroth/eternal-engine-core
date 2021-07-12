@@ -23,7 +23,7 @@ namespace Eternal
 		//class Renderer;
 		//class Context;
 	}
-	namespace Input
+	namespace InputSystem
 	{
 		class Input;
 	}
@@ -34,13 +34,13 @@ namespace Eternal
 	}
 	namespace Time
 	{
-		class Time;
+		class Timer;
 	}
 	namespace Platform
 	{
 		class WindowsProcess;
 	}
-	namespace Log
+	namespace LogSystem
 	{
 		class Log;
 	}
@@ -93,6 +93,8 @@ namespace Eternal
 		using namespace Eternal::GraphicData;
 		using namespace Eternal::GameData;
 		using namespace Eternal::Resources;
+		using namespace Eternal::InputSystem;
+		using namespace Eternal::LogSystem;
 
 		class CoreState : public GameState
 		{
@@ -116,11 +118,11 @@ namespace Eternal
 		private:
 			CoreStateSettings		_Settings;
 
-			Eternal::Time::Time*	_Time				= nullptr;
+			Eternal::Time::Timer*	_Time				= nullptr;
 
-			Eternal::Log::Log*		_FileLog			= nullptr;
-			Eternal::Log::Log*		_ConsoleLog			= nullptr;
-			Eternal::Log::Log*		_MultiChannelLog	= nullptr;
+			Log*		_FileLog			= nullptr;
+			Log*		_ConsoleLog			= nullptr;
+			Log*		_MultiChannelLog	= nullptr;
 
 			Window*					_Window				= nullptr;
 			WindowsProcess*			_WindowsProcess		= nullptr;
@@ -138,9 +140,9 @@ namespace Eternal
 
 			TaskManager*			_TaskManager		= nullptr;
 
-			Eternal::Input::Input*	_KeyboardInput		= nullptr;
-			Eternal::Input::Input*	_PadInput			= nullptr;
-			Eternal::Input::Input*	_MultiInput			= nullptr;
+			Input*	_KeyboardInput		= nullptr;
+			Input*	_PadInput			= nullptr;
+			Input*	_MultiInput			= nullptr;
 
 			GameState* _InitialGameState = nullptr;
 

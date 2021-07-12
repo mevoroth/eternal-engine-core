@@ -43,9 +43,6 @@ AutoRecompileShaderTask::~AutoRecompileShaderTask()
 	_DirectoryHandles = nullptr;
 }
 
-void AutoRecompileShaderTask::DoSetup()
-{
-}
 
 void AutoRecompileShaderTask::DoExecute()
 {
@@ -82,8 +79,4 @@ void AutoRecompileShaderTask::DoExecute()
 	//{
 	//	// BUG?
 	//}
-}
-
-void AutoRecompileShaderTask::DoReset()
-{
 }

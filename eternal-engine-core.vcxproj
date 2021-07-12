@@ -117,7 +117,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>ETERNAL_DEBUG;ETERNAL_ENABLE_D3D12;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
-      <ForcedIncludeFiles>sal.h;CoreSettings.hpp</ForcedIncludeFiles>
+      <ForcedIncludeFiles>sal.h;CoreSettings.hpp;optick.h</ForcedIncludeFiles>
       <AdditionalIncludeDirectories>D:\Code\FBX\FBX SDK\2020.0.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -161,125 +161,61 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\CoreSettings.hpp" />
-    <ClInclude Include="include\Core\CameraComponent.hpp" />
-    <ClInclude Include="include\Core\CameraGameObject.hpp" />
-    <ClInclude Include="include\Core\GraphicGameObject.hpp" />
     <ClInclude Include="include\Core\Game.hpp" />
-    <ClInclude Include="include\Core\GameComponent.hpp" />
-    <ClInclude Include="include\Core\GameObject.hpp" />
     <ClInclude Include="include\Core\GameState.hpp" />
-    <ClInclude Include="include\Core\LightComponent.hpp" />
-    <ClInclude Include="include\Core\LightGameObject.hpp" />
-    <ClInclude Include="include\Core\MaterialComponent.hpp" />
-    <ClInclude Include="include\Core\MeshComponent.hpp" />
-    <ClInclude Include="include\Core\ShadowComponent.hpp" />
     <ClInclude Include="include\Core\StateSharedData.hpp" />
-    <ClInclude Include="include\Core\TransformComponent.hpp" />
-    <ClInclude Include="include\GameData\GameDatas.hpp" />
-    <ClInclude Include="include\GameData\GraphicGameObjectGameData.hpp" />
-    <ClInclude Include="include\GameData\GraphicGameObjectInstanceGameData.hpp" />
-    <ClInclude Include="include\GameData\MaterialGameData.hpp" />
-    <ClInclude Include="include\GameData\MeshGameData.hpp" />
-    <ClInclude Include="include\GameData\TransformGameData.hpp" />
+    <ClInclude Include="include\Core\System.hpp" />
+    <ClInclude Include="include\GameData\GameDatas.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="include\GameData\GraphicGameObjectGameData.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="include\GameData\GraphicGameObjectInstanceGameData.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="include\GameData\MaterialGameData.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="include\GameData\MeshGameData.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="include\GameData\TransformGameData.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="include\GameState\CoreState.hpp" />
     <ClInclude Include="include\Imgui\Imgui.hpp" />
     <ClInclude Include="include\Optick\Optick.hpp" />
     <ClInclude Include="include\Platform\WindowsProcess.hpp" />
     <ClInclude Include="include\GamePools.hpp" />
-    <ClInclude Include="include\Task\ControlsTask.hpp" />
-    <ClInclude Include="include\Task\Core\CommandsTask.hpp" />
-    <ClInclude Include="include\Task\Core\Commands\EngineCommand.hpp" />
-    <ClInclude Include="include\Task\Core\Commands\UploadTextureDataCommand.hpp" />
-    <ClInclude Include="include\Task\Core\GameStateTask.hpp" />
-    <ClInclude Include="include\Task\Core\UpdateComponentTask.hpp" />
-    <ClInclude Include="include\Task\DebugTask.hpp" />
-    <ClInclude Include="include\Task\Graphics\CompositingTask.hpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="include\Task\Graphics\InitFrameTask.hpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="include\Task\Graphics\LightingTask.hpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="include\Task\Graphics\RenderObjectsTask.hpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="include\Task\Graphics\SwapFrameTask.hpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="include\Task\ImguiBeginTask.hpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="include\Task\ImguiEndTask.hpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClInclude>
-    <ClInclude Include="include\Task\TimeTask.hpp" />
     <ClInclude Include="include\Task\Tools\AutoRecompileShaderTask.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Core\CameraComponent.cpp" />
-    <ClCompile Include="src\Core\CameraGameObject.cpp" />
-    <ClCompile Include="src\Core\CommandsTask.cpp" />
-    <ClCompile Include="src\Core\Commands\UploadTextureDataCommand.cpp" />
     <ClCompile Include="src\Core\GameState.cpp" />
-    <ClCompile Include="src\Core\GraphicGameObject.cpp" />
     <ClCompile Include="src\Core\Game.cpp" />
-    <ClCompile Include="src\Core\LightComponent.cpp" />
-    <ClCompile Include="src\Core\LightGameObject.cpp" />
-    <ClCompile Include="src\Core\MaterialComponent.cpp" />
-    <ClCompile Include="src\Core\MeshComponent.cpp" />
-    <ClCompile Include="src\Core\StateSharedData.cpp" />
-    <ClCompile Include="src\Core\TransformComponent.cpp" />
-    <ClCompile Include="src\GameData\GameDatas.cpp" />
-    <ClCompile Include="src\GameData\GraphicGameObjectGameData.cpp" />
-    <ClCompile Include="src\GameData\GraphicGameObjectInstanceGameData.cpp" />
-    <ClCompile Include="src\GameData\MaterialGameData.cpp" />
-    <ClCompile Include="src\GameData\MeshGameData.cpp" />
-    <ClCompile Include="src\GameData\TransformGameData.cpp" />
+    <ClCompile Include="src\Core\System.cpp" />
+    <ClCompile Include="src\GameData\GameDatas.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\GameData\GraphicGameObjectGameData.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\GameData\GraphicGameObjectInstanceGameData.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\GameData\MaterialGameData.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\GameData\MeshGameData.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="src\GameData\TransformGameData.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\GameState\CoreState.cpp" />
     <ClCompile Include="src\Imgui\Imgui.cpp" />
     <ClCompile Include="src\Optick\Optick.cpp" />
     <ClCompile Include="src\Platform\WindowsProcess.cpp" />
-    <ClCompile Include="src\Task\DebugTask.cpp" />
-    <ClCompile Include="src\Task\Graphics\CompositingTask.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="src\Task\Graphics\InitFrameTask.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="src\Task\Graphics\RenderObjectsTask.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="src\Task\Graphics\LightingTask.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="src\Task\Graphics\SwapFrameTask.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="src\Task\ImguiBeginTask.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="src\Task\ImguiEndTask.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="src\Task\ControlsTask.cpp" />
-    <ClCompile Include="src\Task\Task\GameStateTask.cpp" />
-    <ClCompile Include="src\Task\TimeTask.cpp" />
     <ClCompile Include="src\Task\Tools\AutoRecompileShaderTask.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

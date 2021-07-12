@@ -1,27 +1,32 @@
-#ifndef _GAMESTATE_HPP_
-#define _GAMESTATE_HPP_
+#pragma once
 
 namespace Eternal
 {
 	namespace Core
 	{
-		class StateSharedData;
+		class Game;
+		class System;
 
 		class GameState
 		{
 		public:
+			GameState(_In_ Game& InGame)
+				: _Game(InGame)
+			{
+			}
+
 			virtual ~GameState() {}
 			virtual void Begin() = 0;
 			virtual void Update() = 0;
 			virtual GameState* NextState() = 0;
 			virtual void End() = 0;
-			void SetSharedData(_In_ StateSharedData* SharedData);
-			StateSharedData* GetSharedData();
+
+		protected:
+			Game& GetGame() { return _Game; }
+			System& GetSystem();
 
 		private:
-			StateSharedData* _StateSharedData = nullptr;
+			Game& _Game;
 		};
 	}
 }
-
-#endif

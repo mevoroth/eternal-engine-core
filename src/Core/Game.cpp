@@ -1,35 +1,52 @@
 #include "Core/Game.hpp"
+#include "Core/GameState.hpp"
+#include "Core/System.hpp"
 
 using namespace std;
 using namespace Eternal::Core;
 
-Game::Game(_In_ GameState* State)
-	: _Current(State)
+namespace Eternal
 {
-	ETERNAL_ASSERT(_Current);
-}
-
-void Game::Run()
-{
-	ETERNAL_ASSERT(_Current);
-
-	_Current->Begin();
-	for (;;)
+	namespace Core
 	{
-		_Current->Update();
-		GameState* NextState = _Current->NextState();
-
-		if (!NextState)
+		Game::Game(_In_ GameCreateInformation& InGameCreateInformation)
 		{
-			_Current->End();
-			return;
+			_System = new System(InGameCreateInformation.SystemInformation);
 		}
 
-		if (_Current != NextState)
+		Game::~Game()
 		{
-			_Current->End();
-			NextState->Begin();
-			_Current = NextState;
+			delete _CurrentGameState;
+			delete _System;
+		}
+
+		void Game::Run()
+		{
+			ETERNAL_ASSERT(_CurrentGameState);
+
+			OPTICK_THREAD();
+
+			_CurrentGameState->Begin();
+			while (_Running)
+			{
+				OPTICK_FRAME("MainThread");
+				_CurrentGameState->Update();
+
+				GameState* NextState = _CurrentGameState->NextState();
+
+				if (!NextState)
+				{
+					_CurrentGameState->End();
+					return;
+				}
+
+				if (_CurrentGameState != NextState)
+				{
+					_CurrentGameState->End();
+					NextState->Begin();
+					_CurrentGameState = NextState;
+				}
+			}
 		}
 	}
 }

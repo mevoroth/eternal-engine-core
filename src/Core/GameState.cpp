@@ -1,15 +1,13 @@
 #include "Core/GameState.hpp"
+#include "Core/Game.hpp"
 
-#include "Core/StateSharedData.hpp"
-
-using namespace Eternal::Core;
-
-void GameState::SetSharedData(_In_ StateSharedData* SharedData)
+namespace Eternal
 {
-	_StateSharedData = SharedData;
-}
-
-StateSharedData* GameState::GetSharedData()
-{
-	return _StateSharedData;
+	namespace Core
+	{
+		System& GameState::GetSystem()
+		{
+			return _Game.GetSystem();
+		}
+	}
 }
