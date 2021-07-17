@@ -45,10 +45,10 @@
 //#include "GraphicData/BlendStateCollection.hpp"
 #include "GraphicData/RenderingListCollection.hpp"
 #include "GraphicData/GraphicTaskConfigCollection.hpp"
-#include "Import/fbx/ImportFbx.hpp"
+//#include "Import/fbx/ImportFbx.hpp"
 #include "Import/tga/ImportTga.hpp"
-#include "SaveSystem/SaveSystem.hpp"
-#include "GameData/GameDatas.hpp"
+//#include "SaveSystem/SaveSystem.hpp"
+//#include "GameData/GameDatas.hpp"
 #include "File/FilePath.hpp"
 
 #ifdef ETERNAL_DEBUG

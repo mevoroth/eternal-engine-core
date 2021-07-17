@@ -8,11 +8,12 @@
 
 namespace Eternal
 {
-	namespace Imgui
+	namespace ImguiSystem
 	{
 		using namespace Eternal::Graphics;
 		using namespace Eternal::Types;
 		using namespace Eternal::Math;
+		using namespace Eternal::InputSystem;
 
 		struct ImguiProjectionConstants
 		{
@@ -48,19 +49,6 @@ namespace Eternal
 			ImGui::CreateContext();
 
 			ImGuiIO& IO = ImGui::GetIO();
-			IO.BackendPlatformName	= "PC";
-			IO.BackendRendererName	= "EternalGraphics";
-			IO.DisplaySize.x		= static_cast<float>(InContext.GetWindow().GetWidth());
-			IO.DisplaySize.y		= static_cast<float>(InContext.GetWindow().GetHeight());
-			IO.IniFilename			= "imgui.ini";
-
-			IO.BackendFlags			|= ImGuiBackendFlags_HasGamepad
-									| ImGuiBackendFlags_HasMouseCursors
-									//| ImGuiBackendFlags_HasSetMousePos
-									| ImGuiBackendFlags_RendererHasVtxOffset;
-
-			IO.ConfigFlags			|= ImGuiConfigFlags_NavEnableKeyboard
-									| ImGuiConfigFlags_NavEnableGamepad;
 
 			ImGui::StyleColorsDark();
 			//ImGui::StyleColorsClassic();
@@ -69,30 +57,7 @@ namespace Eternal
 			//unsigned char* Pixels;
 			//int Width, Height;
 
-			//io.Fonts->GetTexDataAsRGBA32(&Pixels, &Width, &Height);
-
-			_Map(Input::TAB,		ImGuiKey_Tab);
-			_Map(Input::LEFT,		ImGuiKey_LeftArrow);
-			_Map(Input::RIGHT,		ImGuiKey_RightArrow);
-			_Map(Input::UP,			ImGuiKey_UpArrow);
-			_Map(Input::DOWN,		ImGuiKey_DownArrow);
-			_Map(Input::PGUP,		ImGuiKey_PageUp);
-			_Map(Input::PGDOWN,		ImGuiKey_PageDown);
-			_Map(Input::HOME,		ImGuiKey_Home);
-			_Map(Input::END,		ImGuiKey_End);
-			_Map(Input::DEL,		ImGuiKey_Delete);
-			_Map(Input::BACKSPACE,	ImGuiKey_Backspace);
-			_Map(Input::RETURN,		ImGuiKey_Enter);
-			_Map(Input::ESC,		ImGuiKey_Escape);
-			_Map(Input::SPACE,		ImGuiKey_Space);
-			_Map(Input::A,			ImGuiKey_A);
-			_Map(Input::C,			ImGuiKey_C);
-			_Map(Input::V,			ImGuiKey_V);
-			_Map(Input::X,			ImGuiKey_X);
-			_Map(Input::Y,			ImGuiKey_Y);
-			_Map(Input::Z,			ImGuiKey_Z);
-
-			IO.ImeWindowHandle = InContext.GetWindow().GetWindowHandler();
+			//IO.Fonts->GetTexDataAsRGBA32(&Pixels, &Width, &Height);
 
 			//////////////////////////////////////////////////////////////////////////
 			// Graphics resources
@@ -244,6 +209,75 @@ namespace Eternal
 			);
 			_ImguiFontTextureView		= CreateShaderResourceView(ImguiFontTextureViewCreateInformation);
 			IO.Fonts->SetTexID(reinterpret_cast<ImTextureID>(_ImguiFontTextureView));
+		}
+
+		ImguiContext Imgui::CreateContext(_In_ GraphicsContext& InContext)
+		{
+			ImguiContext Context = { ImGui::GetCurrentContext() ? ImGui::GetCurrentContext() : ImGui::CreateContext() };
+
+			ImGuiIO& IO = ImGui::GetIO();
+			IO.BackendPlatformName	= "PC";
+			IO.BackendRendererName	= "EternalGraphics";
+			IO.DisplaySize.x		= static_cast<float>(InContext.GetWindow().GetWidth());
+			IO.DisplaySize.y		= static_cast<float>(InContext.GetWindow().GetHeight());
+			IO.IniFilename			= "imgui.ini";
+
+			IO.BackendFlags			|= ImGuiBackendFlags_HasGamepad
+									| ImGuiBackendFlags_HasMouseCursors
+									//| ImGuiBackendFlags_HasSetMousePos
+									| ImGuiBackendFlags_RendererHasVtxOffset;
+
+			IO.ConfigFlags			|= ImGuiConfigFlags_NavEnableKeyboard
+									| ImGuiConfigFlags_NavEnableGamepad;
+
+			IO.ImeWindowHandle		= InContext.GetWindow().GetWindowHandler();
+
+			_Map(Input::TAB,		ImGuiKey_Tab);
+			_Map(Input::LEFT,		ImGuiKey_LeftArrow);
+			_Map(Input::RIGHT,		ImGuiKey_RightArrow);
+			_Map(Input::UP,			ImGuiKey_UpArrow);
+			_Map(Input::DOWN,		ImGuiKey_DownArrow);
+			_Map(Input::PGUP,		ImGuiKey_PageUp);
+			_Map(Input::PGDOWN,		ImGuiKey_PageDown);
+			_Map(Input::HOME,		ImGuiKey_Home);
+			_Map(Input::END,		ImGuiKey_End);
+			_Map(Input::DEL,		ImGuiKey_Delete);
+			_Map(Input::BACKSPACE,	ImGuiKey_Backspace);
+			_Map(Input::RETURN,		ImGuiKey_Enter);
+			_Map(Input::ESC,		ImGuiKey_Escape);
+			_Map(Input::SPACE,		ImGuiKey_Space);
+			_Map(Input::A,			ImGuiKey_A);
+			_Map(Input::C,			ImGuiKey_C);
+			_Map(Input::V,			ImGuiKey_V);
+			_Map(Input::X,			ImGuiKey_X);
+			_Map(Input::Y,			ImGuiKey_Y);
+			_Map(Input::Z,			ImGuiKey_Z);
+
+			unsigned char* Pixels		= nullptr;
+			int Width					= 0;
+			int Height					= 0;
+			int BytesPerPixel			= 0;
+			IO.Fonts->GetTexDataAsRGBA32(
+				&Pixels,
+				&Width,
+				&Height,
+				&BytesPerPixel
+			);
+			IO.Fonts->SetTexID(reinterpret_cast<ImTextureID>(_ImguiFontTextureView));
+
+			ImGui::SetCurrentContext(nullptr);
+
+			return Context;
+		}
+
+		void Imgui::SetContext(_In_ const ImguiContext& InContext)
+		{
+			ImGui::SetCurrentContext(InContext.Context);
+		}
+
+		void Imgui::DestroyContext(_In_ const ImguiContext& InContext)
+		{
+			ImGui::DestroyContext(InContext.Context);
 		}
 
 		void Imgui::Begin()

@@ -9,12 +9,17 @@ struct ImDrawData;
 
 namespace Eternal
 {
-	namespace Imgui
+	namespace ImguiSystem
 	{
 		using namespace Eternal::Graphics;
 		using namespace Eternal::InputSystem;
 
 		struct ImguiRenderContext;
+
+		struct ImguiContext
+		{
+			ImGuiContext* Context = nullptr;
+		};
 
 		class Imgui
 		{
@@ -28,10 +33,14 @@ namespace Eternal
 			void Begin();
 			void End();
 
+			ImguiContext CreateContext(_In_ GraphicsContext& InContext);
+			void SetContext(_In_ const ImguiContext& InContext);
+			void DestroyContext(_In_ const ImguiContext& InContext);
+
 			void Render(_In_ GraphicsContext& InContext);
 
 		private:
-			void _Map(_In_ const Input::Input::Key& EternalKey, _In_ const ImGuiKey_& ImguiKey);
+			void _Map(_In_ const Input::Key& EternalKey, _In_ const ImGuiKey_& ImguiKey);
 			void _ProcessInputCharacter(_In_ const ImWchar& ImguiKey, _In_ const Input::Key& KeyName);
 			void _ProcessInputCharacterRange(_In_ const ImWchar& ImguiKeyStart, _In_ const Input::Key& KeyNameStart, _In_ uint32_t Range);
 			void _UpdateInputs();
@@ -50,7 +59,7 @@ namespace Eternal
 				int BytesPerPixel			= 0;
 			};
 
-			vector<Input::Input::Key>	_MappedKeys;
+			vector<Input::Key>			_MappedKeys;
 			Input*						_Input = nullptr;
 
 			ImguiFontMetaData			_ImguiFontMetaData;

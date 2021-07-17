@@ -25,8 +25,14 @@
     <Filter Include="Optick">
       <UniqueIdentifier>{9e21378b-92ce-42f1-9e33-199be084c744}</UniqueIdentifier>
     </Filter>
-    <Filter Include="GameState\Imgui">
+    <Filter Include="Imgui">
       <UniqueIdentifier>{f339b2ac-a76d-4898-a14e-4afc92323b0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Import">
+      <UniqueIdentifier>{e7c361b5-041e-4df3-834f-3feb6223e03c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Components">
+      <UniqueIdentifier>{f0929832-4bf3-408a-8972-cbe55a52635e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -39,32 +45,14 @@
     <ClInclude Include="include\Platform\WindowsProcess.hpp">
       <Filter>Platform</Filter>
     </ClInclude>
-    <ClInclude Include="include\GameData\TransformGameData.hpp">
-      <Filter>GameData</Filter>
-    </ClInclude>
     <ClInclude Include="include\GamePools.hpp" />
-    <ClInclude Include="include\GameData\GraphicGameObjectGameData.hpp">
-      <Filter>GameData</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameData\MeshGameData.hpp">
-      <Filter>GameData</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameData\GameDatas.hpp">
-      <Filter>GameData</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\StateSharedData.hpp" />
     <ClInclude Include="include\Task\Tools\AutoRecompileShaderTask.hpp">
       <Filter>Task\Tools</Filter>
     </ClInclude>
-    <ClInclude Include="include\GameData\GraphicGameObjectInstanceGameData.hpp">
-      <Filter>GameData</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameData\MaterialGameData.hpp">
-      <Filter>GameData</Filter>
-    </ClInclude>
     <ClInclude Include="include\CoreSettings.hpp" />
     <ClInclude Include="include\Imgui\Imgui.hpp">
-      <Filter>GameState\Imgui</Filter>
+      <Filter>Imgui</Filter>
     </ClInclude>
     <ClInclude Include="include\Optick\Optick.hpp">
       <Filter>Optick</Filter>
@@ -74,6 +62,45 @@
     </ClInclude>
     <ClInclude Include="include\Core\System.hpp">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Imgui\ImguiConfig.hpp">
+      <Filter>Imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Task\Core\RendererTask.hpp">
+      <Filter>Task\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Task\Core\StreamingTask.hpp">
+      <Filter>Task\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Import\ImportLevel.hpp">
+      <Filter>Import</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\World.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Level.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\GameObject.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core\Component.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Components\TransformComponent.hpp">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameData\GameData.hpp">
+      <Filter>GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameData\TransformGameData.hpp">
+      <Filter>GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameData\JsonGameData.hpp">
+      <Filter>GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameData\LevelGameData.hpp">
+      <Filter>GameData</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -86,36 +113,45 @@
     <ClCompile Include="src\Platform\WindowsProcess.cpp">
       <Filter>Platform</Filter>
     </ClCompile>
-    <ClCompile Include="src\GameData\TransformGameData.cpp">
-      <Filter>GameData</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GameData\GraphicGameObjectGameData.cpp">
-      <Filter>GameData</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GameData\MeshGameData.cpp">
-      <Filter>GameData</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GameData\GameDatas.cpp">
-      <Filter>GameData</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\GameState.cpp" />
     <ClCompile Include="src\Task\Tools\AutoRecompileShaderTask.cpp">
       <Filter>Task\Tools</Filter>
     </ClCompile>
-    <ClCompile Include="src\GameData\GraphicGameObjectInstanceGameData.cpp">
-      <Filter>GameData</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GameData\MaterialGameData.cpp">
-      <Filter>GameData</Filter>
-    </ClCompile>
     <ClCompile Include="src\Imgui\Imgui.cpp">
-      <Filter>GameState\Imgui</Filter>
+      <Filter>Imgui</Filter>
     </ClCompile>
     <ClCompile Include="src\Optick\Optick.cpp">
       <Filter>Optick</Filter>
     </ClCompile>
     <ClCompile Include="src\Core\System.cpp">
       <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Imgui\ImguiConfig.cpp">
+      <Filter>Imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task\Core\RendererTask.cpp">
+      <Filter>Task\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task\Core\StreamingTask.cpp">
+      <Filter>Task\Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameData\TransformGameData.cpp">
+      <Filter>GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameData\JsonGameData.cpp">
+      <Filter>GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameData\LevelGameData.cpp">
+      <Filter>GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Import\ImportLevel.cpp">
+      <Filter>Import</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Level.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameData\GameData.cpp">
+      <Filter>GameData</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

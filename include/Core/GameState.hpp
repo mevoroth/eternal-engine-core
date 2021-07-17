@@ -19,7 +19,8 @@ namespace Eternal
 			virtual void Begin() = 0;
 			virtual void Update() = 0;
 			virtual GameState* NextState() = 0;
-			virtual void End() = 0;
+			virtual void End() { delete this; }
+			virtual void UpdateDebug() {}
 
 		protected:
 			Game& GetGame() { return _Game; }
