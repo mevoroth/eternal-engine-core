@@ -32,6 +32,8 @@ namespace Eternal
 			~JsonArrayNode();
 
 			virtual const GameDataSource& GetSubNode(_In_ const GameDataSourceKey& InKey) const override final;
+
+		protected:
 			virtual void InternalGet(_Out_ void* OutValue) const override final;
 		};
 
@@ -39,6 +41,7 @@ namespace Eternal
 		{
 			using JsonNode::JsonNode;
 
+		protected:
 			virtual void InternalGet(_Out_ void* OutValue) const override final;
 		};
 
@@ -68,6 +71,9 @@ namespace Eternal
 			JsonMeshNode(_In_ const JsonNodeType& InNode);
 
 			virtual const GameDataSource& GetSubNode(_In_ const GameDataSourceKey& InKey) const override final;
+
+		protected:
+			virtual void InternalGet(_Out_ void* OutValue) const override final;
 
 		private:
 			JsonTransformCollection _TransformCollection;

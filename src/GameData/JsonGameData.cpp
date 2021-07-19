@@ -100,6 +100,12 @@ namespace Eternal
 			return _TransformCollection.Get();
 		}
 
+		void JsonMeshNode::InternalGet(_Out_ void* OutValue) const
+		{
+			std::string& OutPath = *static_cast<std::string*>(OutValue);
+			OutPath = _Node["m_Path"].GetString();
+		}
+
 		//////////////////////////////////////////////////////////////////////////
 		// Light
 		

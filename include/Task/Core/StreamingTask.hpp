@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Parallel/Task.hpp"
+#include "Resources/Streaming.hpp"
 
 namespace Eternal
 {
@@ -12,29 +13,18 @@ namespace Eternal
 	{
 		using namespace Eternal::Parallel;
 		using namespace Eternal::Core;
-
-		struct StreamingTaskCreateInformation
-		{
-
-			StreamingTaskCreateInformation(_In_ System& InSystem)
-				: SystemContext(InSystem)
-			{
-			}
-
-			System& SystemContext;
-		};
+		using namespace Eternal::Resources;
 
 		class StreamingTask final : public Task
 		{
 		public:
-			StreamingTask(_In_ StreamingTaskCreateInformation& InStreamingTaskCreateInformation);
+			using Task::Task;
 
 			virtual void DoExecute() override final;
 
 		private:
-			System& GetSystem() { return _StreamingTaskCreateInformation.SystemContext; }
 
-			StreamingTaskCreateInformation _StreamingTaskCreateInformation;
+			void _ProcessQueues(_In_ RequestQueueType& InStreamingRequests, _Inout_ PayloadQueueType& InOutStreamingPayloads);
 		};
 	}
 }

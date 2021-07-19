@@ -14,6 +14,10 @@ namespace Eternal
 		{
 		public:
 
+			void AddLevel(_In_ Level* InLevel)
+			{
+				_Levels.push_back(InLevel);
+			}
 
 		private:
 			vector<Level*> _Levels;

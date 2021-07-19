@@ -12,7 +12,8 @@ namespace Eternal
 		class AutoRecompileShaderTask : public Task
 		{
 		public:
-			AutoRecompileShaderTask();
+			using Task::Task;
+			//AutoRecompileShaderTask();
 			~AutoRecompileShaderTask();
 
 			virtual void DoExecute() override;

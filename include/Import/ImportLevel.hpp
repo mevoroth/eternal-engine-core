@@ -4,22 +4,21 @@
 
 namespace Eternal
 {
-	namespace Core
+	namespace Resources
 	{
-		class Level;
+		class LevelPayload;
 	}
-
 	namespace Import
 	{
 		using namespace std;
-		using namespace Eternal::Core;
+		using namespace Eternal::Resources;
 
 		class ImportLevel
 		{
 		public:
 			ImportLevel();
 
-			Level* Import(_In_ const string& InName);
+			LevelPayload* Import(_In_ const string& InName);
 		};
 	}
 }

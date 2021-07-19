@@ -8,13 +8,11 @@
 #include "Input/InputFactory.hpp"
 #include "Task/Core/RendererTask.hpp"
 #include "Task/Core/StreamingTask.hpp"
-#include "Import/tga/ImportTga.hpp"
-#include "Import/fbx/ImportFbx.hpp"
-#include "Import/ImportLevel.hpp"
 #include "Parallel/AtomicS32.hpp"
 #include "Parallel/AtomicS32Factory.hpp"
 #include "Parallel/Sleep.hpp"
 #include "Resources/Streaming.hpp"
+#include "Resources/LevelLoader.hpp"
 #include "Optick/Optick.hpp"
 
 namespace Eternal
@@ -50,15 +48,13 @@ namespace Eternal
 			for (uint32_t FrameIndex = 0; FrameIndex < GraphicsContext::FrameBufferingCount; ++FrameIndex)
 				_Frames[FrameIndex].ImguiFrameContext = _Imgui->CreateContext(*_GraphicsContext);
 
-			_ImportTga			= new ImportTga();
-			_ImportFbx			= new ImportFbx();
-			_ImportLevel		= new ImportLevel();
 			_Streaming			= new Streaming();
+			_Streaming->RegisterLoader(AssetType::ASSET_TYPE_LEVEL, new LevelLoader());
 
-			RendererTaskCreateInformation RendererCreateInformation(*this);
+			TaskCreateInformation RendererCreateInformation(*this, "RendererTask");
 			_RendererTask		= new RendererTask(RendererCreateInformation);
 
-			StreamingTaskCreateInformation StreamingCreateInformation(*this);
+			TaskCreateInformation StreamingCreateInformation(*this, "StreamingTask");
 			_StreamingTask		= new StreamingTask(StreamingCreateInformation);
 
 			ParallelSystemCreateInformation ParallelSystemInformation(
@@ -86,15 +82,6 @@ namespace Eternal
 			delete _Streaming;
 			_Streaming = nullptr;
 
-			delete _ImportLevel;
-			_ImportLevel = nullptr;
-
-			delete _ImportFbx;
-			_ImportFbx = nullptr;
-
-			delete _ImportTga;
-			_ImportTga = nullptr;
-
 			for (uint32_t FrameIndex = 0; FrameIndex < GraphicsContext::FrameBufferingCount; ++FrameIndex)
 				_Imgui->DestroyContext(_Frames[FrameIndex].ImguiFrameContext);
 
@@ -113,11 +100,12 @@ namespace Eternal
 			ETERNAL_PROFILER(BASIC)();
 			while (GetGameFrame().SystemState->Load() != SystemCanBeWritten)
 			{
-				Sleep(1);
+				Sleep(10);
 			}
 			GetParallelSystem().StartFrame();
 			GetImgui().SetContext(GetGameFrame().ImguiFrameContext);
 			GetImgui().Begin();
+			GetStreaming().GatherPayloads();
 
 		}
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Core/World.hpp"
+
 namespace Eternal
 {
 	namespace Core
@@ -34,6 +36,10 @@ namespace Eternal
 			}
 
 		protected:
+			void Update();
+
+			World		_World;
+
 			GameState*	_CurrentGameState	= nullptr;
 
 			System*		_System				= nullptr;

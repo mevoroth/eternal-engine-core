@@ -11,15 +11,11 @@ namespace Eternal
 		using namespace Eternal::LogSystem;
 		const Log::LogCategory LogRenderer("Renderer");
 
-		RendererTask::RendererTask(_In_ RendererTaskCreateInformation& InRendererTaskCreateInformation)
-			: _RendererTaskCreateInformation(InRendererTaskCreateInformation)
-		{
-		}
-
 		void RendererTask::DoExecute()
 		{
+			ETERNAL_PROFILER(BASIC)();
 			_WaitForData();
-			LogWrite(LogInfo, LogRenderer, "Rendering...");
+			//LogWrite(LogInfo, LogRenderer, "Rendering...");
 			SystemFrame& CurrentRenderFrame = GetSystem().GetRenderFrame();
 			GraphicsContext& GfxContext = GetSystem().GetGraphicsContext();
 			GfxContext.BeginFrame();

@@ -1,11 +1,16 @@
 #include "Core/Game.hpp"
 #include "Core/GameState.hpp"
 #include "Core/System.hpp"
+#include "Resources/Streaming.hpp"
+#include "Resources/Payload.hpp"
+#include "Resources/LevelPayload.hpp"
 
 namespace Eternal
 {
 	namespace Core
 	{
+		using namespace Eternal::Resources;
+
 		Game::Game(_In_ GameCreateInformation& InGameCreateInformation)
 		{
 			InGameCreateInformation.SystemInformation.GameContext = this;
@@ -30,6 +35,7 @@ namespace Eternal
 				OPTICK_FRAME("GameFrame");
 				GetSystem().StartFrame();
 				GetSystem().Update();
+				Update();
 				{
 					ETERNAL_PROFILER(BASIC)("GameState Update");
 					_CurrentGameState->Update();
@@ -59,6 +65,20 @@ namespace Eternal
 					}
 				}
 			}
+		}
+
+		void Game::Update()
+		{
+			ETERNAL_PROFILER(BASIC)();
+			Streaming& StreamingSystem = GetSystem().GetStreaming();
+			StreamingSystem.ProcessGathered(
+				AssetType::ASSET_TYPE_LEVEL,
+				[this](_In_ Payload& InPayload)
+				{
+					LevelPayload& InLevelPayload = static_cast<LevelPayload&>(InPayload);
+					_World.AddLevel(InLevelPayload.LoadedLevel);
+				}
+			);
 		}
 	}
 }

@@ -115,13 +115,13 @@
       <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>ETERNAL_DEBUG=1;ETERNAL_ENABLE_D3D12=1;IMGUI_USER_CONFIG="Imgui/ImguiConfig.hpp";FBXSDK_SHARED=1;ETERNAL_USE_STD_PARALLEL=1;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <ForcedIncludeFiles>sal.h;CoreSettings.hpp;optick.h</ForcedIncludeFiles>
       <AdditionalIncludeDirectories>D:\Code\FBX\FBX SDK\2020.0.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4189;4100</DisableSpecificWarnings>
+      <PreprocessorDefinitions>ETERNAL_ENABLE_D3D12=1;ETERNAL_PROFILER_USE_VERBOSE=0;ETERNAL_USE_STD_PARALLEL=1;ETERNAL_DEBUG=1;IMGUI_USER_CONFIG="Imgui/ImguiConfig.hpp";FBXSDK_SHARED=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -160,6 +160,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="include\Components\MeshComponent.hpp" />
     <ClInclude Include="include\Components\TransformComponent.hpp" />
     <ClInclude Include="include\CoreSettings.hpp" />
     <ClInclude Include="include\Core\Component.hpp" />
@@ -173,14 +174,19 @@
     <ClInclude Include="include\GameData\GameData.hpp" />
     <ClInclude Include="include\GameData\JsonGameData.hpp" />
     <ClInclude Include="include\GameData\LevelGameData.hpp" />
+    <ClInclude Include="include\GameData\MeshGameData.hpp" />
     <ClInclude Include="include\GameData\TransformGameData.hpp" />
-    <ClInclude Include="include\GameState\CoreState.hpp" />
+    <ClInclude Include="include\GameState\CoreState.hpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="include\Imgui\Imgui.hpp" />
     <ClInclude Include="include\Imgui\ImguiConfig.hpp" />
     <ClInclude Include="include\Import\ImportLevel.hpp" />
     <ClInclude Include="include\Optick\Optick.hpp" />
     <ClInclude Include="include\Platform\WindowsProcess.hpp" />
     <ClInclude Include="include\GamePools.hpp" />
+    <ClInclude Include="include\Resources\LevelLoader.hpp" />
+    <ClInclude Include="include\Resources\LevelPayload.hpp" />
     <ClInclude Include="include\Task\Core\RendererTask.hpp" />
     <ClInclude Include="include\Task\Core\StreamingTask.hpp" />
     <ClInclude Include="include\Task\Tools\AutoRecompileShaderTask.hpp" />
@@ -193,13 +199,17 @@
     <ClCompile Include="src\GameData\GameData.cpp" />
     <ClCompile Include="src\GameData\JsonGameData.cpp" />
     <ClCompile Include="src\GameData\LevelGameData.cpp" />
+    <ClCompile Include="src\GameData\MeshGameData.cpp" />
     <ClCompile Include="src\GameData\TransformGameData.cpp" />
-    <ClCompile Include="src\GameState\CoreState.cpp" />
+    <ClCompile Include="src\GameState\CoreState.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="src\Imgui\Imgui.cpp" />
     <ClCompile Include="src\Imgui\ImguiConfig.cpp" />
     <ClCompile Include="src\Import\ImportLevel.cpp" />
     <ClCompile Include="src\Optick\Optick.cpp" />
     <ClCompile Include="src\Platform\WindowsProcess.cpp" />
+    <ClCompile Include="src\Resources\LevelLoader.cpp" />
     <ClCompile Include="src\Task\Core\RendererTask.cpp" />
     <ClCompile Include="src\Task\Core\StreamingTask.cpp" />
     <ClCompile Include="src\Task\Tools\AutoRecompileShaderTask.cpp" />

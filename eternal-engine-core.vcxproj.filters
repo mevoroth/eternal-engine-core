@@ -28,11 +28,14 @@
     <Filter Include="Imgui">
       <UniqueIdentifier>{f339b2ac-a76d-4898-a14e-4afc92323b0f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Import">
-      <UniqueIdentifier>{e7c361b5-041e-4df3-834f-3feb6223e03c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Components">
       <UniqueIdentifier>{f0929832-4bf3-408a-8972-cbe55a52635e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Import">
+      <UniqueIdentifier>{c1d7de51-989a-4a97-84d7-cea134460c19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{e6a00742-b0cb-4ea8-856a-26151a9f2421}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -72,9 +75,6 @@
     <ClInclude Include="include\Task\Core\StreamingTask.hpp">
       <Filter>Task\Core</Filter>
     </ClInclude>
-    <ClInclude Include="include\Import\ImportLevel.hpp">
-      <Filter>Import</Filter>
-    </ClInclude>
     <ClInclude Include="include\Core\World.hpp">
       <Filter>Core</Filter>
     </ClInclude>
@@ -101,6 +101,21 @@
     </ClInclude>
     <ClInclude Include="include\GameData\LevelGameData.hpp">
       <Filter>GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Components\MeshComponent.hpp">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameData\MeshGameData.hpp">
+      <Filter>GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Import\ImportLevel.hpp">
+      <Filter>Import</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Resources\LevelLoader.hpp">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Resources\LevelPayload.hpp">
+      <Filter>Resources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -144,14 +159,20 @@
     <ClCompile Include="src\GameData\LevelGameData.cpp">
       <Filter>GameData</Filter>
     </ClCompile>
-    <ClCompile Include="src\Import\ImportLevel.cpp">
-      <Filter>Import</Filter>
-    </ClCompile>
     <ClCompile Include="src\Core\Level.cpp">
       <Filter>Core</Filter>
     </ClCompile>
     <ClCompile Include="src\GameData\GameData.cpp">
       <Filter>GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameData\MeshGameData.cpp">
+      <Filter>GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Import\ImportLevel.cpp">
+      <Filter>Import</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resources\LevelLoader.cpp">
+      <Filter>Resources</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

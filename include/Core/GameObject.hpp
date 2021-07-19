@@ -14,6 +14,12 @@ namespace Eternal
 		{
 		public:
 
+			template<typename ComponentType>
+			void AddComponent()
+			{
+				AddComponent(new ComponentType());
+			}
+
 			void AddComponent(_In_ Component* InComponent)
 			{
 				_Components.push_back(InComponent);

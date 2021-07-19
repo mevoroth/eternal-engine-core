@@ -129,24 +129,6 @@ namespace Eternal
 				return *_Imgui;
 			}
 
-			inline ImportTga& GetImportTga()
-			{
-				ETERNAL_ASSERT(_ImportTga);
-				return *_ImportTga;
-			}
-
-			inline ImportFbx& GetImportFbx()
-			{
-				ETERNAL_ASSERT(_ImportFbx);
-				return *_ImportFbx;
-			}
-
-			inline ImportLevel& GetImportLevel()
-			{
-				ETERNAL_ASSERT(_ImportLevel);
-				return *_ImportLevel;
-			}
-
 			inline Streaming& GetStreaming()
 			{
 				ETERNAL_ASSERT(_Streaming);
@@ -171,9 +153,6 @@ namespace Eternal
 			Timer*														_Timer				= nullptr;
 			Log*														_Logs				= nullptr;
 			Input*														_Input				= nullptr;
-			ImportTga*													_ImportTga			= nullptr;
-			ImportFbx*													_ImportFbx			= nullptr;
-			ImportLevel*												_ImportLevel		= nullptr;
 			Streaming*													_Streaming			= nullptr;
 
 			//////////////////////////////////////////////////////////////////////////
