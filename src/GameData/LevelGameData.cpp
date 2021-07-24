@@ -6,6 +6,7 @@
 #include "GameData/TransformGameData.hpp"
 #include "GameData/MeshGameData.hpp"
 #include "Resources/LevelPayload.hpp"
+#include "Resources/Payload.hpp"
 
 namespace Eternal
 {
@@ -45,17 +46,22 @@ namespace Eternal
 
 						MeshGameData GameData;
 						std::string* MeshPath = GameData.Load<std::string>(MeshItem);
-						MeshRequest Request(*MeshPath);
+						MeshRequest* Request = new MeshRequest(*MeshPath);
 						delete MeshPath;
+
+						uint32_t GameObjectCount = 0;
+						Transforms.Get(GameObjectCount);
+
+						Request->ComponentsToUpdate.reserve(GameObjectCount);
 
 						IterateGameDataCollection(
 							Transforms,
-							[OutLevel](_In_ const GameDataSource& TransformItem)
+							[OutLevel, &Request](_In_ const GameDataSource& TransformItem)
 							{
 								TransformGameData GameData;
 								GameObject* MeshObject = new GameObject();
 								MeshObject->AddComponent(GameData.Load<TransformComponent>(TransformItem));
-								MeshObject->AddComponent<MeshComponent>();
+								Request->ComponentsToUpdate.push_back(MeshObject->AddComponent<MeshComponent>());
 								OutLevel->AddGameObject(MeshObject);
 							}
 						);

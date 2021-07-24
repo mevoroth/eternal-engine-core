@@ -18,6 +18,7 @@ namespace Eternal
 			//LogWrite(LogInfo, LogRenderer, "Rendering...");
 			SystemFrame& CurrentRenderFrame = GetSystem().GetRenderFrame();
 			GraphicsContext& GfxContext = GetSystem().GetGraphicsContext();
+			GfxContext.RegisterGraphicsCommands(CurrentRenderFrame.GraphicsCommands.size() ? &CurrentRenderFrame.GraphicsCommands : nullptr);
 			GfxContext.BeginFrame();
 
 			GetSystem().GetImgui().SetContext(CurrentRenderFrame.ImguiFrameContext);

@@ -37,13 +37,19 @@
     <Filter Include="Resources">
       <UniqueIdentifier>{e6a00742-b0cb-4ea8-856a-26151a9f2421}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GraphicsCommand">
+      <UniqueIdentifier>{9e773936-516e-44df-8515-ad4b8956afc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphicsEngine">
+      <UniqueIdentifier>{69c578c0-dd41-4948-a45d-07acc6b5bf9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="GraphicsEngine\RenderPasses">
+      <UniqueIdentifier>{3f7df8ec-f1cc-4943-a505-c8193287b32d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Game.hpp">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="include\GameState\CoreState.hpp">
-      <Filter>GameState</Filter>
     </ClInclude>
     <ClInclude Include="include\Platform\WindowsProcess.hpp">
       <Filter>Platform</Filter>
@@ -117,13 +123,22 @@
     <ClInclude Include="include\Resources\LevelPayload.hpp">
       <Filter>Resources</Filter>
     </ClInclude>
+    <ClInclude Include="include\Core\WorldObject.hpp">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsCommand\UploadMeshGraphicsCommand.hpp">
+      <Filter>GraphicsCommand</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsEngine\Pass.hpp">
+      <Filter>GraphicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsEngine\RenderPasses\OpaquePass.hpp">
+      <Filter>GraphicsEngine\RenderPasses</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Game.cpp">
       <Filter>Core</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GameState\CoreState.cpp">
-      <Filter>GameState</Filter>
     </ClCompile>
     <ClCompile Include="src\Platform\WindowsProcess.cpp">
       <Filter>Platform</Filter>
@@ -173,6 +188,24 @@
     </ClCompile>
     <ClCompile Include="src\Resources\LevelLoader.cpp">
       <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\GameObject.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\World.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsCommand\UploadMeshGraphicsCommand.cpp">
+      <Filter>GraphicsCommand</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Resources\LevelPayload.cpp">
+      <Filter>Resources</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Components\MeshComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\RenderPasses\OpaquePass.cpp">
+      <Filter>GraphicsEngine\RenderPasses</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

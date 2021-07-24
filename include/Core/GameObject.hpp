@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/WorldObject.hpp"
 #include <vector>
 
 namespace Eternal
@@ -10,25 +11,24 @@ namespace Eternal
 
 		class Component;
 
-		class GameObject
+		class GameObject : public WorldObject
 		{
 		public:
 
+			GameObject();
+
+			virtual void SetWorld(_In_ World* InWorld) override final;
+
 			template<typename ComponentType>
-			void AddComponent()
+			inline ComponentType* AddComponent()
 			{
-				AddComponent(new ComponentType());
+				ComponentType* OutComponent = new ComponentType();
+				AddComponent(OutComponent);
+				return OutComponent;
 			}
 
-			void AddComponent(_In_ Component* InComponent)
-			{
-				_Components.push_back(InComponent);
-			}
-
-			void RemoveComponent(_In_ Component* InComponent)
-			{
-				vector<Component*>::iterator ComponentIterator = remove(_Components.begin(), _Components.end(), InComponent);
-			}
+			void AddComponent(_In_ Component* InComponent);
+			void RemoveComponent(_In_ Component* InComponent);
 
 		private:
 			vector<Component*> _Components;

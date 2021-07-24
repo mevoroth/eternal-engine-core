@@ -8,19 +8,24 @@ namespace Eternal
 	{
 		using namespace std;
 
+		class Game;
 		class Level;
 
 		class World
 		{
 		public:
 
-			void AddLevel(_In_ Level* InLevel)
+			World(_In_ Game& InGame)
+				: _Game(InGame)
 			{
-				_Levels.push_back(InLevel);
 			}
 
+			Game& GetGame() { return _Game; }
+			void AddLevel(_In_ Level* InLevel);
+
 		private:
-			vector<Level*> _Levels;
+			Game&			_Game;
+			vector<Level*>	_Levels;
 		};
 	}
 }

@@ -16,5 +16,10 @@ namespace Eternal
 		{
 			Level* LoadedLevel = nullptr;
 		};
+
+		struct LevelRequest : public StreamingRequest
+		{
+			LevelRequest(_In_ const string& InPath);
+		};
 	}
 }

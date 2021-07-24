@@ -29,6 +29,7 @@ namespace Eternal
 			static constexpr uint32_t ImguiMaxIndices		= 65536;
 
 			Imgui(_In_ GraphicsContext& InContext, _In_ Input* InInput);
+			~Imgui();
 
 			void Begin();
 			void End();

@@ -84,7 +84,7 @@ namespace Eternal
 			);
 
 			vector<View*>& BackBuffersViews = InContext.GetSwapChain().GetBackBufferRenderTargetViews();
-			for (uint32_t RenderPassIndex = 0; RenderPassIndex < ETERNAL_ARRAYSIZE(_ImguiRenderPasses); ++RenderPassIndex)
+			for (uint32_t RenderPassIndex = 0; RenderPassIndex < _ImguiRenderPasses.size(); ++RenderPassIndex)
 			{
 				RenderPassCreateInformation ImguiRenderPassCreateInformation(
 					InContext.GetMainViewport(),
@@ -125,6 +125,7 @@ namespace Eternal
 				*_ImguiRenderPasses[0],
 				*_ImguiVS,
 				*_ImguiPS,
+				DepthStencilNoneNone,
 				Rasterizer(FrontFace::FRONT_FACE_CLOCKWISE)
 			);
 			_ImguiPipeline			= CreatePipeline(InContext, ImguiPipelineCreateInformation);
@@ -156,9 +157,7 @@ namespace Eternal
 			BufferResourceCreateInformation ImguiVertexBufferResourceCreateInformation(
 				InContext.GetDevice(),
 				"ImguiVertexBuffer",
-				BufferCreateInformation(
-					Format::FORMAT_UNKNOWN,
-					BufferResourceUsage::BUFFER_RESOURCE_USAGE_VERTEX_BUFFER,
+				VertexBufferCreateInformation(
 					sizeof(ImDrawVert) * ImguiMaxVertices,
 					sizeof(ImDrawVert)
 				),
@@ -169,10 +168,9 @@ namespace Eternal
 			BufferResourceCreateInformation ImguiIndexBufferResourceCreateInformation(
 				InContext.GetDevice(),
 				"ImguiIndexBuffer",
-				BufferCreateInformation(
-					Format::FORMAT_R16_UINT,
-					BufferResourceUsage::BUFFER_RESOURCE_USAGE_INDEX_BUFFER,
-					sizeof(ImDrawIdx) * ImguiMaxIndices
+				IndexBufferCreateInformation(
+					sizeof(ImDrawIdx) * ImguiMaxIndices,
+					sizeof(ImDrawIdx)
 				),
 				ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
 			);
@@ -209,6 +207,25 @@ namespace Eternal
 			);
 			_ImguiFontTextureView		= CreateShaderResourceView(ImguiFontTextureViewCreateInformation);
 			IO.Fonts->SetTexID(reinterpret_cast<ImTextureID>(_ImguiFontTextureView));
+		}
+
+		Imgui::~Imgui()
+		{
+			DestroyView(_ImguiFontTextureView);
+			DestroyResource(_ImguiFontTexture);
+			DestroyMultiBufferedResource(_ImguiIndexBuffer);
+			DestroyMultiBufferedResource(_ImguiVertexBuffer);
+			DestroyMultiBufferedView(_ImguiConstantBufferView);
+			DestroyMultiBufferedResource(_ImguiConstantBuffer);
+			DestroyPipeline(_ImguiPipeline);
+			DestroyDescriptorTable(_ImguiDescriptorTable);
+			DestroySampler(_ImguiBilinearSampler);
+			DestroyRootSignature(_ImguiRootSignature);
+			DestroyInputLayout(_ImguiInputLayout);
+			for (uint32_t RenderPassIndex = 0; RenderPassIndex < _ImguiRenderPasses.size(); ++RenderPassIndex)
+				DestroyRenderPass(_ImguiRenderPasses[RenderPassIndex]);
+			delete _ImguiBlendState;
+			_ImguiBlendState = nullptr;
 		}
 
 		ImguiContext Imgui::CreateContext(_In_ GraphicsContext& InContext)
@@ -320,10 +337,11 @@ namespace Eternal
 
 				//////////////////////////////////////////////////////////////////////////
 				// Map
-				MapRange UploadBufferMapRange(UploadBufferSize);
-				void* UploadTextureDataPtr = ImguiFontUploadTexture->Map(UploadBufferMapRange);
-				memcpy(UploadTextureDataPtr, _ImguiFontMetaData.Pixels, UploadBufferSize);
-				ImguiFontUploadTexture->Unmap(UploadBufferMapRange);
+				{
+					MapRange UploadBufferMapRange(UploadBufferSize);
+					MapScope<> UploadBufferMapScope(*ImguiFontUploadTexture, UploadBufferMapRange);
+					memcpy(UploadBufferMapScope.GetDataPointer(), _ImguiFontMetaData.Pixels, UploadBufferSize);
+				}
 
 				CommandList* UploadFontCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "CopyImguiFontFromCPUToGPU");
 
@@ -355,9 +373,9 @@ namespace Eternal
 			MapRange VerticesMapRange(sizeof(ImDrawVert) * ImguiMaxVertices);
 			MapRange IndicesMapRange(sizeof(ImDrawIdx) * ImguiMaxIndices);
 
-			RenderContext.ImguiConstantsPointer	= static_cast<ImguiProjectionConstants*>((*_ImguiConstantBuffer)->Map(ProjectionMapRange));
-			RenderContext.ImguiVerticesPointer	= static_cast<ImDrawVert*>((*_ImguiVertexBuffer)->Map(VerticesMapRange));
-			RenderContext.ImguiIndicesPointer	= static_cast<ImDrawIdx*>((*_ImguiIndexBuffer)->Map(IndicesMapRange));
+			RenderContext.ImguiConstantsPointer	= (*_ImguiConstantBuffer)->Map<ImguiProjectionConstants>(ProjectionMapRange);
+			RenderContext.ImguiVerticesPointer	= (*_ImguiVertexBuffer)->Map<ImDrawVert>(VerticesMapRange);
+			RenderContext.ImguiIndicesPointer	= (*_ImguiIndexBuffer)->Map<ImDrawIdx>(IndicesMapRange);
 
 			_ImGui_FillBuffers(ImguiDrawData, RenderContext);
 

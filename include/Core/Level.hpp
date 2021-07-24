@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/WorldObject.hpp"
 #include <vector>
 
 namespace Eternal
@@ -10,19 +11,15 @@ namespace Eternal
 
 		class GameObject;
 
-		class Level
+		class Level : public WorldObject
 		{
 		public:
 			Level();
 
-			void AddGameObject(_In_ GameObject* InGameObject)
-			{
-				_GameObjects.push_back(InGameObject);
-			}
-			void RemoveGameObject(_In_ GameObject* InGameObject)
-			{
-				vector<GameObject*>::iterator GameObjectIterator = remove(_GameObjects.begin(), _GameObjects.end(), InGameObject);
-			}
+			virtual void SetWorld(_In_ World* InWorld) override final;
+
+			void AddGameObject(_In_ GameObject* InGameObject);
+			void RemoveGameObject(_In_ GameObject* InGameObject);
 
 		private:
 			vector<GameObject*> _GameObjects;

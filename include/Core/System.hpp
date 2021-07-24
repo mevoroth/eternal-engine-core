@@ -14,6 +14,11 @@ namespace Eternal
 		class GraphicsContext;
 	}
 
+	namespace GraphicData
+	{
+		class SceneResources;
+	}
+
 	namespace Time
 	{
 		class Timer;
@@ -53,10 +58,16 @@ namespace Eternal
 		class Streaming;
 	}
 
+	namespace Components
+	{
+		class Mesh;
+	}
+
 	namespace Core
 	{
 		using namespace std;
 		using namespace Eternal::Graphics;
+		using namespace Eternal::GraphicData;
 		using namespace Eternal::Time;
 		using namespace Eternal::Platform;
 		using namespace Eternal::LogSystem;
@@ -66,6 +77,7 @@ namespace Eternal
 		using namespace Eternal::Tasks;
 		using namespace Eternal::ImguiSystem;
 		using namespace Eternal::Resources;
+		using namespace Eternal::Components;
 
 		class Game;
 
@@ -74,11 +86,16 @@ namespace Eternal
 
 		struct SystemFrame
 		{
+			static constexpr uint32_t EstimatedGraphicsCommandsCount = 1024;
+			static constexpr uint32_t EstimatedMeshesCount = 4096;
+
 			SystemFrame();
 			~SystemFrame();
 
 			AtomicS32* SystemState = nullptr;
 			ImguiContext ImguiFrameContext;
+			vector<Mesh*> Meshes;
+			vector<GraphicsCommand*> GraphicsCommands;
 		};
 
 		struct SystemCreateInformation
@@ -135,6 +152,12 @@ namespace Eternal
 				return *_Streaming;
 			}
 
+			inline SceneResources& GetSceneResources()
+			{
+				ETERNAL_ASSERT(_SceneResources);
+				return *_SceneResources;
+			}
+
 			SystemFrame& GetGameFrame();
 			SystemFrame& GetRenderFrame();
 			void AdvanceRender();
@@ -154,6 +177,7 @@ namespace Eternal
 			Log*														_Logs				= nullptr;
 			Input*														_Input				= nullptr;
 			Streaming*													_Streaming			= nullptr;
+			SceneResources*												_SceneResources		= nullptr;
 
 			//////////////////////////////////////////////////////////////////////////
 			// Tasks

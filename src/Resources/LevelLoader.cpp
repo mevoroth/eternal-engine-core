@@ -20,11 +20,11 @@ namespace Eternal
 			_ImportLevel = nullptr;
 		}
 
-		void LevelLoader::LoadPayload(_In_ const StreamingRequest& InRequest, _Out_ Payload*& OutPayload) const
+		void LevelLoader::LoadPayload(_In_ const StreamingRequest* InRequest, _Out_ Payload*& OutPayload) const
 		{
 			ETERNAL_PROFILER(BASIC)();
-			OutPayload = _ImportLevel->Import(InRequest.RequestPath);
-			LogWrite(LogInfo, LogImport, string("Loaded [") + InRequest.RequestPath + "]");
+			OutPayload = _ImportLevel->Import(InRequest->RequestPath);
+			LogWrite(LogInfo, LogImport, string("Loaded [") + InRequest->RequestPath + "]");
 		}
 
 		void LevelLoader::DestroyPayloadLoader()

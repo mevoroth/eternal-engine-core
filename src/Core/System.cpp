@@ -1,6 +1,7 @@
 #include "Core/System.hpp"
 #include "Core/Game.hpp"
 #include "Graphics/GraphicsInclude.hpp"
+#include "GraphicData/SceneResources.hpp"
 #include "File/FilePath.hpp"
 #include "Time/Timer.hpp"
 #include "Time/TimeFactory.hpp"
@@ -51,6 +52,8 @@ namespace Eternal
 			_Streaming			= new Streaming();
 			_Streaming->RegisterLoader(AssetType::ASSET_TYPE_LEVEL, new LevelLoader());
 
+			_SceneResources		= new SceneResources(*_GraphicsContext);
+
 			TaskCreateInformation RendererCreateInformation(*this, "RendererTask");
 			_RendererTask		= new RendererTask(RendererCreateInformation);
 
@@ -79,6 +82,9 @@ namespace Eternal
 			delete _RendererTask;
 			_RendererTask = nullptr;
 
+			delete _SceneResources;
+			_SceneResources = nullptr;
+
 			delete _Streaming;
 			_Streaming = nullptr;
 
@@ -106,7 +112,6 @@ namespace Eternal
 			GetImgui().SetContext(GetGameFrame().ImguiFrameContext);
 			GetImgui().Begin();
 			GetStreaming().GatherPayloads();
-
 		}
 
 		void System::Update()
@@ -155,6 +160,7 @@ namespace Eternal
 		SystemFrame::SystemFrame()
 			: SystemState(CreateAtomicS32())
 		{
+			GraphicsCommands.reserve(EstimatedGraphicsCommandsCount);
 		}
 
 		SystemFrame::~SystemFrame()

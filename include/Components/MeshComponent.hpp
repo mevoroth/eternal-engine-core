@@ -15,10 +15,10 @@ namespace Eternal
 
 			MeshComponent() {}
 
-			void SetMesh(_In_ Mesh* InMesh) { _Mesh = InMesh; }
+			void SetMesh(_In_ MeshCollection* InMeshCollection);
 
 		private:
-			Mesh* _Mesh = nullptr;
+			MeshCollection* _MeshCollection = nullptr;
 		};
 	}
 }

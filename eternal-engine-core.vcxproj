@@ -165,6 +165,7 @@
     <ClInclude Include="include\CoreSettings.hpp" />
     <ClInclude Include="include\Core\Component.hpp" />
     <ClInclude Include="include\Core\Game.hpp" />
+    <ClInclude Include="include\Core\WorldObject.hpp" />
     <ClInclude Include="include\Core\GameObject.hpp" />
     <ClInclude Include="include\Core\GameState.hpp" />
     <ClInclude Include="include\Core\Level.hpp" />
@@ -176,9 +177,9 @@
     <ClInclude Include="include\GameData\LevelGameData.hpp" />
     <ClInclude Include="include\GameData\MeshGameData.hpp" />
     <ClInclude Include="include\GameData\TransformGameData.hpp" />
-    <ClInclude Include="include\GameState\CoreState.hpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClInclude>
+    <ClInclude Include="include\GraphicsCommand\UploadMeshGraphicsCommand.hpp" />
+    <ClInclude Include="include\GraphicsEngine\Pass.hpp" />
+    <ClInclude Include="include\GraphicsEngine\RenderPasses\OpaquePass.hpp" />
     <ClInclude Include="include\Imgui\Imgui.hpp" />
     <ClInclude Include="include\Imgui\ImguiConfig.hpp" />
     <ClInclude Include="include\Import\ImportLevel.hpp" />
@@ -192,24 +193,27 @@
     <ClInclude Include="include\Task\Tools\AutoRecompileShaderTask.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Components\MeshComponent.cpp" />
+    <ClCompile Include="src\Core\GameObject.cpp" />
     <ClCompile Include="src\Core\GameState.cpp" />
     <ClCompile Include="src\Core\Game.cpp" />
     <ClCompile Include="src\Core\Level.cpp" />
     <ClCompile Include="src\Core\System.cpp" />
+    <ClCompile Include="src\Core\World.cpp" />
     <ClCompile Include="src\GameData\GameData.cpp" />
     <ClCompile Include="src\GameData\JsonGameData.cpp" />
     <ClCompile Include="src\GameData\LevelGameData.cpp" />
     <ClCompile Include="src\GameData\MeshGameData.cpp" />
     <ClCompile Include="src\GameData\TransformGameData.cpp" />
-    <ClCompile Include="src\GameState\CoreState.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
+    <ClCompile Include="src\GraphicsCommand\UploadMeshGraphicsCommand.cpp" />
+    <ClCompile Include="src\GraphicsEngine\RenderPasses\OpaquePass.cpp" />
     <ClCompile Include="src\Imgui\Imgui.cpp" />
     <ClCompile Include="src\Imgui\ImguiConfig.cpp" />
     <ClCompile Include="src\Import\ImportLevel.cpp" />
     <ClCompile Include="src\Optick\Optick.cpp" />
     <ClCompile Include="src\Platform\WindowsProcess.cpp" />
     <ClCompile Include="src\Resources\LevelLoader.cpp" />
+    <ClCompile Include="src\Resources\LevelPayload.cpp" />
     <ClCompile Include="src\Task\Core\RendererTask.cpp" />
     <ClCompile Include="src\Task\Core\StreamingTask.cpp" />
     <ClCompile Include="src\Task\Tools\AutoRecompileShaderTask.cpp" />

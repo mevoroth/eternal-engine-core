@@ -26,7 +26,7 @@ namespace Eternal
 
 			for (uint32_t QueueType = 0; QueueType < InStreamingRequests.size(); ++QueueType)
 			{
-				vector<StreamingRequest>& Requests = InStreamingRequests[QueueType];
+				vector<StreamingRequest*>& Requests = InStreamingRequests[QueueType];
 
 				const StreamingLoader* Loader = StreamingSystem.GetLoader(static_cast<AssetType>(QueueType));
 				for (uint32_t RequestIndex = 0; RequestIndex < Requests.size(); ++RequestIndex)
@@ -36,6 +36,9 @@ namespace Eternal
 					Loader->LoadPayload(Requests[RequestIndex], LastPayload);
 
 					_ProcessQueues(LastPayload->AdditionalRequests, InOutStreamingPayloads);
+
+					delete Requests[RequestIndex];
+					Requests[RequestIndex] = nullptr;
 				}
 
 				Requests.clear();

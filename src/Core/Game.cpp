@@ -4,12 +4,15 @@
 #include "Resources/Streaming.hpp"
 #include "Resources/Payload.hpp"
 #include "Resources/LevelPayload.hpp"
+#include "GraphicsCommand/UploadMeshGraphicsCommand.hpp"
+#include "Components/MeshComponent.hpp"
 
 namespace Eternal
 {
 	namespace Core
 	{
 		using namespace Eternal::Resources;
+		using namespace Eternal::GraphicsCommands;
 
 		Game::Game(_In_ GameCreateInformation& InGameCreateInformation)
 		{
@@ -71,12 +74,28 @@ namespace Eternal
 		{
 			ETERNAL_PROFILER(BASIC)();
 			Streaming& StreamingSystem = GetSystem().GetStreaming();
+			vector<GraphicsCommand*>& GraphicsCommands = GetSystem().GetGameFrame().GraphicsCommands;
 			StreamingSystem.ProcessGathered(
 				AssetType::ASSET_TYPE_LEVEL,
 				[this](_In_ Payload& InPayload)
 				{
 					LevelPayload& InLevelPayload = static_cast<LevelPayload&>(InPayload);
 					_World.AddLevel(InLevelPayload.LoadedLevel);
+				}
+			);
+
+			StreamingSystem.ProcessGathered(
+				AssetType::ASSET_TYPE_MESH,
+				[this, &GraphicsCommands](_In_ Payload& InPayload)
+				{
+					MeshPayload& InMeshPayload = static_cast<MeshPayload&>(InPayload);
+					GraphicsCommands.push_back(
+						new UploadMeshGraphicsCommand(InMeshPayload)
+					);
+					for (uint32_t ComponentIndex = 0; ComponentIndex < InMeshPayload.ComponentsToUpdate.size(); ++ComponentIndex)
+					{
+						InMeshPayload.ComponentsToUpdate[ComponentIndex]->SetMesh(InMeshPayload.LoadedMesh);
+					}
 				}
 			);
 		}
