@@ -4,8 +4,14 @@
 
 namespace Eternal
 {
+	namespace Time
+	{
+		using TimeSecondsT = double;
+	}
 	namespace Core
 	{
+		using namespace Eternal::Time;
+
 		class GameState;
 		class System;
 
@@ -38,12 +44,14 @@ namespace Eternal
 		protected:
 			void Update();
 
-			World		_World;
+			World			_World;
 
-			GameState*	_CurrentGameState	= nullptr;
+			GameState*		_CurrentGameState	= nullptr;
 
-			System*		_System				= nullptr;
-			bool		_Running			= true;
+			System*			_System				= nullptr;
+			bool			_Running			= true;
+			TimeSecondsT	_ElapsedTime		= 0.0;
+			TimeSecondsT	_DeltaSeconds		= 0.0;
 		};
 
 		template<typename GameStateType>

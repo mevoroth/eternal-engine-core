@@ -6,7 +6,7 @@ namespace Eternal
 {
 	namespace Resources
 	{
-		class MeshPayload;
+		struct MeshPayload;
 	}
 	namespace GraphicsCommands
 	{
@@ -17,7 +17,7 @@ namespace Eternal
 		{
 			UploadMeshGraphicsCommand(_In_ MeshPayload& InPayload);
 
-			virtual void Execute(_In_ GraphicsContext& InContext, _In_ CommandList& InCommandList) override final;
+			virtual void Execute(_In_ GraphicsContext& InContext) override final;
 
 		private:
 			MeshPayload& _Payload;

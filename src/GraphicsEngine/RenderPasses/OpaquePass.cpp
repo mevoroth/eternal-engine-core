@@ -1,9 +1,11 @@
 #include "GraphicsEngine/RenderPasses/OpaquePass.hpp"
 #include "Core/System.hpp"
 #include "Graphics/GraphicsInclude.hpp"
+#include "GraphicsEngine/Renderer.hpp"
 #include "GraphicData/MeshVertexFormat.hpp"
 #include "GraphicData/RenderTargetTexture.hpp"
-#include "GraphicData/SceneResources.hpp"
+#include "GraphicData/GlobalResources.hpp"
+#include "Mesh/Mesh.hpp"
 
 namespace Eternal
 {
@@ -11,7 +13,7 @@ namespace Eternal
 	{
 		using namespace Eternal::GraphicData;
 
-		OpaquePass::OpaquePass(_In_ GraphicsContext& InContext, _In_ System& InSystem)
+		OpaquePass::OpaquePass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 		{
 			ShaderCreateInformation OpaqueVSCreateInformation(ShaderType::VS, "OpaqueVS", "opaque.vs.hlsl");
 			Shader& OpaqueVS = *InContext.GetShader(OpaqueVSCreateInformation);
@@ -23,10 +25,14 @@ namespace Eternal
 				RootSignatureCreateInformation(
 					{
 						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VS),
-						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS)
-					}
+						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VS),
+						//RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS)
+					},
+					{}, {},
+					/*InHasInputAssembler=*/ true
 				)
 			);
+			_OpaqueDescriptorTable = _OpaqueRootSignature->CreateRootDescriptorTable(InContext);
 			
 			_OpaqueInputLayout = CreateInputLayout(
 				InContext,
@@ -41,17 +47,18 @@ namespace Eternal
 				}
 			);
 
+			GlobalResources& InGlobalResources = InRenderer.GetGlobalResources();
 			_OpaqueRenderPass = CreateRenderPass(
 				InContext,
 				RenderPassCreateInformation(
 					InContext.GetMainViewport(),
 					{
-						RenderTargetInformation(BlendStateAdditive, RenderTargetOperator::Load_Store, InSystem.GetSceneResources().GetGBufferEmissive().GetRenderTargetDepthStencilView()),
-						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Load_Store, InSystem.GetSceneResources().GetGBufferAlbedo().GetRenderTargetDepthStencilView()),
-						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Load_Store, InSystem.GetSceneResources().GetGBufferNormals().GetRenderTargetDepthStencilView()),
-						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Load_Store, InSystem.GetSceneResources().GetGBufferRoughnessMetallicSpecular().GetRenderTargetDepthStencilView())
+						RenderTargetInformation(BlendStateAdditive, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferLuminance().GetRenderTargetDepthStencilView()),
+						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferAlbedo().GetRenderTargetDepthStencilView()),
+						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferNormals().GetRenderTargetDepthStencilView()),
+						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferRoughnessMetallicSpecular().GetRenderTargetDepthStencilView())
 					},
-					InSystem.GetSceneResources().GetGBufferDepthStencil().GetRenderTargetDepthStencilView(), RenderTargetOperator::Load_Store
+					InGlobalResources.GetGBufferDepthStencil().GetRenderTargetDepthStencilView(), RenderTargetOperator::Load_Store
 				)
 			);
 
@@ -60,25 +67,63 @@ namespace Eternal
 				*_OpaqueInputLayout,
 				*_OpaqueRenderPass,
 				OpaqueVS, OpaquePS,
-				DepthStencilTestWriteLessNone
+				DepthStencilTestWriteGreaterNone
 			);
 			_OpaquePipeline = CreatePipeline(InContext, OpaquePipelineCreateInformation);
 		}
 
 		OpaquePass::~OpaquePass()
 		{
-
+			DestroyPipeline(_OpaquePipeline);
+			DestroyRenderPass(_OpaqueRenderPass);
+			DestroyInputLayout(_OpaqueInputLayout);
+			DestroyDescriptorTable(_OpaqueDescriptorTable);
+			DestroyRootSignature(_OpaqueRootSignature);
 		}
 
-		void OpaquePass::Render(_In_ GraphicsContext& InContext, _In_ System& InSystem)
+		void OpaquePass::Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer)
 		{
+			ETERNAL_PROFILER(BASIC)();
+
+			vector<MeshCollection*>& MeshCollections = InSystem.GetRenderFrame().MeshCollections;
+			if (MeshCollections.size() == 0)
+				return;
+
 			CommandList* OpaqueCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "OpaquePass");
 
-			vector<Mesh*>& Meshes = InSystem.GetRenderFrame().Meshes;
-			for (uint32_t MeshIndex = 0; MeshIndex < Meshes.size(); ++MeshIndex)
-			{
+			OpaqueCommandList->Begin(InContext);
+			OpaqueCommandList->BeginRenderPass(*_OpaqueRenderPass);
+			OpaqueCommandList->SetGraphicsPipeline(*_OpaquePipeline);
 
+			_OpaqueDescriptorTable->SetDescriptor(1, InRenderer.GetGlobalResources().GetViewConstantBufferView());
+
+			for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
+			{
+				vector<Mesh*>& Meshes = MeshCollections[CollectionIndex]->Meshes;
+				for (uint32_t MeshIndex = 0; MeshIndex < Meshes.size(); ++MeshIndex)
+				{
+					GPUMesh& CurrentGPUMesh = Meshes[MeshIndex]->GetGPUMesh();
+					const Resource* MeshVertexBuffer = CurrentGPUMesh.MeshVertexBuffer;
+					OpaqueCommandList->SetIndexBuffer(*CurrentGPUMesh.MeshIndexBuffer);
+					OpaqueCommandList->SetVertexBuffers(&MeshVertexBuffer);
+					for (uint32_t DrawIndex = 0; DrawIndex < CurrentGPUMesh.PerDrawInformations.size(); ++DrawIndex)
+					{
+						GPUMesh::PerDrawInformation& DrawInformation = CurrentGPUMesh.PerDrawInformations[DrawIndex];
+
+						_OpaqueDescriptorTable->SetDescriptor(0, DrawInformation.PerDrawConstantBufferVS);
+						OpaqueCommandList->SetGraphicsDescriptorTable(InContext, *_OpaqueDescriptorTable);
+						OpaqueCommandList->DrawIndexedInstanced(
+							DrawInformation.IndicesCount, 1,
+							DrawInformation.IndicesOffset,
+							DrawInformation.VerticesOffset
+						);
+					}
+				}
 			}
+			
+			OpaqueCommandList->EndRenderPass();
+			OpaqueCommandList->End();
 		}
+
 	}
 }

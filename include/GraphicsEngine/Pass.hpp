@@ -8,6 +8,8 @@ namespace Eternal
 		class RootSignature;
 		class InputLayout;
 		class RenderPass;
+		class Pipeline;
+		class DescriptorTable;
 	}
 
 	namespace Core
@@ -20,13 +22,15 @@ namespace Eternal
 		using namespace Eternal::Graphics;
 		using namespace Eternal::Core;
 
+		class Renderer;
+
 		class Pass
 		{
 		public:
 
 			virtual ~Pass() {}
 
-			virtual void Render(_In_ GraphicsContext& InContext, _In_ System& InSystem) = 0;
+			virtual void Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer) = 0;
 		};
 	}
 }

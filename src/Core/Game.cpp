@@ -6,6 +6,7 @@
 #include "Resources/LevelPayload.hpp"
 #include "GraphicsCommand/UploadMeshGraphicsCommand.hpp"
 #include "Components/MeshComponent.hpp"
+#include "Time/Timer.hpp"
 
 namespace Eternal
 {
@@ -15,6 +16,7 @@ namespace Eternal
 		using namespace Eternal::GraphicsCommands;
 
 		Game::Game(_In_ GameCreateInformation& InGameCreateInformation)
+			: _World(*this)
 		{
 			InGameCreateInformation.SystemInformation.GameContext = this;
 			_System = new System(InGameCreateInformation.SystemInformation);
@@ -98,6 +100,10 @@ namespace Eternal
 					}
 				}
 			);
+
+			_DeltaSeconds	= GetSystem().GetTimer().GetDeltaTimeSeconds();
+			_ElapsedTime	+= _DeltaSeconds;
+			_World.Update(_DeltaSeconds);
 		}
 	}
 }

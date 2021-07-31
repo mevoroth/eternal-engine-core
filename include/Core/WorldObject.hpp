@@ -5,6 +5,8 @@ namespace Eternal
 	namespace Core
 	{
 		class World;
+		class Level;
+		class GameObject;
 
 		class WorldObject
 		{
@@ -25,8 +27,23 @@ namespace Eternal
 				return _World;
 			}
 
+			inline void SetParent(_In_ WorldObject* InWorldObject)
+			{
+				_Parent = InWorldObject;
+				SetWorld(InWorldObject ? InWorldObject->GetWorld() : nullptr);
+			}
+
+		protected:
+
+			inline WorldObject* GetParentObject()
+			{
+				return _Parent;
+			}
+
 		private:
-			World* _World = nullptr;
+
+			World*			_World	= nullptr;
+			WorldObject*	_Parent	= nullptr;
 		};
 	}
 }

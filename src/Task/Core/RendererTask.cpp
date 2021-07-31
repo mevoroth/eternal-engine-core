@@ -2,6 +2,7 @@
 #include "Core/System.hpp"
 #include "Parallel/AtomicS32.hpp"
 #include "Parallel/Sleep.hpp"
+#include "GraphicsEngine/Renderer.hpp"
 #include "Log/Log.hpp"
 
 namespace Eternal
@@ -16,15 +17,7 @@ namespace Eternal
 			ETERNAL_PROFILER(BASIC)();
 			_WaitForData();
 			//LogWrite(LogInfo, LogRenderer, "Rendering...");
-			SystemFrame& CurrentRenderFrame = GetSystem().GetRenderFrame();
-			GraphicsContext& GfxContext = GetSystem().GetGraphicsContext();
-			GfxContext.RegisterGraphicsCommands(CurrentRenderFrame.GraphicsCommands.size() ? &CurrentRenderFrame.GraphicsCommands : nullptr);
-			GfxContext.BeginFrame();
-
-			GetSystem().GetImgui().SetContext(CurrentRenderFrame.ImguiFrameContext);
-			GetSystem().GetImgui().Render(GfxContext);
-
-			GfxContext.EndFrame();
+			GetSystem().Render();
 			_AdvanceFrame();
 		}
 

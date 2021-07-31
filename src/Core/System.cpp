@@ -1,7 +1,7 @@
 #include "Core/System.hpp"
 #include "Core/Game.hpp"
 #include "Graphics/GraphicsInclude.hpp"
-#include "GraphicData/SceneResources.hpp"
+#include "GraphicsEngine/Renderer.hpp"
 #include "File/FilePath.hpp"
 #include "Time/Timer.hpp"
 #include "Time/TimeFactory.hpp"
@@ -44,15 +44,15 @@ namespace Eternal
 			WindowsProcess::SetIsRunning(&InSystemCreateInformation.GameContext->_Running);
 			
 			_GraphicsContext	= CreateGraphicsContext(InSystemCreateInformation.ContextInformation);
-			_Imgui				= new Imgui(*_GraphicsContext, _Input);
-			
-			for (uint32_t FrameIndex = 0; FrameIndex < GraphicsContext::FrameBufferingCount; ++FrameIndex)
-				_Frames[FrameIndex].ImguiFrameContext = _Imgui->CreateContext(*_GraphicsContext);
 
 			_Streaming			= new Streaming();
 			_Streaming->RegisterLoader(AssetType::ASSET_TYPE_LEVEL, new LevelLoader());
 
-			_SceneResources		= new SceneResources(*_GraphicsContext);
+			_Renderer			= new Renderer(*_GraphicsContext);
+			_Imgui				= new Imgui(*_GraphicsContext, *_Renderer, _Input);
+
+			for (uint32_t FrameIndex = 0; FrameIndex < GraphicsContext::FrameBufferingCount; ++FrameIndex)
+				_Frames[FrameIndex].ImguiFrameContext = _Imgui->CreateContext(*_GraphicsContext);
 
 			TaskCreateInformation RendererCreateInformation(*this, "RendererTask");
 			_RendererTask		= new RendererTask(RendererCreateInformation);
@@ -82,17 +82,17 @@ namespace Eternal
 			delete _RendererTask;
 			_RendererTask = nullptr;
 
-			delete _SceneResources;
-			_SceneResources = nullptr;
-
-			delete _Streaming;
-			_Streaming = nullptr;
+			delete _Renderer;
+			_Renderer = nullptr;
 
 			for (uint32_t FrameIndex = 0; FrameIndex < GraphicsContext::FrameBufferingCount; ++FrameIndex)
 				_Imgui->DestroyContext(_Frames[FrameIndex].ImguiFrameContext);
 
 			delete _Imgui;
 			_Imgui = nullptr;
+
+			delete _Streaming;
+			_Streaming = nullptr;
 
 			DestroyGraphicsContext(_GraphicsContext);
 
@@ -112,6 +112,23 @@ namespace Eternal
 			GetImgui().SetContext(GetGameFrame().ImguiFrameContext);
 			GetImgui().Begin();
 			GetStreaming().GatherPayloads();
+			{
+				SystemFrame& OldestFrame = GetOldestGameFrame();
+
+				// Meshes
+				vector<MeshCollection*>& MeshCollections = GetGameFrame().MeshCollections;
+				vector<MeshCollection*>& OldestPendingMeshCollections = OldestFrame.PendingMeshCollections;
+				MeshCollections.insert(
+					MeshCollections.end(),
+					OldestPendingMeshCollections.begin(),
+					OldestPendingMeshCollections.end()
+				);
+				OldestPendingMeshCollections.clear();
+
+				// Camera
+				GetGameFrame().View = OldestFrame.PendingView ? OldestFrame.PendingView : OldestFrame.View;
+				OldestFrame.PendingView = nullptr;
+			}
 		}
 
 		void System::Update()
@@ -120,6 +137,23 @@ namespace Eternal
 			WindowsProcess::ExecuteMessageLoop();
 			_Timer->Update();
 			_Input->Update();
+		}
+
+		void System::Render()
+		{
+			SystemFrame& CurrentRenderFrame = GetRenderFrame();
+			GraphicsContext& GfxContext = GetGraphicsContext();
+			GfxContext.RegisterGraphicsCommands(CurrentRenderFrame.GraphicsCommands.size() ? &CurrentRenderFrame.GraphicsCommands : nullptr);
+			GfxContext.BeginFrame();
+
+			GetRenderer().Render(GfxContext, *this);
+
+			GetImgui().SetContext(CurrentRenderFrame.ImguiFrameContext);
+			GetImgui().Render(GfxContext);
+
+			GetRenderer().Present(GfxContext, *this);
+
+			GfxContext.EndFrame();
 		}
 
 		void System::EndFrame()
@@ -139,6 +173,12 @@ namespace Eternal
 		{
 			ETERNAL_ASSERT(_GameIndex);
 			return _Frames[_GameIndex->Load()];
+		}
+
+		SystemFrame& System::GetOldestGameFrame()
+		{
+			ETERNAL_ASSERT(_GameIndex);
+			return _Frames[(_GameIndex->Load() + 1) % _Frames.size()];
 		}
 
 		SystemFrame& System::GetRenderFrame()

@@ -14,9 +14,9 @@ namespace Eternal
 		class GraphicsContext;
 	}
 
-	namespace GraphicData
+	namespace GraphicsEngine
 	{
-		class SceneResources;
+		class Renderer;
 	}
 
 	namespace Time
@@ -60,14 +60,15 @@ namespace Eternal
 
 	namespace Components
 	{
-		class Mesh;
+		class MeshCollection;
+		class Camera;
 	}
 
 	namespace Core
 	{
 		using namespace std;
 		using namespace Eternal::Graphics;
-		using namespace Eternal::GraphicData;
+		using namespace Eternal::GraphicsEngine;
 		using namespace Eternal::Time;
 		using namespace Eternal::Platform;
 		using namespace Eternal::LogSystem;
@@ -94,8 +95,11 @@ namespace Eternal
 
 			AtomicS32* SystemState = nullptr;
 			ImguiContext ImguiFrameContext;
-			vector<Mesh*> Meshes;
+			vector<MeshCollection*> MeshCollections;
+			vector<MeshCollection*> PendingMeshCollections;
 			vector<GraphicsCommand*> GraphicsCommands;
+			Camera* View = nullptr;
+			Camera* PendingView = nullptr;
 		};
 
 		struct SystemCreateInformation
@@ -152,13 +156,20 @@ namespace Eternal
 				return *_Streaming;
 			}
 
-			inline SceneResources& GetSceneResources()
+			inline Renderer& GetRenderer()
 			{
-				ETERNAL_ASSERT(_SceneResources);
-				return *_SceneResources;
+				ETERNAL_ASSERT(_Renderer);
+				return *_Renderer;
+			}
+
+			inline Timer& GetTimer()
+			{
+				ETERNAL_ASSERT(_Timer);
+				return *_Timer;
 			}
 
 			SystemFrame& GetGameFrame();
+			SystemFrame& GetOldestGameFrame();
 			SystemFrame& GetRenderFrame();
 			void AdvanceRender();
 			void AdvanceGame();
@@ -166,6 +177,7 @@ namespace Eternal
 			void StartFrame();
 			void EndFrame();
 			void Update();
+			void Render();
 
 		private:
 			SystemCreateInformation										_SystemCreateInformation;
@@ -177,7 +189,7 @@ namespace Eternal
 			Log*														_Logs				= nullptr;
 			Input*														_Input				= nullptr;
 			Streaming*													_Streaming			= nullptr;
-			SceneResources*												_SceneResources		= nullptr;
+			Renderer*													_Renderer			= nullptr;
 
 			//////////////////////////////////////////////////////////////////////////
 			// Tasks

@@ -14,9 +14,9 @@ namespace Eternal
 		{
 		}
 
-		void UploadMeshGraphicsCommand::Execute(_In_ GraphicsContext& InContext, _In_ CommandList& InCommandList)
+		void UploadMeshGraphicsCommand::Execute(_In_ GraphicsContext& InContext)
 		{
-			for (uint32_t MeshIndex = 0, MeshCount = _Payload.LoadedMesh->Meshes.size(); MeshIndex < MeshCount; ++MeshIndex)
+			for (uint32_t MeshIndex = 0, MeshCount = static_cast<uint32_t>(_Payload.LoadedMesh->Meshes.size()); MeshIndex < MeshCount; ++MeshIndex)
 			{
 				Mesh* CurrentMesh = _Payload.LoadedMesh->Meshes[MeshIndex];
 
@@ -27,8 +27,8 @@ namespace Eternal
 					InContext.GetDevice(),
 					CurrentMesh->GetName(),
 					VertexBufferCreateInformation(
-						VertexBufferSize,
-						CurrentMesh->GetVertexStride()
+						CurrentMesh->GetVertexStride(),
+						CurrentMesh->GetVerticesCount()
 					),
 					ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
 				);
@@ -48,8 +48,8 @@ namespace Eternal
 					InContext.GetDevice(),
 					CurrentMesh->GetName(),
 					IndexBufferCreateInformation(
-						IndexBufferSize,
-						CurrentMesh->GetIndexStride()
+						CurrentMesh->GetIndexStride(),
+						IndexBufferSize
 					),
 					ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
 				);
@@ -65,7 +65,6 @@ namespace Eternal
 				// Constant buffer
 				uint32_t ConstantBufferStride = CurrentMesh->GetConstantBufferStride();
 				uint32_t ConstantBufferCount = CurrentMesh->GetConstantBufferCount();
-				uint32_t ConstantBufferSize = ConstantBufferStride * ConstantBufferCount;
 
 				BufferResourceCreateInformation MeshConstantBufferResourceCreateInformation(
 					InContext.GetDevice(),
@@ -73,25 +72,34 @@ namespace Eternal
 					BufferCreateInformation(
 						Format::FORMAT_UNKNOWN,
 						BufferResourceUsage::BUFFER_RESOURCE_USAGE_CONSTANT_BUFFER,
-						ConstantBufferSize,
-						CurrentMesh->GetConstantBufferStride()
+						CurrentMesh->GetConstantBufferStride(),
+						ConstantBufferCount
 					),
 					ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
 				);
 				Resource* MeshConstantBuffer = CreateBuffer(MeshConstantBufferResourceCreateInformation);
 				// Upload
 				{
-					MapRange MeshConstanBufferRange(ConstantBufferSize);
-					MapScope<> MeshConstantBufferMapScope(*MeshConstantBuffer, MeshConstanBufferRange);
-					memcpy(MeshConstantBufferMapScope.GetDataPointer(), CurrentMesh->GetConstantBufferData(), ConstantBufferSize);
+					uint32_t ActualConstantBufferStride	= MeshConstantBuffer->GetBufferStride();
+					uint32_t ActualConstantBufferSize	= ActualConstantBufferStride * ConstantBufferCount;
+					MapRange MeshConstanBufferRange(ActualConstantBufferStride * ConstantBufferCount);
+					MapScope<uint8_t> MeshConstantBufferMapScope(*MeshConstantBuffer, MeshConstanBufferRange);
+
+					for (uint32_t ElementIndex = 0; ElementIndex < ConstantBufferCount; ++ElementIndex)
+					{
+						uint8_t* DestinationOffset	= MeshConstantBufferMapScope.GetDataPointer() + ActualConstantBufferStride * ElementIndex;
+						const uint8_t* SourceOffset	= static_cast<const uint8_t*>(CurrentMesh->GetConstantBufferData()) + ConstantBufferStride * ElementIndex;
+
+						memcpy(DestinationOffset, SourceOffset, ConstantBufferStride);
+					}
 				}
 				CurrentMesh->SetMeshConstantBuffer(MeshConstantBuffer);
 
 				for (uint32_t ConstantBufferViewIndex = 0; ConstantBufferViewIndex < ConstantBufferCount; ++ConstantBufferViewIndex)
 				{
 					ViewMetaData MetaData;
-					MetaData.ConstantBufferView.BufferOffset	= ConstantBufferViewIndex * ConstantBufferStride;
-					MetaData.ConstantBufferView.BufferSize		= ConstantBufferStride;
+					MetaData.ConstantBufferView.BufferElementOffset	= ConstantBufferViewIndex;
+					MetaData.ConstantBufferView.BufferSize			= ConstantBufferStride;
 					ConstantBufferViewCreateInformation PerDrawConstantBufferViewCreateInformation(
 						InContext,
 						MeshConstantBuffer,

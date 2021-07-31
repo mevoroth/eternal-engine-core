@@ -1,5 +1,7 @@
 #include "Core/GameObject.hpp"
 #include "Core/Component.hpp"
+#include "Core/Level.hpp"
+#include "Core/World.hpp"
 
 namespace Eternal
 {
@@ -8,6 +10,7 @@ namespace Eternal
 		GameObject::GameObject()
 			: WorldObject()
 		{
+			_Components.reserve(World::ComponentsPerGameObjectInitialPool);
 		}
 
 		void GameObject::SetWorld(_In_ World* InWorld)
@@ -17,16 +20,9 @@ namespace Eternal
 				_Components[ComponentIndex]->SetWorld(InWorld);
 		}
 
-		void GameObject::AddComponent(_In_ Component* InComponent)
+		Level* GameObject::GetParent()
 		{
-			_Components.push_back(InComponent);
-			InComponent->SetWorld(GetWorld());
-		}
-
-		void GameObject::RemoveComponent(_In_ Component* InComponent)
-		{
-			InComponent->SetWorld(nullptr);
-			vector<Component*>::iterator ComponentIterator = remove(_Components.begin(), _Components.end(), InComponent);
+			return static_cast<Level*>(GetParentObject());
 		}
 	}
 }

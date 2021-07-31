@@ -1,5 +1,11 @@
 #include "GameData/JsonGameData.hpp"
 #include "Transform/Transform.hpp"
+#include "Core/GameObject.hpp"
+#include "Components/TransformComponent.hpp"
+#include "Components/CameraComponent.hpp"
+#include "GameData/CameraGameData.hpp"
+#include "Camera/OrthographicCamera.hpp"
+#include "Camera/PerspectiveCamera.hpp"
 #include "Types/Types.hpp"
 
 namespace Eternal
@@ -7,6 +13,7 @@ namespace Eternal
 	namespace GameDataSystem
 	{
 		using namespace Eternal::Types;
+		using namespace Eternal::Core;
 
 		//////////////////////////////////////////////////////////////////////////
 		// Node
@@ -85,6 +92,51 @@ namespace Eternal
 			return _TransformCollection.Get();
 		}
 
+		void JsonCameraNode::InternalGet(_Out_ void* OutValue) const
+		{
+			GameObject* CameraGameObject = static_cast<GameObject*>(OutValue);
+			CameraComponent* Component = CameraGameObject->AddComponent<CameraComponent>();
+			TransformComponent* CameraTransformComponent = CameraGameObject->AddComponent<TransformComponent>(
+				[Component](_Inout_ TransformComponent* InOutComponent)
+				{
+					InOutComponent->SetHasBehavior();
+					InOutComponent->SetUpdatesEveryFrame();
+					InOutComponent->OnTransformChanged().Receivers.push_back(&Component->OnTransformChangedReceiver());
+				}
+			);
+
+			const GameDataSource& Transforms = GetSubNode(GameDataSourceKey::TRANSFORM);
+			Transforms.GetSubNode(0).Get(CameraTransformComponent->GetTransform());
+
+			CameraProjection ProjectionType = static_cast<CameraProjection>(_Node["m_Projection"].GetInt());
+			Camera* CameraData = nullptr;
+
+			switch (ProjectionType)
+			{
+			case CameraProjection::CAMERA_PROJECTION_ORTHOGRAPHIC:
+			{
+				CameraData = new OrthographicCamera(
+					_Node["m_Near"].GetFloat(),
+					_Node["m_Far"].GetFloat(),
+					_Node["m_Width"].GetFloat(),
+					_Node["m_Height"].GetFloat()
+				);
+			} break;
+			case CameraProjection::CAMERA_PROJECTION_PERSPECTIVE:
+			{
+				CameraData = new PerspectiveCamera(
+					_Node["m_Near"].GetFloat(),
+					_Node["m_Far"].GetFloat(),
+					_Node["m_FOV"].GetFloat(),
+					_Node["m_ScreenRatio"].GetFloat()
+				);
+			} break;
+			}
+
+			CameraData->UpdateWorldToView(CameraTransformComponent->GetTransform());
+			Component->SetCamera(CameraData);
+		}
+
 		//////////////////////////////////////////////////////////////////////////
 		// Mesh
 
@@ -139,7 +191,7 @@ namespace Eternal
 
 			// Rotation
 			const JsonNodeType& RotationNode = _Node["m_Rotation"];
-			Vector4 Rotation(
+			Quaternion Rotation(
 				RotationNode["x"].GetFloat(),
 				RotationNode["y"].GetFloat(),
 				RotationNode["z"].GetFloat(),

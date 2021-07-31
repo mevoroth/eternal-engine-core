@@ -135,6 +135,21 @@
     <ClInclude Include="include\GraphicsEngine\RenderPasses\OpaquePass.hpp">
       <Filter>GraphicsEngine\RenderPasses</Filter>
     </ClInclude>
+    <ClInclude Include="include\GraphicsEngine\Renderer.hpp">
+      <Filter>GraphicsEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameData\CameraGameData.hpp">
+      <Filter>GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Components\CameraComponent.hpp">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsEngine\RenderPasses\DirectLightingPass.hpp">
+      <Filter>GraphicsEngine\RenderPasses</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsEngine\RenderPasses\PresentPass.hpp">
+      <Filter>GraphicsEngine\RenderPasses</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Game.cpp">
@@ -205,6 +220,27 @@
       <Filter>Components</Filter>
     </ClCompile>
     <ClCompile Include="src\GraphicsEngine\RenderPasses\OpaquePass.cpp">
+      <Filter>GraphicsEngine\RenderPasses</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Renderer.cpp">
+      <Filter>GraphicsEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameData\CameraGameData.cpp">
+      <Filter>GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core\Component.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Components\CameraComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Components\TransformComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\RenderPasses\DirectLightingPass.cpp">
+      <Filter>GraphicsEngine\RenderPasses</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\RenderPasses\PresentPass.cpp">
       <Filter>GraphicsEngine\RenderPasses</Filter>
     </ClCompile>
   </ItemGroup>

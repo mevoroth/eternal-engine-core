@@ -9,9 +9,15 @@ struct ImDrawData;
 
 namespace Eternal
 {
+	namespace GraphicsEngine
+	{
+		class Renderer;
+	}
+
 	namespace ImguiSystem
 	{
 		using namespace Eternal::Graphics;
+		using namespace Eternal::GraphicsEngine;
 		using namespace Eternal::InputSystem;
 
 		struct ImguiRenderContext;
@@ -28,7 +34,7 @@ namespace Eternal
 			static constexpr uint32_t ImguiMaxVertices		= 65536;
 			static constexpr uint32_t ImguiMaxIndices		= 65536;
 
-			Imgui(_In_ GraphicsContext& InContext, _In_ Input* InInput);
+			Imgui(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer, _In_ Input* InInput);
 			~Imgui();
 
 			void Begin();
@@ -67,22 +73,22 @@ namespace Eternal
 			uint32_t					_PreviousDrawCount = 1;
 
 			// Graphics resources
-			array<RenderPass*, GraphicsContext::FrameBufferingCount>	_ImguiRenderPasses;
-			MultiBuffered<Resource>*									_ImguiConstantBuffer;
-			MultiBuffered<View>*										_ImguiConstantBufferView;
-			MultiBuffered<Resource>*									_ImguiVertexBuffer;
-			MultiBuffered<Resource>*									_ImguiIndexBuffer;
-
-			Shader*														_ImguiVS					= nullptr;
-			Shader*														_ImguiPS					= nullptr;
-			Pipeline*													_ImguiPipeline				= nullptr;
-			Sampler*													_ImguiBilinearSampler		= nullptr;
-			InputLayout*												_ImguiInputLayout			= nullptr;
-			RootSignature*												_ImguiRootSignature			= nullptr;
-			BlendState*													_ImguiBlendState			= nullptr;
-			DescriptorTable*											_ImguiDescriptorTable		= nullptr;
-			Resource*													_ImguiFontTexture			= nullptr;
-			View*														_ImguiFontTextureView		= nullptr;
+			MultiBuffered<Resource>*	_ImguiConstantBuffer;
+			MultiBuffered<View>*		_ImguiConstantBufferView;
+			MultiBuffered<Resource>*	_ImguiVertexBuffer;
+			MultiBuffered<Resource>*	_ImguiIndexBuffer;
+			
+			RenderPass*					_ImguiRenderPass			= nullptr;
+			Shader*						_ImguiVS					= nullptr;
+			Shader*						_ImguiPS					= nullptr;
+			Pipeline*					_ImguiPipeline				= nullptr;
+			Sampler*					_ImguiBilinearSampler		= nullptr;
+			InputLayout*				_ImguiInputLayout			= nullptr;
+			RootSignature*				_ImguiRootSignature			= nullptr;
+			BlendState*					_ImguiBlendState			= nullptr;
+			DescriptorTable*			_ImguiDescriptorTable		= nullptr;
+			Resource*					_ImguiFontTexture			= nullptr;
+			View*						_ImguiFontTextureView		= nullptr;
 		};
 	}
 }

@@ -2,6 +2,9 @@
 
 #include "Window/Window.hpp"
 #include "Graphics/GraphicsInclude.hpp"
+#include "GraphicsEngine/Renderer.hpp"
+#include "GraphicData/GlobalResources.hpp"
+#include "GraphicData/RenderTargetTexture.hpp"
 #include "Input/Input.hpp"
 #include "Types/Types.hpp"
 #include "Math/Math.hpp"
@@ -11,6 +14,8 @@ namespace Eternal
 	namespace ImguiSystem
 	{
 		using namespace Eternal::Graphics;
+		using namespace Eternal::GraphicsEngine;
+		using namespace Eternal::GraphicData;
 		using namespace Eternal::Types;
 		using namespace Eternal::Math;
 		using namespace Eternal::InputSystem;
@@ -40,7 +45,7 @@ namespace Eternal
 			uint32_t					ImguiIndicesSize		= 0;
 		};
 
-		Imgui::Imgui(_In_ GraphicsContext& InContext, _In_ Input* InInput)
+		Imgui::Imgui(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer, _In_ Input* InInput)
 			: _Input(InInput)
 		{
 			using ImguiVertexStream = VertexStream<ImDrawVert>;
@@ -83,17 +88,13 @@ namespace Eternal
 				BlendOperator::BLEND_OPERATOR_ADD
 			);
 
-			vector<View*>& BackBuffersViews = InContext.GetSwapChain().GetBackBufferRenderTargetViews();
-			for (uint32_t RenderPassIndex = 0; RenderPassIndex < _ImguiRenderPasses.size(); ++RenderPassIndex)
-			{
-				RenderPassCreateInformation ImguiRenderPassCreateInformation(
-					InContext.GetMainViewport(),
-					{
-						RenderTargetInformation(*_ImguiBlendState, RenderTargetOperator::Load_Store, BackBuffersViews[RenderPassIndex])
-					}
-				);
-				_ImguiRenderPasses[RenderPassIndex] = CreateRenderPass(InContext, ImguiRenderPassCreateInformation);
-			}
+			RenderPassCreateInformation ImguiRenderPassCreateInformation(
+				InContext.GetMainViewport(),
+				{
+					RenderTargetInformation(*_ImguiBlendState, RenderTargetOperator::Load_Store, InRenderer.GetGlobalResources().GetGBufferLuminance().GetRenderTargetDepthStencilView())
+				}
+			);
+			_ImguiRenderPass = CreateRenderPass(InContext, ImguiRenderPassCreateInformation);
 
 			vector<VertexStreamBase> ImguiVertexStreams =
 			{
@@ -122,7 +123,7 @@ namespace Eternal
 			PipelineCreateInformation ImguiPipelineCreateInformation(
 				*_ImguiRootSignature,
 				*_ImguiInputLayout,
-				*_ImguiRenderPasses[0],
+				*_ImguiRenderPass,
 				*_ImguiVS,
 				*_ImguiPS,
 				DepthStencilNoneNone,
@@ -139,7 +140,8 @@ namespace Eternal
 				BufferCreateInformation(
 					Format::FORMAT_UNKNOWN,
 					BufferResourceUsage::BUFFER_RESOURCE_USAGE_CONSTANT_BUFFER,
-					sizeof(ImguiProjectionConstants) * ImguiMaxProjections
+					sizeof(ImguiProjectionConstants),
+					ImguiMaxProjections
 				),
 				ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
 			);
@@ -158,8 +160,8 @@ namespace Eternal
 				InContext.GetDevice(),
 				"ImguiVertexBuffer",
 				VertexBufferCreateInformation(
-					sizeof(ImDrawVert) * ImguiMaxVertices,
-					sizeof(ImDrawVert)
+					sizeof(ImDrawVert),
+					ImguiMaxVertices
 				),
 				ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
 			);
@@ -169,8 +171,8 @@ namespace Eternal
 				InContext.GetDevice(),
 				"ImguiIndexBuffer",
 				IndexBufferCreateInformation(
-					sizeof(ImDrawIdx) * ImguiMaxIndices,
-					sizeof(ImDrawIdx)
+					sizeof(ImDrawIdx),
+					ImguiMaxIndices
 				),
 				ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
 			);
@@ -222,8 +224,7 @@ namespace Eternal
 			DestroySampler(_ImguiBilinearSampler);
 			DestroyRootSignature(_ImguiRootSignature);
 			DestroyInputLayout(_ImguiInputLayout);
-			for (uint32_t RenderPassIndex = 0; RenderPassIndex < _ImguiRenderPasses.size(); ++RenderPassIndex)
-				DestroyRenderPass(_ImguiRenderPasses[RenderPassIndex]);
+			DestroyRenderPass(_ImguiRenderPass);
 			delete _ImguiBlendState;
 			_ImguiBlendState = nullptr;
 		}
@@ -311,6 +312,7 @@ namespace Eternal
 
 		void Imgui::Render(_In_ GraphicsContext& InContext)
 		{
+			ETERNAL_PROFILER(BASIC)();
 			_UploadFontTexture(InContext);
 			_Render(InContext);
 		}
@@ -322,14 +324,16 @@ namespace Eternal
 				//////////////////////////////////////////////////////////////////////////
 				// Upload buffer
 				std::string UploadTextureName = "ImguiFontTextureUploadBuffer";
-				const uint32_t UploadBufferSize = _ImguiFontMetaData.Width * _ImguiFontMetaData.Height * _ImguiFontMetaData.BytesPerPixel;
+				const uint32_t UploadBufferPixels = _ImguiFontMetaData.Width * _ImguiFontMetaData.Height;
+				const uint32_t UploadBufferSize = UploadBufferPixels * _ImguiFontMetaData.BytesPerPixel;
 				BufferResourceCreateInformation UploadBufferTextureInformation(
 					InContext.GetDevice(),
 					UploadTextureName,
 					BufferCreateInformation(
 						Format::FORMAT_RGBA8888_UNORM,
 						BufferResourceUsage::BUFFER_RESOURCE_USAGE_COPY_READ,
-						UploadBufferSize
+						_ImguiFontMetaData.BytesPerPixel,
+						UploadBufferPixels
 					),
 					ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
 				);
@@ -389,9 +393,7 @@ namespace Eternal
 
 			ImguiCommandList->Begin(InContext);
 			{
-				//ResourceTransitionScope ScopedTransitions(*ImguiCommandList, Transitions, ETERNAL_ARRAYSIZE(Transitions));
-
-				ImguiCommandList->BeginRenderPass(*_ImguiRenderPasses[InContext.GetCurrentFrameIndex()]);
+				ImguiCommandList->BeginRenderPass(*_ImguiRenderPass);
 				ImguiCommandList->SetGraphicsPipeline(*_ImguiPipeline);
 
 				_ImGui_Render(ImguiDrawData, RenderContext, InContext, ImguiCommandList);
@@ -466,7 +468,7 @@ namespace Eternal
 
 		void Imgui::_ImGui_SetupRenderState(_In_ ImDrawData* InDrawData, _In_ ImguiRenderContext& InImguiContext, _In_ GraphicsContext& InContext, _In_ CommandList* InImguiCommandList)
 		{
-			Viewport* ImguiViewport = CreateInvertedViewport(
+			Viewport* ImguiViewport = CreateViewport(
 				InContext,
 				static_cast<int32_t>(InDrawData->DisplaySize.x),
 				static_cast<int32_t>(InDrawData->DisplaySize.y)
@@ -494,8 +496,8 @@ namespace Eternal
 			InImguiCommandList->SetVertexBuffers(&CurrentVertexBuffer);
 
 			ViewMetaData ProjectionConstantsMetaData;
-			ProjectionConstantsMetaData.ConstantBufferView.BufferOffset	= InImguiContext.ImguiProjectionCount * sizeof(ImguiProjectionConstants);
-			ProjectionConstantsMetaData.ConstantBufferView.BufferSize	= sizeof(ImguiProjectionConstants);
+			ProjectionConstantsMetaData.ConstantBufferView.BufferElementOffset	= InImguiContext.ImguiProjectionCount;
+			ProjectionConstantsMetaData.ConstantBufferView.BufferSize			= sizeof(ImguiProjectionConstants);
 			ConstantBufferViewCreateInformation ProjectionConstantsBufferViewCreateInformation(
 				InContext,
 				&(*_ImguiConstantBuffer),

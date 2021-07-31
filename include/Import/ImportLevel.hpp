@@ -6,7 +6,7 @@ namespace Eternal
 {
 	namespace Resources
 	{
-		class LevelPayload;
+		struct LevelPayload;
 	}
 	namespace Import
 	{

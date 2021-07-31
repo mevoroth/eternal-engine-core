@@ -8,7 +8,7 @@ namespace Eternal
 		Level::Level()
 			: WorldObject()
 		{
-			_GameObjects.reserve(4096);
+			_GameObjects.reserve(GameObjectsInitialPool);
 		}
 
 		void Level::SetWorld(_In_ World* InWorld)
@@ -21,12 +21,12 @@ namespace Eternal
 		void Level::AddGameObject(_In_ GameObject* InGameObject)
 		{
 			_GameObjects.push_back(InGameObject);
-			InGameObject->SetWorld(GetWorld());
+			InGameObject->SetParent(this);
 		}
 
 		void Level::RemoveGameObject(_In_ GameObject* InGameObject)
 		{
-			InGameObject->SetWorld(nullptr);
+			InGameObject->SetParent(nullptr);
 			vector<GameObject*>::iterator GameObjectIterator = remove(_GameObjects.begin(), _GameObjects.end(), InGameObject);
 		}
 	}

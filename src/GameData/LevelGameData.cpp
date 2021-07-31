@@ -5,6 +5,7 @@
 #include "Components/MeshComponent.hpp"
 #include "GameData/TransformGameData.hpp"
 #include "GameData/MeshGameData.hpp"
+#include "GameData/CameraGameData.hpp"
 #include "Resources/LevelPayload.hpp"
 #include "Resources/Payload.hpp"
 
@@ -29,7 +30,8 @@ namespace Eternal
 					Cameras,
 					[OutLevel = OutLevelPayload->LoadedLevel](_In_ const GameDataSource& CameraItem)
 					{
-						//CameraItem.
+						CameraGameData GameData;
+						OutLevel->AddGameObject(GameData.Load<GameObject>(CameraItem));
 					}
 				);
 			}
@@ -60,7 +62,7 @@ namespace Eternal
 							{
 								TransformGameData GameData;
 								GameObject* MeshObject = new GameObject();
-								MeshObject->AddComponent(GameData.Load<TransformComponent>(TransformItem));
+								MeshObject->AddComponent<TransformComponent>(GameData.Load<TransformComponent>(TransformItem));
 								Request->ComponentsToUpdate.push_back(MeshObject->AddComponent<MeshComponent>());
 								OutLevel->AddGameObject(MeshObject);
 							}

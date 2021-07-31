@@ -14,6 +14,8 @@ namespace Eternal
 		class Level : public WorldObject
 		{
 		public:
+			static constexpr uint32_t GameObjectsInitialPool = 4096;
+
 			Level();
 
 			virtual void SetWorld(_In_ World* InWorld) override final;
