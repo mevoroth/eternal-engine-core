@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GraphicsEngine/Pass.hpp"
+#include "Graphics/GraphicsInclude.hpp"
 
 namespace Eternal
 {
@@ -17,10 +18,15 @@ namespace Eternal
 
 		private:
 			
-			RootSignature*		_DirectLightingRootSignature	= nullptr;
-			RenderPass*			_DirectLightingRenderPass		= nullptr;
-			Pipeline*			_DirectLightingPipeline			= nullptr;
-			DescriptorTable*	_DirectLightingDescriptorTable	= nullptr;
+			RootSignature*				_DirectLightingRootSignature		= nullptr;
+			RenderPass*					_DirectLightingRenderPass			= nullptr;
+			Pipeline*					_DirectLightingPipeline				= nullptr;
+			DescriptorTable*			_DirectLightingDescriptorTable		= nullptr;
+
+			MultiBuffered<Resource>*	_DirectLightingConstantBuffer		= nullptr;
+			MultiBuffered<View>*		_DirectLightingConstantBufferView	= nullptr;
+			MultiBuffered<Resource>*	_DirectLightingLightsBuffer			= nullptr;
+			MultiBuffered<View>*		_DirectLightingLightsBufferView		= nullptr;
 
 		};
 	}
