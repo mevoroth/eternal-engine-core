@@ -4,7 +4,8 @@
 #include "Resources/Streaming.hpp"
 #include "Resources/Payload.hpp"
 #include "Resources/LevelPayload.hpp"
-#include "GraphicsCommand/UploadMeshGraphicsCommand.hpp"
+#include "GraphicsCommand/GraphicsCommandUploadMesh.hpp"
+#include "GraphicsCommand/GraphicsCommandUploadTexture.hpp"
 #include "Components/MeshComponent.hpp"
 #include "Time/Timer.hpp"
 
@@ -75,10 +76,23 @@ namespace Eternal
 		void Game::Update()
 		{
 			ETERNAL_PROFILER(BASIC)();
+
+			ProcessStreamingPayloads();
+
+			_DeltaSeconds	= GetSystem().GetTimer().GetDeltaTimeSeconds();
+			_ElapsedTime	+= _DeltaSeconds;
+			_World.Update(_DeltaSeconds);
+		}
+
+		void Game::ProcessStreamingPayloads()
+		{
 			Streaming& StreamingSystem = GetSystem().GetStreaming();
+			TextureFactory& Factory = GetSystem().GetTextureFactory();
 			vector<GraphicsCommand*>& GraphicsCommands = GetSystem().GetGameFrame().GraphicsCommands;
+
 			StreamingSystem.ProcessGathered(
 				AssetType::ASSET_TYPE_LEVEL,
+				GetSystem().GetGameFrame().DelayedDestroyedRequests,
 				[this](_In_ Payload& InPayload)
 				{
 					LevelPayload& InLevelPayload = static_cast<LevelPayload&>(InPayload);
@@ -88,11 +102,12 @@ namespace Eternal
 
 			StreamingSystem.ProcessGathered(
 				AssetType::ASSET_TYPE_MESH,
+				GetSystem().GetGameFrame().DelayedDestroyedRequests,
 				[this, &GraphicsCommands](_In_ Payload& InPayload)
 				{
 					MeshPayload& InMeshPayload = static_cast<MeshPayload&>(InPayload);
 					GraphicsCommands.push_back(
-						new UploadMeshGraphicsCommand(InMeshPayload)
+						new GraphicsCommandUploadMesh(InMeshPayload)
 					);
 					for (uint32_t ComponentIndex = 0; ComponentIndex < InMeshPayload.ComponentsToUpdate.size(); ++ComponentIndex)
 					{
@@ -101,9 +116,17 @@ namespace Eternal
 				}
 			);
 
-			_DeltaSeconds	= GetSystem().GetTimer().GetDeltaTimeSeconds();
-			_ElapsedTime	+= _DeltaSeconds;
-			_World.Update(_DeltaSeconds);
+			StreamingSystem.ProcessGathered(
+				AssetType::ASSET_TYPE_TEXTURE,
+				GetSystem().GetGameFrame().DelayedDestroyedRequests,
+				[this, &GraphicsCommands, &Factory](_In_ Payload& InPayload)
+				{
+					TexturePayload& InTexturePayload = static_cast<TexturePayload&>(InPayload);
+					GraphicsCommands.push_back(
+						new GraphicsCommandUploadTexture(InTexturePayload, Factory)
+					);
+				}
+			);
 		}
 	}
 }

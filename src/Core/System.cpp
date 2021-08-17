@@ -14,6 +14,7 @@
 #include "Parallel/Sleep.hpp"
 #include "Resources/Streaming.hpp"
 #include "Resources/LevelLoader.hpp"
+#include "Resources/Payload.hpp"
 #include "Optick/Optick.hpp"
 
 namespace Eternal
@@ -26,15 +27,23 @@ namespace Eternal
 		using namespace Eternal::Platform;
 		using namespace Eternal::Parallel;
 
+		template<typename SystemType>
+		void Destroy(_Inout_ SystemType*& InOutSystem)
+		{
+			delete InOutSystem;
+			InOutSystem = nullptr;
+		}
+
 		System::System(_In_ SystemCreateInformation& InSystemCreateInformation)
 			: _SystemCreateInformation(InSystemCreateInformation)
 			, _GameIndex(CreateAtomicS32())
 			, _RenderIndex(CreateAtomicS32())
 		{
-			FilePath::Register(InSystemCreateInformation.ShaderIncludePath,	FileType::FILE_TYPE_SHADERS);
-			FilePath::Register(InSystemCreateInformation.LevelPath,			FileType::FILE_TYPE_LEVELS);
-			FilePath::Register(InSystemCreateInformation.FBXPath,			FileType::FILE_TYPE_MESHES);
-			FilePath::Register(InSystemCreateInformation.TexturePath,		FileType::FILE_TYPE_TEXTURES);
+			for (uint32_t IncludeIndex = 0; IncludeIndex < InSystemCreateInformation.ShaderIncludePath.size(); ++IncludeIndex)
+				FilePath::Register(InSystemCreateInformation.ShaderIncludePath[IncludeIndex],	FileType::FILE_TYPE_SHADERS);
+			FilePath::Register(InSystemCreateInformation.LevelPath,								FileType::FILE_TYPE_LEVELS);
+			FilePath::Register(InSystemCreateInformation.FBXPath,								FileType::FILE_TYPE_MESHES);
+			FilePath::Register(InSystemCreateInformation.TexturePath,							FileType::FILE_TYPE_TEXTURES);
 
 			_Timer				= CreateTimer(TimeType::TIME_TYPE_WIN);
 			_Logs				= CreateMultiChannelLog({ LogType::LOG_TYPE_CONSOLE/*, LogType::LOG_TYPE_FILE*/ });
@@ -45,7 +54,7 @@ namespace Eternal
 			
 			_GraphicsContext	= CreateGraphicsContext(InSystemCreateInformation.ContextInformation);
 
-			_Streaming			= new Streaming();
+			_Streaming			= new Streaming(_TextureFactory);
 			_Streaming->RegisterLoader(AssetType::ASSET_TYPE_LEVEL, new LevelLoader());
 
 			_Renderer			= new Renderer(*_GraphicsContext);
@@ -67,66 +76,80 @@ namespace Eternal
 			_ParallelSystem		= new ParallelSystem(ParallelSystemInformation);
 
 			Optick::OptickStart(*_GraphicsContext);
+
+			_LoadBuiltin();
 		}
 
 		System::~System()
 		{
+			_Streaming->Shutdown();
+
+			Destroy(_ParallelSystem);
+
 			Optick::OptickStop();
 
-			delete _ParallelSystem;
-			_ParallelSystem = nullptr;
-
-			delete _StreamingTask;
-			_StreamingTask = nullptr;
-
-			delete _RendererTask;
-			_RendererTask = nullptr;
-
-			delete _Renderer;
-			_Renderer = nullptr;
+			Destroy(_StreamingTask);
+			Destroy(_RendererTask);
 
 			for (uint32_t FrameIndex = 0; FrameIndex < GraphicsContext::FrameBufferingCount; ++FrameIndex)
 				_Imgui->DestroyContext(_Frames[FrameIndex].ImguiFrameContext);
 
-			delete _Imgui;
-			_Imgui = nullptr;
-
-			delete _Streaming;
-			_Streaming = nullptr;
-
 			DestroyGraphicsContext(_GraphicsContext);
 
-			DeleteInput(_Input);
-			DeleteLog(_Logs);
+			Destroy(_Imgui);
+			Destroy(_Streaming);
+			Destroy(_Renderer);
+
+			DestroyInput(_Input);
+			DestroyLog(_Logs);
 			DestroyTimer(_Timer);
+		}
+
+		void System::_LoadBuiltin()
+		{
+			_Streaming->EnqueueRequest(
+				new TextureRequest(
+					FilePath::Find("black.tga", FileType::FILE_TYPE_TEXTURES),
+					"black",
+					"black"
+				)
+			);
+			_Streaming->CommitRequests();
 		}
 
 		void System::StartFrame()
 		{
 			ETERNAL_PROFILER(BASIC)();
-			while (GetGameFrame().SystemState->Load() != SystemCanBeWritten)
+			SystemFrame& CurrentGameFrame = GetGameFrame();
+
+			while (CurrentGameFrame.SystemState->Load() != SystemCanBeWritten)
 			{
 				Sleep(10);
 			}
 			GetParallelSystem().StartFrame();
-			GetImgui().SetContext(GetGameFrame().ImguiFrameContext);
+			GetImgui().SetContext(CurrentGameFrame.ImguiFrameContext);
 			GetImgui().Begin();
 			GetStreaming().GatherPayloads();
+			// Delayed payloads delete
+			{
+				for (uint32_t QueueType = 0; QueueType < CurrentGameFrame.DelayedDestroyedRequests.size(); ++QueueType)
+				{
+					for (uint32_t RequestIndex = 0; RequestIndex < CurrentGameFrame.DelayedDestroyedRequests[QueueType].size(); ++RequestIndex)
+					{
+						delete CurrentGameFrame.DelayedDestroyedRequests[QueueType][RequestIndex];
+						CurrentGameFrame.DelayedDestroyedRequests[QueueType][RequestIndex] = nullptr;
+					}
+					CurrentGameFrame.DelayedDestroyedRequests[QueueType].clear();
+				}
+			}
 			{
 				SystemFrame& OldestFrame = GetOldestGameFrame();
 
-				// Meshes
-				vector<MeshCollection*>& MeshCollections = GetGameFrame().MeshCollections;
-				vector<MeshCollection*>& OldestPendingMeshCollections = OldestFrame.PendingMeshCollections;
-				MeshCollections.insert(
-					MeshCollections.end(),
-					OldestPendingMeshCollections.begin(),
-					OldestPendingMeshCollections.end()
-				);
-				OldestPendingMeshCollections.clear();
+				CurrentGameFrame.MeshCollections.Commit(OldestFrame.MeshCollections);
+				CurrentGameFrame.Lights.Commit(OldestFrame.Lights);
 
 				// Camera
-				GetGameFrame().View = OldestFrame.PendingView ? OldestFrame.PendingView : OldestFrame.View;
+				CurrentGameFrame.View = OldestFrame.PendingView ? OldestFrame.PendingView : OldestFrame.View;
 				OldestFrame.PendingView = nullptr;
 			}
 		}

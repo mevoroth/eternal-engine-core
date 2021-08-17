@@ -3,6 +3,8 @@
 #include "Platform/WindowsProcess.hpp"
 #include "Parallel/ParallelSystem.hpp"
 #include "Graphics/GraphicsContext.hpp"
+#include "Resources/TextureFactory.hpp"
+#include "Resources/Streaming.hpp"
 #include "Imgui/Imgui.hpp"
 #include <array>
 
@@ -62,6 +64,7 @@ namespace Eternal
 	{
 		class MeshCollection;
 		class Camera;
+		class Light;
 	}
 
 	namespace Core
@@ -81,9 +84,35 @@ namespace Eternal
 		using namespace Eternal::Components;
 
 		class Game;
+		struct SystemFrame;
 
 		static constexpr int SystemCanBeRendered = 1;
 		static constexpr int SystemCanBeWritten = 0;
+
+		template<typename ObjectType>
+		struct ObjectList
+		{
+			void Add(_In_ ObjectType* InObject)
+			{
+				Objects.push_back(InObject);
+				PendingObjects.push_back(InObject);
+			}
+
+			void Commit(_Inout_ ObjectList<ObjectType>& InOutOldestFrameObjectList)
+			{
+				Objects.insert(
+					Objects.end(),
+					InOutOldestFrameObjectList.PendingObjects.begin(),
+					InOutOldestFrameObjectList.PendingObjects.end()
+				);
+				InOutOldestFrameObjectList.PendingObjects.clear();
+			}
+
+			operator const vector<ObjectType*>&() const { return Objects; }
+
+			vector<ObjectType*> Objects;
+			vector<ObjectType*> PendingObjects;
+		};
 
 		struct SystemFrame
 		{
@@ -95,9 +124,11 @@ namespace Eternal
 
 			AtomicS32* SystemState = nullptr;
 			ImguiContext ImguiFrameContext;
-			vector<MeshCollection*> MeshCollections;
-			vector<MeshCollection*> PendingMeshCollections;
+			ObjectList<MeshCollection> MeshCollections;
+			ObjectList<Light> Lights;
 			vector<GraphicsCommand*> GraphicsCommands;
+			PayloadQueueType DelayedDestroyedRequests;
+			
 			Camera* View = nullptr;
 			Camera* PendingView = nullptr;
 		};
@@ -109,14 +140,14 @@ namespace Eternal
 			{
 			}
 
-			GraphicsContextCreateInformation&	ContextInformation;
+			GraphicsContextCreateInformation& ContextInformation;
 
-			Game* GameContext					= nullptr;
+			Game* GameContext						= nullptr;
 
-			const char* ShaderIncludePath		= nullptr;
-			const char* FBXPath					= nullptr;
-			const char* TexturePath				= nullptr;
-			const char* LevelPath				= nullptr;
+			vector<const char*> ShaderIncludePath;
+			const char* FBXPath						= nullptr;
+			const char* TexturePath					= nullptr;
+			const char* LevelPath					= nullptr;
 		};
 
 		class System
@@ -168,6 +199,11 @@ namespace Eternal
 				return *_Timer;
 			}
 
+			inline TextureFactory& GetTextureFactory()
+			{
+				return _TextureFactory;
+			}
+
 			SystemFrame& GetGameFrame();
 			SystemFrame& GetOldestGameFrame();
 			SystemFrame& GetRenderFrame();
@@ -180,8 +216,11 @@ namespace Eternal
 			void Render();
 
 		private:
+			void _LoadBuiltin();
+			
 			SystemCreateInformation										_SystemCreateInformation;
 			WindowsProcess												_WindowProcess;
+			TextureFactory												_TextureFactory;
 			ParallelSystem*												_ParallelSystem		= nullptr;
 			GraphicsContext*											_GraphicsContext	= nullptr;
 			Imgui*														_Imgui				= nullptr;
