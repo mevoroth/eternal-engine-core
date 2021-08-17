@@ -126,7 +126,7 @@
     <ClInclude Include="include\Core\WorldObject.hpp">
       <Filter>Core</Filter>
     </ClInclude>
-    <ClInclude Include="include\GraphicsCommand\UploadMeshGraphicsCommand.hpp">
+    <ClInclude Include="include\GraphicsCommand\GraphicsCommandUploadMesh.hpp">
       <Filter>GraphicsCommand</Filter>
     </ClInclude>
     <ClInclude Include="include\GraphicsEngine\Pass.hpp">
@@ -149,6 +149,18 @@
     </ClInclude>
     <ClInclude Include="include\GraphicsEngine\RenderPasses\PresentPass.hpp">
       <Filter>GraphicsEngine\RenderPasses</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Components\LightComponent.hpp">
+      <Filter>Components</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GameData\LightGameData.hpp">
+      <Filter>GameData</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsEngine\RenderPasses\TonemappingPass.hpp">
+      <Filter>GraphicsEngine\RenderPasses</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsCommand\GraphicsCommandUploadTexture.hpp">
+      <Filter>GraphicsCommand</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -210,7 +222,7 @@
     <ClCompile Include="src\Core\World.cpp">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsCommand\UploadMeshGraphicsCommand.cpp">
+    <ClCompile Include="src\GraphicsCommand\GraphicsCommandUploadMesh.cpp">
       <Filter>GraphicsCommand</Filter>
     </ClCompile>
     <ClCompile Include="src\Resources\LevelPayload.cpp">
@@ -242,6 +254,18 @@
     </ClCompile>
     <ClCompile Include="src\GraphicsEngine\RenderPasses\PresentPass.cpp">
       <Filter>GraphicsEngine\RenderPasses</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameData\LightGameData.cpp">
+      <Filter>GameData</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Components\LightComponent.cpp">
+      <Filter>Components</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\RenderPasses\TonemappingPass.cpp">
+      <Filter>GraphicsEngine\RenderPasses</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsCommand\GraphicsCommandUploadTexture.cpp">
+      <Filter>GraphicsCommand</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

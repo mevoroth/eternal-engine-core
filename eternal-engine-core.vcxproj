@@ -116,8 +116,8 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <MinimalRebuild>false</MinimalRebuild>
-      <ForcedIncludeFiles>sal.h;CoreSettings.hpp;optick.h</ForcedIncludeFiles>
-      <AdditionalIncludeDirectories>D:\Code\FBX\FBX SDK\2020.0.1\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ForcedIncludeFiles>sal.h;Types/HLSLReflection.hpp;CoreSettings.hpp;optick.h</ForcedIncludeFiles>
+      <AdditionalIncludeDirectories>D:\Code\FBX\FBX SDK\2020.0.1\include;$(SolutionDir)\eternal-engine-shaders\ShadersReflection;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4189;4100</DisableSpecificWarnings>
@@ -162,6 +162,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\Components\CameraComponent.hpp" />
+    <ClInclude Include="include\Components\LightComponent.hpp" />
     <ClInclude Include="include\Components\MeshComponent.hpp" />
     <ClInclude Include="include\Components\TransformComponent.hpp" />
     <ClInclude Include="include\CoreSettings.hpp" />
@@ -178,14 +179,17 @@
     <ClInclude Include="include\GameData\GameData.hpp" />
     <ClInclude Include="include\GameData\JsonGameData.hpp" />
     <ClInclude Include="include\GameData\LevelGameData.hpp" />
+    <ClInclude Include="include\GameData\LightGameData.hpp" />
     <ClInclude Include="include\GameData\MeshGameData.hpp" />
     <ClInclude Include="include\GameData\TransformGameData.hpp" />
-    <ClInclude Include="include\GraphicsCommand\UploadMeshGraphicsCommand.hpp" />
+    <ClInclude Include="include\GraphicsCommand\GraphicsCommandUploadMesh.hpp" />
+    <ClInclude Include="include\GraphicsCommand\GraphicsCommandUploadTexture.hpp" />
     <ClInclude Include="include\GraphicsEngine\Renderer.hpp" />
     <ClInclude Include="include\GraphicsEngine\Pass.hpp" />
     <ClInclude Include="include\GraphicsEngine\RenderPasses\DirectLightingPass.hpp" />
     <ClInclude Include="include\GraphicsEngine\RenderPasses\OpaquePass.hpp" />
     <ClInclude Include="include\GraphicsEngine\RenderPasses\PresentPass.hpp" />
+    <ClInclude Include="include\GraphicsEngine\RenderPasses\TonemappingPass.hpp" />
     <ClInclude Include="include\Imgui\Imgui.hpp" />
     <ClInclude Include="include\Imgui\ImguiConfig.hpp" />
     <ClInclude Include="include\Import\ImportLevel.hpp" />
@@ -200,6 +204,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Components\CameraComponent.cpp" />
+    <ClCompile Include="src\Components\LightComponent.cpp" />
     <ClCompile Include="src\Components\MeshComponent.cpp" />
     <ClCompile Include="src\Components\TransformComponent.cpp" />
     <ClCompile Include="src\Core\Component.cpp" />
@@ -213,13 +218,16 @@
     <ClCompile Include="src\GameData\GameData.cpp" />
     <ClCompile Include="src\GameData\JsonGameData.cpp" />
     <ClCompile Include="src\GameData\LevelGameData.cpp" />
+    <ClCompile Include="src\GameData\LightGameData.cpp" />
     <ClCompile Include="src\GameData\MeshGameData.cpp" />
     <ClCompile Include="src\GameData\TransformGameData.cpp" />
-    <ClCompile Include="src\GraphicsCommand\UploadMeshGraphicsCommand.cpp" />
+    <ClCompile Include="src\GraphicsCommand\GraphicsCommandUploadMesh.cpp" />
+    <ClCompile Include="src\GraphicsCommand\GraphicsCommandUploadTexture.cpp" />
     <ClCompile Include="src\GraphicsEngine\Renderer.cpp" />
     <ClCompile Include="src\GraphicsEngine\RenderPasses\DirectLightingPass.cpp" />
     <ClCompile Include="src\GraphicsEngine\RenderPasses\OpaquePass.cpp" />
     <ClCompile Include="src\GraphicsEngine\RenderPasses\PresentPass.cpp" />
+    <ClCompile Include="src\GraphicsEngine\RenderPasses\TonemappingPass.cpp" />
     <ClCompile Include="src\Imgui\Imgui.cpp" />
     <ClCompile Include="src\Imgui\ImguiConfig.cpp" />
     <ClCompile Include="src\Import\ImportLevel.cpp" />
