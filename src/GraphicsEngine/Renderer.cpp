@@ -2,6 +2,7 @@
 #include "GraphicData/GlobalResources.hpp"
 #include "GraphicsEngine/RenderPasses/OpaquePass.hpp"
 #include "GraphicsEngine/RenderPasses/DirectLightingPass.hpp"
+#include "GraphicsEngine/RenderPasses/TonemappingPass.hpp"
 #include "GraphicsEngine/RenderPasses/PresentPass.hpp"
 
 namespace Eternal
@@ -20,7 +21,8 @@ namespace Eternal
 			: _GlobalResources(new GlobalResources(InContext))
 			, _Passes({
 				new OpaquePass(InContext, *this),
-				new DirectLightingPass(InContext, *this)
+				new DirectLightingPass(InContext, *this),
+				new TonemappingPass(InContext, *this)
 			})
 			, _PresentPass(new PresentPass(InContext, *this))
 		{
@@ -38,7 +40,7 @@ namespace Eternal
 		void Renderer::Render(_In_ GraphicsContext& InContext, _In_ System& InSystem)
 		{
 			ETERNAL_PROFILER(BASIC)("Frame");
-			if (_GlobalResources->BeginRender(InSystem))
+			if (_GlobalResources->BeginRender(InContext, InSystem))
 			{
 				for (uint32_t PassIndex = 0; PassIndex < _Passes.size(); ++PassIndex)
 					_Passes[PassIndex]->Render(InContext, InSystem, *this);
