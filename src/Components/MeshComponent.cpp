@@ -13,8 +13,7 @@ namespace Eternal
 		{
 			_MeshCollection = InMeshCollection;
 			System& EngineSystem = GetWorld()->GetGame().GetSystem();
-			EngineSystem.GetGameFrame().MeshCollections.push_back(InMeshCollection);
-			EngineSystem.GetGameFrame().PendingMeshCollections.push_back(InMeshCollection);
+			EngineSystem.GetGameFrame().MeshCollections.Add(InMeshCollection);
 		}
 	}
 }
