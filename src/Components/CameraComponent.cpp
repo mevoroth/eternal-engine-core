@@ -15,15 +15,14 @@ namespace Eternal
 			_CameraComponent->GetCamera().UpdateWorldToView(InTransform);
 		}
 
-		CameraComponent::CameraComponent()
-			: _OnTransformChangedReceiver(this)
+		CameraComponent::CameraComponent(_In_ World* InWorld /* = nullptr */)
+			: Component(InWorld)
+			, _OnTransformChangedReceiver(this)
 		{
 			_ComponentState.ComponentHasBehavior = true;
-			_ComponentState.ComponentUpdatesEveryFrame = true;
-			_ComponentState.ComponentIsDirty = true;
 		}
 
-		void CameraComponent::Update(_In_ TimeSecondsT InDeltaSeconds)
+		void CameraComponent::Begin()
 		{
 			System& SystemEngine = GetWorld()->GetGame().GetSystem();
 			SystemEngine.GetGameFrame().PendingView = _Camera;
