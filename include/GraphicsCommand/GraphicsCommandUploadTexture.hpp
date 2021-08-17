@@ -6,21 +6,23 @@ namespace Eternal
 {
 	namespace Resources
 	{
-		struct MeshPayload;
+		struct TexturePayload;
+		class TextureFactory;
 	}
 	namespace GraphicsCommands
 	{
 		using namespace Eternal::Graphics;
 		using namespace Eternal::Resources;
 
-		struct UploadMeshGraphicsCommand final : public GraphicsCommand
+		struct GraphicsCommandUploadTexture final : public GraphicsCommand
 		{
-			UploadMeshGraphicsCommand(_In_ MeshPayload& InPayload);
+			GraphicsCommandUploadTexture(_In_ TexturePayload& InPayload, _In_ TextureFactory& InTextureFactory);
 
 			virtual void Execute(_In_ GraphicsContext& InContext) override final;
 
 		private:
-			MeshPayload& _Payload;
+			TexturePayload& _Payload;
+			TextureFactory& _Factory;
 		};
 	}
 }

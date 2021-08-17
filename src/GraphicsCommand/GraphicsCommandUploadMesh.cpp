@@ -1,4 +1,4 @@
-#include "GraphicsCommand/UploadMeshGraphicsCommand.hpp"
+#include "GraphicsCommand/GraphicsCommandUploadMesh.hpp"
 #include "Mesh/Mesh.hpp"
 #include "Resources/Payload.hpp"
 #include "Graphics/GraphicsInclude.hpp"
@@ -9,35 +9,45 @@ namespace Eternal
 	{
 		using namespace Eternal::Graphics;
 
-		UploadMeshGraphicsCommand::UploadMeshGraphicsCommand(_In_ MeshPayload& InPayload)
+		GraphicsCommandUploadMesh::GraphicsCommandUploadMesh(_In_ MeshPayload& InPayload)
 			: _Payload(InPayload)
 		{
 		}
 
-		void UploadMeshGraphicsCommand::Execute(_In_ GraphicsContext& InContext)
+		void GraphicsCommandUploadMesh::Execute(_In_ GraphicsContext& InContext)
 		{
 			for (uint32_t MeshIndex = 0, MeshCount = static_cast<uint32_t>(_Payload.LoadedMesh->Meshes.size()); MeshIndex < MeshCount; ++MeshIndex)
 			{
 				Mesh* CurrentMesh = _Payload.LoadedMesh->Meshes[MeshIndex];
 
 				// Vertex buffer
-				uint32_t VertexBufferSize = CurrentMesh->GetVertexStride() * CurrentMesh->GetVerticesCount();
+				uint32_t VerticesCount = CurrentMesh->GetVerticesCount();
+				uint32_t VertexStride = CurrentMesh->GetVertexStride();
+				uint32_t VertexBufferSize = CurrentMesh->GetVertexStride() * VerticesCount;
 
 				BufferResourceCreateInformation MeshVerticesResourceCreateInformation(
 					InContext.GetDevice(),
 					CurrentMesh->GetName(),
 					VertexBufferCreateInformation(
-						CurrentMesh->GetVertexStride(),
-						CurrentMesh->GetVerticesCount()
+						VertexStride,
+						VerticesCount
 					),
 					ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
 				);
 				Resource* MeshVertexBuffer = CreateBuffer(MeshVerticesResourceCreateInformation);
 				// Upload
 				{
+					uint32_t ActualVertexStride = MeshVertexBuffer->GetBufferStride();
 					MapRange MeshVertexBufferRange(VertexBufferSize);
-					MapScope<> MeshVertexBufferMapScope(*MeshVertexBuffer, MeshVertexBufferRange);
-					memcpy(MeshVertexBufferMapScope.GetDataPointer(), CurrentMesh->GetVerticesData(), VertexBufferSize);
+					MapScope<uint8_t> MeshVertexBufferMapScope(*MeshVertexBuffer, MeshVertexBufferRange);
+
+					for (uint32_t VertexIndex = 0; VertexIndex < VerticesCount; ++VertexIndex)
+					{
+						uint8_t* DestinationOffset = MeshVertexBufferMapScope.GetDataPointer() + ActualVertexStride * VertexIndex;
+						const uint8_t* SourceOffset = static_cast<const uint8_t*>(CurrentMesh->GetVerticesData()) + VertexStride * VertexIndex;
+
+						memcpy(DestinationOffset, SourceOffset, VertexStride);
+					}
 				}
 				CurrentMesh->SetMeshVertexBuffer(MeshVertexBuffer);
 
@@ -81,7 +91,6 @@ namespace Eternal
 				// Upload
 				{
 					uint32_t ActualConstantBufferStride	= MeshConstantBuffer->GetBufferStride();
-					uint32_t ActualConstantBufferSize	= ActualConstantBufferStride * ConstantBufferCount;
 					MapRange MeshConstanBufferRange(ActualConstantBufferStride * ConstantBufferCount);
 					MapScope<uint8_t> MeshConstantBufferMapScope(*MeshConstantBuffer, MeshConstanBufferRange);
 
