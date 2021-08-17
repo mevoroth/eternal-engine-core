@@ -1,10 +1,7 @@
 #include "GraphicsEngine/RenderPasses/OpaquePass.hpp"
 #include "Core/System.hpp"
-#include "Graphics/GraphicsInclude.hpp"
-#include "GraphicsEngine/Renderer.hpp"
 #include "GraphicData/MeshVertexFormat.hpp"
-#include "GraphicData/RenderTargetTexture.hpp"
-#include "GraphicData/GlobalResources.hpp"
+#include "Material/Material.hpp"
 #include "Mesh/Mesh.hpp"
 
 namespace Eternal
@@ -16,9 +13,9 @@ namespace Eternal
 		OpaquePass::OpaquePass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 		{
 			ShaderCreateInformation OpaqueVSCreateInformation(ShaderType::VS, "OpaqueVS", "opaque.vs.hlsl");
-			Shader& OpaqueVS = *InContext.GetShader(OpaqueVSCreateInformation);
+			Shader* OpaqueVS = InContext.GetShader(OpaqueVSCreateInformation);
 			ShaderCreateInformation OpaquePSCreateInformation(ShaderType::PS, "OpaquePS", "opaque.ps.hlsl");
-			Shader& OpaquePS = *InContext.GetShader(OpaquePSCreateInformation);
+			Shader* OpaquePS = InContext.GetShader(OpaquePSCreateInformation);
 
 			_OpaqueRootSignature = CreateRootSignature(
 				InContext,
@@ -26,7 +23,10 @@ namespace Eternal
 					{
 						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VS),
 						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VS),
-						//RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS)
+						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
+						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
+						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
+						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_SAMPLER,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS)
 					},
 					{}, {},
 					/*InHasInputAssembler=*/ true
@@ -58,14 +58,14 @@ namespace Eternal
 						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferNormals().GetRenderTargetDepthStencilView()),
 						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferRoughnessMetallicSpecular().GetRenderTargetDepthStencilView())
 					},
-					InGlobalResources.GetGBufferDepthStencil().GetRenderTargetDepthStencilView(), RenderTargetOperator::Load_Store
+					InGlobalResources.GetGBufferDepthStencil().GetRenderTargetDepthStencilView(), RenderTargetOperator::Clear_Store
 				)
 			);
 
-			PipelineCreateInformation OpaquePipelineCreateInformation(
+			GraphicsPipelineCreateInformation OpaquePipelineCreateInformation(
 				*_OpaqueRootSignature,
-				*_OpaqueInputLayout,
-				*_OpaqueRenderPass,
+				_OpaqueInputLayout,
+				_OpaqueRenderPass,
 				OpaqueVS, OpaquePS,
 				DepthStencilTestWriteGreaterNone
 			);
@@ -85,7 +85,7 @@ namespace Eternal
 		{
 			ETERNAL_PROFILER(BASIC)();
 
-			vector<MeshCollection*>& MeshCollections = InSystem.GetRenderFrame().MeshCollections;
+			const vector<MeshCollection*>& MeshCollections = InSystem.GetRenderFrame().MeshCollections;
 			if (MeshCollections.size() == 0)
 				return;
 
@@ -96,6 +96,7 @@ namespace Eternal
 			OpaqueCommandList->SetGraphicsPipeline(*_OpaquePipeline);
 
 			_OpaqueDescriptorTable->SetDescriptor(1, InRenderer.GetGlobalResources().GetViewConstantBufferView());
+			_OpaqueDescriptorTable->SetDescriptor(5, InContext.GetBilinearClampSampler());
 
 			for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
 			{
@@ -109,6 +110,8 @@ namespace Eternal
 					for (uint32_t DrawIndex = 0; DrawIndex < CurrentGPUMesh.PerDrawInformations.size(); ++DrawIndex)
 					{
 						GPUMesh::PerDrawInformation& DrawInformation = CurrentGPUMesh.PerDrawInformations[DrawIndex];
+
+						DrawInformation.PerDrawMaterial->CommitMaterial(*_OpaqueDescriptorTable);
 
 						_OpaqueDescriptorTable->SetDescriptor(0, DrawInformation.PerDrawConstantBufferVS);
 						OpaqueCommandList->SetGraphicsDescriptorTable(InContext, *_OpaqueDescriptorTable);

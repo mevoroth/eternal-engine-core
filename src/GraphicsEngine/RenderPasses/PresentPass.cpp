@@ -1,8 +1,4 @@
 #include "GraphicsEngine/RenderPasses/PresentPass.hpp"
-#include "GraphicsEngine/Renderer.hpp"
-#include "GraphicData/GlobalResources.hpp"
-#include "GraphicData/RenderTargetTexture.hpp"
-#include "Graphics/GraphicsInclude.hpp"
 
 namespace Eternal
 {
@@ -11,9 +7,9 @@ namespace Eternal
 		PresentPass::PresentPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 		{
 			ShaderCreateInformation ScreenVSCreateInformation(ShaderType::VS, "ScreenVS", "screen.vs.hlsl");
-			Shader& ScreenVS = *InContext.GetShader(ScreenVSCreateInformation);
+			Shader* ScreenVS = InContext.GetShader(ScreenVSCreateInformation);
 			ShaderCreateInformation SampleTexturePSCreateInformation(ShaderType::PS, "SampleTexturePS", "sampletexture.ps.hlsl");
-			Shader& SampleTexturePS = *InContext.GetShader(SampleTexturePSCreateInformation);
+			Shader* SampleTexturePS = InContext.GetShader(SampleTexturePSCreateInformation);
 
 			_PresentRootSignature = CreateRootSignature(
 				InContext,
@@ -29,7 +25,7 @@ namespace Eternal
 
 			_PresentPipeline = CreatePipeline(
 				InContext,
-				PipelineCreateInformation(
+				GraphicsPipelineCreateInformation(
 					*_PresentRootSignature,
 					InContext.GetEmptyInputLayout(),
 					InContext.GetBackBufferRenderPass(),
