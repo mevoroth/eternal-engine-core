@@ -2,6 +2,7 @@
 #include "Core/Level.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/CameraComponent.hpp"
+#include "Components/LightComponent.hpp"
 
 namespace Eternal
 {
@@ -28,6 +29,7 @@ namespace Eternal
 		{
 			ComponentPool<TransformComponent>::Update(InDeltaSeconds);
 			ComponentPool<CameraComponent>::Update(InDeltaSeconds);
+			ComponentPool<LightComponent>::Update(InDeltaSeconds);
 		}
 	}
 }
