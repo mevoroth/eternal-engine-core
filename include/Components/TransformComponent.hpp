@@ -26,6 +26,7 @@ namespace Eternal
 
 			TransformComponent(_In_ World* InWorld = nullptr);
 
+			void Begin() {}
 			void Update(_In_ TimeSecondsT InDeltaSeconds);
 			inline const Transform& GetTransform() const { return _Transform; }
 			inline Transform& GetTransform()

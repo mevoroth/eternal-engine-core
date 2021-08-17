@@ -6,7 +6,7 @@ namespace Eternal
 	{
 		static ComponentPool<TransformComponent> TransformComponentsPool;
 
-		TransformComponent::TransformComponent(_In_ World* InWorld)
+		TransformComponent::TransformComponent(_In_ World* InWorld /* = nullptr */)
 			: Component(InWorld)
 			, _OnTransformChanged(&OnTransformChangedEvent::OnTransformChanged)
 		{
