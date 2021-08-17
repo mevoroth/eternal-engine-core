@@ -79,8 +79,6 @@ namespace Eternal
 			MultiBuffered<Resource>*	_ImguiIndexBuffer;
 			
 			RenderPass*					_ImguiRenderPass			= nullptr;
-			Shader*						_ImguiVS					= nullptr;
-			Shader*						_ImguiPS					= nullptr;
 			Pipeline*					_ImguiPipeline				= nullptr;
 			Sampler*					_ImguiBilinearSampler		= nullptr;
 			InputLayout*				_ImguiInputLayout			= nullptr;

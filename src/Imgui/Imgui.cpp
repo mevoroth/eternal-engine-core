@@ -71,13 +71,13 @@ namespace Eternal
 				"ImguiVS",
 				"imgui\\imgui.vs.hlsl"
 			);
-			_ImguiVS = InContext.GetShader(ImguiVSCreateInformation);
+			Shader* ImguiVS = InContext.GetShader(ImguiVSCreateInformation);
 			ShaderCreateInformation ImguiPSCreateInformation(
 				ShaderType::PS,
 				"ImguiPS",
 				"imgui\\imgui.ps.hlsl"
 			);
-			_ImguiPS = InContext.GetShader(ImguiPSCreateInformation);
+			Shader* ImguiPS = InContext.GetShader(ImguiPSCreateInformation);
 			
 			_ImguiBlendState = new BlendState(
 				Blend::BLEND_SOURCE_ALPHA,
@@ -120,12 +120,12 @@ namespace Eternal
 			_ImguiRootSignature		= CreateRootSignature(InContext, ImguiRootSignatureInformation);
 			_ImguiDescriptorTable	= _ImguiRootSignature->CreateRootDescriptorTable(InContext);
 
-			PipelineCreateInformation ImguiPipelineCreateInformation(
+			GraphicsPipelineCreateInformation ImguiPipelineCreateInformation(
 				*_ImguiRootSignature,
-				*_ImguiInputLayout,
-				*_ImguiRenderPass,
-				*_ImguiVS,
-				*_ImguiPS,
+				_ImguiInputLayout,
+				_ImguiRenderPass,
+				ImguiVS,
+				ImguiPS,
 				DepthStencilNoneNone,
 				Rasterizer(FrontFace::FRONT_FACE_CLOCKWISE)
 			);
