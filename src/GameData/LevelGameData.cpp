@@ -3,9 +3,11 @@
 #include "Core/GameObject.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/MeshComponent.hpp"
+#include "Components/LightComponent.hpp"
 #include "GameData/TransformGameData.hpp"
 #include "GameData/MeshGameData.hpp"
 #include "GameData/CameraGameData.hpp"
+#include "GameData/LightGameData.hpp"
 #include "Resources/LevelPayload.hpp"
 #include "Resources/Payload.hpp"
 
@@ -68,7 +70,7 @@ namespace Eternal
 							}
 						);
 
-						OutLevelPayload->Add(Request);
+						OutLevelPayload->AddRequest(Request);
 					}
 				);
 			}
@@ -76,6 +78,34 @@ namespace Eternal
 			// Light
 			{
 				ETERNAL_PROFILER(DETAIL)("Lights");
+				const GameDataSource& Lights = InNode.GetSubNode(GameDataSourceKey::LIGHTS);
+				IterateGameDataCollection(
+					Lights,
+					[OutLevel = OutLevelPayload->LoadedLevel, OutLevelPayload](_In_ const GameDataSource& LightItem)
+					{
+						const GameDataSource& Transforms = LightItem.GetSubNode(GameDataSourceKey::TRANSFORM);
+
+						LightGameData LightData;
+
+						IterateGameDataCollection(
+							Transforms,
+							[OutLevel, &LightData, &LightItem](_In_ const GameDataSource& TransformItem)
+							{
+								TransformGameData TransformData;
+								GameObject* LightObject = new GameObject();
+								LightComponent* NewLightComponent = LightData.Load<LightComponent>(LightItem);
+								LightObject->AddComponent<LightComponent>(NewLightComponent);
+								LightObject->AddComponent<TransformComponent>(TransformData.Load<TransformComponent>(TransformItem),
+									[NewLightComponent](_Inout_ TransformComponent* InOutComponent)
+									{
+										InOutComponent->SetHasBehavior();
+										InOutComponent->OnTransformChanged().Receivers.push_back(&NewLightComponent->OnTransformChangedReceiver());
+									});
+								OutLevel->AddGameObject(LightObject);
+							}
+						);
+					}
+				);
 			}
 
 			return OutLevelPayload;

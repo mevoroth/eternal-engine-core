@@ -88,6 +88,9 @@ namespace Eternal
 
 			virtual const GameDataSource& GetSubNode(_In_ const GameDataSourceKey& InKey) const override final;
 
+		protected:
+			virtual void InternalGet(_Out_ void* OutValue) const override final;
+
 		private:
 			JsonTransformCollection _TransformCollection;
 		};

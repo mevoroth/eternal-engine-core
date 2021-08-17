@@ -3,10 +3,16 @@
 #include "Core/GameObject.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Components/CameraComponent.hpp"
+#include "Components/LightComponent.hpp"
 #include "GameData/CameraGameData.hpp"
+#include "GameData/LightGameData.hpp"
 #include "Camera/OrthographicCamera.hpp"
 #include "Camera/PerspectiveCamera.hpp"
+#include "Light/DirectionalLight.hpp"
+#include "Light/PointLight.hpp"
+#include "Light/SpotLight.hpp"
 #include "Types/Types.hpp"
+#include "Math/Math.hpp"
 
 namespace Eternal
 {
@@ -14,6 +20,7 @@ namespace Eternal
 	{
 		using namespace Eternal::Types;
 		using namespace Eternal::Core;
+		using namespace Eternal::Math;
 
 		//////////////////////////////////////////////////////////////////////////
 		// Node
@@ -127,7 +134,7 @@ namespace Eternal
 				CameraData = new PerspectiveCamera(
 					_Node["m_Near"].GetFloat(),
 					_Node["m_Far"].GetFloat(),
-					_Node["m_FOV"].GetFloat(),
+					_Node["m_FOV"].GetFloat() * DegreesToRadians,
 					_Node["m_ScreenRatio"].GetFloat()
 				);
 			} break;
@@ -171,6 +178,45 @@ namespace Eternal
 		{
 			ETERNAL_ASSERT(InKey == GameDataSourceKey::TRANSFORM);
 			return _TransformCollection.Get();
+		}
+
+		void JsonLightNode::InternalGet(_Out_ void* OutValue) const
+		{
+			LightComponent* OutComponent = static_cast<LightComponent*>(OutValue);
+			Light* OutLight = nullptr;
+
+			LightType Type = static_cast<LightType>(_Node["m_LightType"].GetInt());
+
+			switch (Type)
+			{
+			case LightType::LIGHT_TYPE_DIRECTIONAL:
+			{
+				OutLight = new DirectionalLight();
+			} break;
+			case LightType::LIGHT_TYPE_POINT:
+			{
+				OutLight = new PointLight();
+			} break;
+			case LightType::LIGHT_TYPE_SPOTLIGHT:
+			//{
+
+			//} break;
+			case LightType::LIGHT_TYPE_AREA:
+			default:
+			{
+				ETERNAL_BREAK();
+			} break;
+			}
+
+			Vector3 Color(
+				_Node["m_LightColor"]["r"].GetFloat(),
+				_Node["m_LightColor"]["g"].GetFloat(),
+				_Node["m_LightColor"]["b"].GetFloat()
+			);
+			OutLight->SetColor(Color);
+			OutLight->SetIntensity(_Node["m_LightIntensity"].GetFloat());
+
+			OutComponent->SetLight(OutLight);
 		}
 
 		//////////////////////////////////////////////////////////////////////////

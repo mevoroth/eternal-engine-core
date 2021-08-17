@@ -6,13 +6,15 @@ namespace Eternal
 {
 	namespace GameDataSystem
 	{
-		enum class CameraProjection : uint32_t
+		enum class LightType : uint32_t
 		{
-			CAMERA_PROJECTION_ORTHOGRAPHIC = 0,
-			CAMERA_PROJECTION_PERSPECTIVE
+			LIGHT_TYPE_DIRECTIONAL = 0,
+			LIGHT_TYPE_POINT,
+			LIGHT_TYPE_SPOTLIGHT,
+			LIGHT_TYPE_AREA
 		};
 
-		class CameraGameData final : public GameData
+		class LightGameData final : public GameData
 		{
 		public:
 			virtual void* InternalLoad(_In_ const GameDataSource& InNode) const override final;
