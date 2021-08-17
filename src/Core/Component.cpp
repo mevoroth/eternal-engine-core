@@ -5,6 +5,7 @@
 #include "Components/TransformComponent.hpp"
 #include "Components/CameraComponent.hpp"
 #include "Components/MeshComponent.hpp"
+#include "Components/LightComponent.hpp"
 
 namespace Eternal
 {
@@ -54,6 +55,8 @@ namespace Eternal
 					if (_ComponentsAdded[ComponentIndex]->_ComponentState.ComponentUpdatesEveryFrame)
 						_ComponentsToUpdate.push_back(_ComponentsAdded[ComponentIndex]);
 
+					_ComponentsAdded[ComponentIndex]->Begin();
+
 					swap(_ComponentsAdded[ComponentIndex], _ComponentsAdded[--ComponentsCount]);
 				}
 			}
@@ -95,9 +98,11 @@ namespace Eternal
 		template void Component::OnAddComponent<TransformComponent>();
 		template void Component::OnAddComponent<MeshComponent>();
 		template void Component::OnAddComponent<CameraComponent>();
+		template void Component::OnAddComponent<LightComponent>();
 
 		template struct ComponentPool<TransformComponent>;
 		template struct ComponentPool<MeshComponent>;
 		template struct ComponentPool<CameraComponent>;
+		template struct ComponentPool<LightComponent>;
 	}
 }
