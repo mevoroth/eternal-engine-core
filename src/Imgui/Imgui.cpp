@@ -551,10 +551,10 @@ namespace Eternal
 					}
 					else
 					{
-						float Left		= (ImguiCommand->ClipRect.x - ClipOffset.x)* ClipScale.x;
-						float Top		= (ImguiCommand->ClipRect.y - ClipOffset.y)* ClipScale.y;
-						float Right		= (ImguiCommand->ClipRect.z - ClipOffset.x)* ClipScale.x;
-						float Bottom	= (ImguiCommand->ClipRect.w - ClipOffset.y)* ClipScale.y;
+						float Left		= (ImguiCommand->ClipRect.x - ClipOffset.x) * ClipScale.x;
+						float Top		= (ImguiCommand->ClipRect.y - ClipOffset.y) * ClipScale.y;
+						float Right		= (ImguiCommand->ClipRect.z - ClipOffset.x) * ClipScale.x;
+						float Bottom	= (ImguiCommand->ClipRect.w - ClipOffset.y) * ClipScale.y;
 
 						// Apply Scissor, Bind texture, Draw
 
