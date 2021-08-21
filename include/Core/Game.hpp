@@ -43,6 +43,7 @@ namespace Eternal
 
 		protected:
 			void Update();
+			void UpdateDebug();
 			void ProcessStreamingPayloads();
 
 			World			_World;

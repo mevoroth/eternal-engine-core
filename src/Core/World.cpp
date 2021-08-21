@@ -22,6 +22,9 @@ namespace Eternal
 
 		void World::Update(_In_ TimeSecondsT InDeltaSeconds)
 		{
+			for (uint32_t LevelIndex = 0; LevelIndex < _Levels.size(); ++LevelIndex)
+				_Levels[LevelIndex]->Update(InDeltaSeconds);
+
 			_UpdateComponents(InDeltaSeconds);
 		}
 
@@ -30,6 +33,12 @@ namespace Eternal
 			ComponentPool<TransformComponent>::Update(InDeltaSeconds);
 			ComponentPool<CameraComponent>::Update(InDeltaSeconds);
 			ComponentPool<LightComponent>::Update(InDeltaSeconds);
+		}
+
+		void World::UpdateDebug()
+		{
+			for (uint32_t LevelIndex = 0; LevelIndex < _Levels.size(); ++LevelIndex)
+				_Levels[LevelIndex]->UpdateDebug();
 		}
 	}
 }

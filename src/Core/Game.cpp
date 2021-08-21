@@ -50,6 +50,7 @@ namespace Eternal
 					ETERNAL_PROFILER(BASIC)("GameState Debug Update");
 					_CurrentGameState->UpdateDebug();
 				}
+				UpdateDebug();
 				GetSystem().EndFrame();
 
 				{
@@ -82,6 +83,13 @@ namespace Eternal
 			_DeltaSeconds	= GetSystem().GetTimer().GetDeltaTimeSeconds();
 			_ElapsedTime	+= _DeltaSeconds;
 			_World.Update(_DeltaSeconds);
+		}
+
+		void Game::UpdateDebug()
+		{
+			ETERNAL_PROFILER(BASIC)();
+
+			_World.UpdateDebug();
 		}
 
 		void Game::ProcessStreamingPayloads()

@@ -24,5 +24,12 @@ namespace Eternal
 		{
 			return static_cast<Level*>(GetParentObject());
 		}
+
+		//////////////////////////////////////////////////////////////////////////
+
+		GameObject::GameObjectState::GameObjectState()
+			: ObjectUpdatesEveryFrame(false)
+		{
+		}
 	}
 }

@@ -5,9 +5,15 @@
 
 namespace Eternal
 {
+	namespace Time
+	{
+		using TimeSecondsT = double;
+	}
+
 	namespace Core
 	{
 		using namespace std;
+		using namespace Eternal::Time;
 
 		class GameObject;
 
@@ -18,10 +24,13 @@ namespace Eternal
 
 			Level();
 
+			void Update(_In_ const TimeSecondsT InDeltaSeconds);
 			virtual void SetWorld(_In_ World* InWorld) override final;
 
 			void AddGameObject(_In_ GameObject* InGameObject);
 			void RemoveGameObject(_In_ GameObject* InGameObject);
+
+			void UpdateDebug();
 
 		private:
 			vector<GameObject*> _GameObjects;

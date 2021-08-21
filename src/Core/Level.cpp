@@ -29,5 +29,17 @@ namespace Eternal
 			InGameObject->SetParent(nullptr);
 			vector<GameObject*>::iterator GameObjectIterator = remove(_GameObjects.begin(), _GameObjects.end(), InGameObject);
 		}
+
+		void Level::Update(_In_ const TimeSecondsT InDeltaSeconds)
+		{
+			for (uint32_t GameObjectIndex = 0; GameObjectIndex < _GameObjects.size(); ++GameObjectIndex)
+				_GameObjects[GameObjectIndex]->Update(InDeltaSeconds);
+		}
+
+		void Level::UpdateDebug()
+		{
+			for (uint32_t GameObjectIndex = 0; GameObjectIndex < _GameObjects.size(); ++GameObjectIndex)
+				_GameObjects[GameObjectIndex]->UpdateDebug();
+		}
 	}
 }

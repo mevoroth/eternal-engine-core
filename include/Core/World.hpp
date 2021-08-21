@@ -32,6 +32,7 @@ namespace Eternal
 			void AddLevel(_In_ Level* InLevel);
 
 			void Update(_In_ TimeSecondsT InDeltaSeconds);
+			void UpdateDebug();
 
 		private:
 			void _UpdateComponents(_In_ TimeSecondsT InDeltaSeconds);
