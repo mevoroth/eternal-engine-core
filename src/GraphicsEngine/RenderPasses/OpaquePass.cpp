@@ -12,9 +12,25 @@ namespace Eternal
 
 		OpaquePass::OpaquePass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 		{
-			ShaderCreateInformation OpaqueVSCreateInformation(ShaderType::VS, "OpaqueVS", "opaque.vs.hlsl");
+			ShaderCreateInformation OpaqueVSCreateInformation(
+				ShaderType::VS, "OpaqueVS", "object.vs.hlsl",
+				{
+					"OBJECT_NEEDS_NORMAL",		"1",
+					"OBJECT_NEEDS_TANGENT",		"1",
+					"OBJECT_NEEDS_BINORMAL",	"1",
+					"OBJECT_NEEDS_UV",			"1"
+				}
+			);
 			Shader* OpaqueVS = InContext.GetShader(OpaqueVSCreateInformation);
-			ShaderCreateInformation OpaquePSCreateInformation(ShaderType::PS, "OpaquePS", "opaque.ps.hlsl");
+			ShaderCreateInformation OpaquePSCreateInformation(
+				ShaderType::PS, "OpaquePS", "opaque.ps.hlsl",
+				{
+					"OBJECT_NEEDS_NORMAL",		"1",
+					"OBJECT_NEEDS_TANGENT",		"1",
+					"OBJECT_NEEDS_BINORMAL",	"1",
+					"OBJECT_NEEDS_UV",			"1"
+				}
+			);
 			Shader* OpaquePS = InContext.GetShader(OpaquePSCreateInformation);
 
 			_OpaqueRootSignature = CreateRootSignature(
