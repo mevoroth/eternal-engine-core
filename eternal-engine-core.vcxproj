@@ -121,8 +121,9 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4189;4100</DisableSpecificWarnings>
-      <PreprocessorDefinitions>ETERNAL_ENABLE_D3D12=1;ETERNAL_PROFILER_USE_VERBOSE=0;ETERNAL_USE_STD_PARALLEL=1;ETERNAL_DEBUG=1;IMGUI_USER_CONFIG="Imgui/ImguiConfig.hpp";FBXSDK_SHARED=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ETERNAL_ENABLE_D3D12=1;ETERNAL_PROFILER_USE_VERBOSE=0;ETERNAL_USE_STD_PARALLEL=1;ETERNAL_DEBUG=1;IMGUI_USER_CONFIG="Imgui/ImguiConfig.hpp";FBXSDK_SHARED=1;NOMINMAX=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>Default</LanguageStandard>
+      <UndefinePreprocessorDefinitions>%(UndefinePreprocessorDefinitions)</UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -182,6 +183,7 @@
     <ClInclude Include="include\GameData\LightGameData.hpp" />
     <ClInclude Include="include\GameData\MeshGameData.hpp" />
     <ClInclude Include="include\GameData\TransformGameData.hpp" />
+    <ClInclude Include="include\GameObjects\CameraGameObject.hpp" />
     <ClInclude Include="include\GraphicsCommand\GraphicsCommandUploadMesh.hpp" />
     <ClInclude Include="include\GraphicsCommand\GraphicsCommandUploadTexture.hpp" />
     <ClInclude Include="include\GraphicsEngine\Renderer.hpp" />
@@ -221,6 +223,7 @@
     <ClCompile Include="src\GameData\LightGameData.cpp" />
     <ClCompile Include="src\GameData\MeshGameData.cpp" />
     <ClCompile Include="src\GameData\TransformGameData.cpp" />
+    <ClCompile Include="src\GameObjects\CameraGameObject.cpp" />
     <ClCompile Include="src\GraphicsCommand\GraphicsCommandUploadMesh.cpp" />
     <ClCompile Include="src\GraphicsCommand\GraphicsCommandUploadTexture.cpp" />
     <ClCompile Include="src\GraphicsEngine\Renderer.cpp" />

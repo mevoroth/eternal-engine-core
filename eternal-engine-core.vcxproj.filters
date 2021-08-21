@@ -46,6 +46,9 @@
     <Filter Include="GraphicsEngine\RenderPasses">
       <UniqueIdentifier>{3f7df8ec-f1cc-4943-a505-c8193287b32d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GameObjects">
+      <UniqueIdentifier>{fc589e1f-563c-4e66-a62a-6c63c909e37c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Game.hpp">
@@ -162,6 +165,9 @@
     <ClInclude Include="include\GraphicsCommand\GraphicsCommandUploadTexture.hpp">
       <Filter>GraphicsCommand</Filter>
     </ClInclude>
+    <ClInclude Include="include\GameObjects\CameraGameObject.hpp">
+      <Filter>GameObjects</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Game.cpp">
@@ -266,6 +272,9 @@
     </ClCompile>
     <ClCompile Include="src\GraphicsCommand\GraphicsCommandUploadTexture.cpp">
       <Filter>GraphicsCommand</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GameObjects\CameraGameObject.cpp">
+      <Filter>GameObjects</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
