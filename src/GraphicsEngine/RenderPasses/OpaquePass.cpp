@@ -33,7 +33,7 @@ namespace Eternal
 			);
 			Shader* OpaquePS = InContext.GetShader(OpaquePSCreateInformation);
 
-			_OpaqueRootSignature = CreateRootSignature(
+			_RootSignature = CreateRootSignature(
 				InContext,
 				RootSignatureCreateInformation(
 					{
@@ -48,7 +48,7 @@ namespace Eternal
 					/*InHasInputAssembler=*/ true
 				)
 			);
-			_OpaqueDescriptorTable = _OpaqueRootSignature->CreateRootDescriptorTable(InContext);
+			_OpaqueDescriptorTable = _RootSignature->CreateRootDescriptorTable(InContext);
 			
 			_OpaqueInputLayout = CreateInputLayout(
 				InContext,
@@ -79,22 +79,20 @@ namespace Eternal
 			);
 
 			GraphicsPipelineCreateInformation OpaquePipelineCreateInformation(
-				*_OpaqueRootSignature,
+				*_RootSignature,
 				_OpaqueInputLayout,
 				_OpaqueRenderPass,
 				OpaqueVS, OpaquePS,
-				DepthStencilTestWriteGreaterNone
+				DepthStencilTestWriteNone
 			);
-			_OpaquePipeline = CreatePipeline(InContext, OpaquePipelineCreateInformation);
+			_Pipeline = CreatePipeline(InContext, OpaquePipelineCreateInformation);
 		}
 
 		OpaquePass::~OpaquePass()
 		{
-			DestroyPipeline(_OpaquePipeline);
 			DestroyRenderPass(_OpaqueRenderPass);
 			DestroyInputLayout(_OpaqueInputLayout);
 			DestroyDescriptorTable(_OpaqueDescriptorTable);
-			DestroyRootSignature(_OpaqueRootSignature);
 		}
 
 		void OpaquePass::Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer)
@@ -109,7 +107,7 @@ namespace Eternal
 
 			OpaqueCommandList->Begin(InContext);
 			OpaqueCommandList->BeginRenderPass(*_OpaqueRenderPass);
-			OpaqueCommandList->SetGraphicsPipeline(*_OpaquePipeline);
+			OpaqueCommandList->SetGraphicsPipeline(*_Pipeline);
 
 			_OpaqueDescriptorTable->SetDescriptor(1, InRenderer.GetGlobalResources().GetViewConstantBufferView());
 			_OpaqueDescriptorTable->SetDescriptor(5, InContext.GetBilinearClampSampler());

@@ -33,9 +33,15 @@ namespace Eternal
 		{
 		public:
 
-			virtual ~Pass() {}
+			virtual ~Pass();
 
 			virtual void Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer) = 0;
+
+		protected:
+
+			RootSignature*	_RootSignature	= nullptr;
+			Pipeline*		_Pipeline		= nullptr;
+
 		};
 	}
 }

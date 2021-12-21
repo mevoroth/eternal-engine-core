@@ -11,7 +11,7 @@ namespace Eternal
 			ShaderCreateInformation SampleTexturePSCreateInformation(ShaderType::PS, "SampleTexturePS", "sampletexture.ps.hlsl");
 			Shader* SampleTexturePS = InContext.GetShader(SampleTexturePSCreateInformation);
 
-			_PresentRootSignature = CreateRootSignature(
+			_RootSignature = CreateRootSignature(
 				InContext,
 				RootSignatureCreateInformation(
 					{
@@ -21,17 +21,22 @@ namespace Eternal
 				)
 			);
 
-			_PresentDescriptorTable = _PresentRootSignature->CreateRootDescriptorTable(InContext);
+			_PresentDescriptorTable = _RootSignature->CreateRootDescriptorTable(InContext);
 
-			_PresentPipeline = CreatePipeline(
+			_Pipeline = CreatePipeline(
 				InContext,
 				GraphicsPipelineCreateInformation(
-					*_PresentRootSignature,
+					*_RootSignature,
 					InContext.GetEmptyInputLayout(),
 					InContext.GetBackBufferRenderPass(),
 					ScreenVS, SampleTexturePS
 				)
 			);
+		}
+
+		PresentPass::~PresentPass()
+		{
+			DestroyDescriptorTable(_PresentDescriptorTable);
 		}
 
 		void PresentPass::Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer)
@@ -47,7 +52,7 @@ namespace Eternal
 				ResourceTransitionScope LuminanceToCopySourceScope(*PresentCommandList, &LuminanceToCopySource, 1);
 
 				PresentCommandList->BeginRenderPass(InContext.GetCurrentFrameBackBufferRenderPass());
-				PresentCommandList->SetGraphicsPipeline(*_PresentPipeline);
+				PresentCommandList->SetGraphicsPipeline(*_Pipeline);
 				PresentCommandList->SetGraphicsDescriptorTable(InContext, *_PresentDescriptorTable);
 				PresentCommandList->DrawInstanced(6);
 				PresentCommandList->EndRenderPass();
