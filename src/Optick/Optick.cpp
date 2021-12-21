@@ -31,6 +31,7 @@ namespace Eternal
 //				OPTICK_GPU_INIT_D3D12(InD3DDevice, InCommandQueues, ETERNAL_ARRAYSIZE(InCommandQueues));
 //			} break;
 //#endif
+//#ifdef ETERNAL_ENABLE_VULKAN
 //			case DeviceType::VULKAN:
 //			{
 //				VulkanDevice& InDevice					= static_cast<VulkanDevice&>(InContext.GetDevice());
@@ -70,6 +71,7 @@ namespace Eternal
 //
 //				OPTICK_GPU_INIT_VULKAN(InVkDevices, InVkPhysicalDevices, InCommandQueues, QueueFamilies.data(), ETERNAL_ARRAYSIZE(InCommandQueues), &VkFunctions);
 //			} break;
+//#endif
 //			default:
 //			{
 //				ETERNAL_BREAK();
