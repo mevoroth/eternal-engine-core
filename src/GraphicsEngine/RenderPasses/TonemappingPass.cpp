@@ -29,7 +29,7 @@ namespace Eternal
 			);
 			Shader* TonemappingCS = InContext.GetShader(TonemappingCSCreateInformation);
 
-			_TonemappingRootSignature = CreateRootSignature(
+			_RootSignature = CreateRootSignature(
 				InContext,
 				RootSignatureCreateInformation(
 					{
@@ -39,12 +39,12 @@ namespace Eternal
 				)
 			);
 
-			_TonemappingDescriptorTable = _TonemappingRootSignature->CreateRootDescriptorTable(InContext);
+			_TonemappingDescriptorTable = _RootSignature->CreateRootDescriptorTable(InContext);
 
-			_TonemappingPipeline = CreatePipeline(
+			_Pipeline = CreatePipeline(
 				InContext,
 				ComputePipelineCreateInformation(
-					*_TonemappingRootSignature,
+					*_RootSignature,
 					TonemappingCS
 				)
 			);
@@ -52,24 +52,21 @@ namespace Eternal
 
 		TonemappingPass::~TonemappingPass()
 		{
-			DestroyPipeline(_TonemappingPipeline);
 			DestroyDescriptorTable(_TonemappingDescriptorTable);
-			DestroyRootSignature(_TonemappingRootSignature);
 		}
 
 		void TonemappingPass::Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer)
 		{
-			CommandList* TonemappingCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "Tonemapping");
+			CommandListScope TonemappingCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "Tonemapping");
 
-			TonemappingCommandList->Begin(InContext);
+			_TonemappingDescriptorTable->SetDescriptor(0, InRenderer.GetGlobalResources().GetViewConstantBufferView());
+			_TonemappingDescriptorTable->SetDescriptor(1, InRenderer.GetGlobalResources().GetGBufferLuminance().GetUnorderedAccessView());
+
 			{
 				ResourceTransition LuminanceToUnorderedAccess(InRenderer.GetGlobalResources().GetGBufferLuminance().GetUnorderedAccessView(), TransitionState::TRANSITION_SHADER_WRITE);
 				ResourceTransitionScope TonemappingTransitionScope(*TonemappingCommandList, &LuminanceToUnorderedAccess, 1);
 
-				_TonemappingDescriptorTable->SetDescriptor(0, InRenderer.GetGlobalResources().GetViewConstantBufferView());
-				_TonemappingDescriptorTable->SetDescriptor(1, InRenderer.GetGlobalResources().GetGBufferLuminance().GetUnorderedAccessView());
-
-				TonemappingCommandList->SetComputePipeline(*_TonemappingPipeline);
+				TonemappingCommandList->SetComputePipeline(*_Pipeline);
 				TonemappingCommandList->SetComputeDescriptorTable(InContext, *_TonemappingDescriptorTable);
 				TonemappingCommandList->Dispatch(
 					Math::DivideRoundUp(InContext.GetWindow().GetWidth(), ThreadGroupCountX),
@@ -77,7 +74,6 @@ namespace Eternal
 					1
 				);
 			}
-			TonemappingCommandList->End();
 		}
 	}
 }

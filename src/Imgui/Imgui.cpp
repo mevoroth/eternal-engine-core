@@ -347,9 +347,8 @@ namespace Eternal
 					memcpy(UploadBufferMapScope.GetDataPointer(), _ImguiFontMetaData.Pixels, UploadBufferSize);
 				}
 
-				CommandList* UploadFontCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "CopyImguiFontFromCPUToGPU");
+				CommandListScope UploadFontCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "CopyImguiFontFromCPUToGPU");
 
-				UploadFontCommandList->Begin(InContext);
 				CopyRegion ImguiFontCopyRegion(
 					TextureFromBufferRegion(
 						Extent3D(_ImguiFontMetaData.Width, _ImguiFontMetaData.Height),
@@ -359,7 +358,6 @@ namespace Eternal
 				UploadFontCommandList->CopyResource(*_ImguiFontTexture, *ImguiFontUploadTexture, ImguiFontCopyRegion);
 				ResourceTransition TransitionToShaderRead(_ImguiFontTexture, TransitionState::TRANSITION_PIXEL_SHADER_READ);
 				UploadFontCommandList->Transition(&TransitionToShaderRead, 1);
-				UploadFontCommandList->End();
 
 				_ImguiFontMetaData.Pixels = nullptr;
 			}
@@ -383,7 +381,7 @@ namespace Eternal
 
 			_ImGui_FillBuffers(ImguiDrawData, RenderContext);
 
-			CommandList* ImguiCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "RenderImgui");
+			CommandListScope ImguiCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "RenderImgui");
 
 			ResourceTransition Transitions[] =
 			{
@@ -391,7 +389,6 @@ namespace Eternal
 				ResourceTransition(*_ImguiVertexBuffer,	TransitionState::TRANSITION_VERTEX_BUFFER_READ)
 			};
 
-			ImguiCommandList->Begin(InContext);
 			{
 				ImguiCommandList->BeginRenderPass(*_ImguiRenderPass);
 				ImguiCommandList->SetGraphicsPipeline(*_ImguiPipeline);
@@ -400,7 +397,6 @@ namespace Eternal
 
 				ImguiCommandList->EndRenderPass();
 			}
-			ImguiCommandList->End();
 
 			(*_ImguiConstantBuffer)->Unmap(ProjectionMapRange);
 			(*_ImguiVertexBuffer)->Unmap(VerticesMapRange);

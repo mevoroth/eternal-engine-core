@@ -226,6 +226,7 @@
     <ClCompile Include="src\GameObjects\CameraGameObject.cpp" />
     <ClCompile Include="src\GraphicsCommand\GraphicsCommandUploadMesh.cpp" />
     <ClCompile Include="src\GraphicsCommand\GraphicsCommandUploadTexture.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Pass.cpp" />
     <ClCompile Include="src\GraphicsEngine\Renderer.cpp" />
     <ClCompile Include="src\GraphicsEngine\RenderPasses\DirectLightingPass.cpp" />
     <ClCompile Include="src\GraphicsEngine\RenderPasses\OpaquePass.cpp" />

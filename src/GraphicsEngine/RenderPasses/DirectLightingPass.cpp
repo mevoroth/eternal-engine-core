@@ -19,7 +19,7 @@ namespace Eternal
 			ShaderCreateInformation DirectLightingPSCreateInformation(ShaderType::PS, "DirectLightingPS", "directlighting.ps.hlsl");
 			Shader* DirectLightingPS = InContext.GetShader(DirectLightingPSCreateInformation);
 
-			_DirectLightingRootSignature = CreateRootSignature(
+			_RootSignature = CreateRootSignature(
 				InContext,
 				RootSignatureCreateInformation(
 					{
@@ -35,7 +35,7 @@ namespace Eternal
 				)
 			);
 
-			_DirectLightingDescriptorTable = _DirectLightingRootSignature->CreateRootDescriptorTable(InContext);
+			_DirectLightingDescriptorTable = _RootSignature->CreateRootDescriptorTable(InContext);
 
 			_DirectLightingRenderPass = CreateRenderPass(
 				InContext,
@@ -47,10 +47,10 @@ namespace Eternal
 				)
 			);
 
-			_DirectLightingPipeline = CreatePipeline(
+			_Pipeline = CreatePipeline(
 				InContext,
 				GraphicsPipelineCreateInformation(
-					*_DirectLightingRootSignature,
+					*_RootSignature,
 					InContext.GetEmptyInputLayout(),
 					_DirectLightingRenderPass,
 					ScreenVS,
@@ -117,15 +117,13 @@ namespace Eternal
 
 		DirectLightingPass::~DirectLightingPass()
 		{
-			DestroyPipeline(_DirectLightingPipeline);
 			DestroyRenderPass(_DirectLightingRenderPass);
 			DestroyDescriptorTable(_DirectLightingDescriptorTable);
-			DestroyRootSignature(_DirectLightingRootSignature);
 		}
 
 		void DirectLightingPass::Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer)
 		{
-			CommandList* DirectLightingCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "DirectLighting");
+			CommandListScope DirectLightingCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "DirectLighting");
 
 			const vector<Light*>& Lights = InSystem.GetRenderFrame().Lights;
 			{
@@ -160,7 +158,6 @@ namespace Eternal
 			_DirectLightingDescriptorTable->SetDescriptor(6, DirectLightingLightsBufferView);
 			_DirectLightingDescriptorTable->SetDescriptor(7, InContext.GetPointClampSampler());
 
-			DirectLightingCommandList->Begin(InContext);
 			{
 				ResourceTransition Transitions[] =
 				{
@@ -172,12 +169,11 @@ namespace Eternal
 				ResourceTransitionScope GBufferToShaderReadScope(*DirectLightingCommandList, Transitions, ETERNAL_ARRAYSIZE(Transitions));
 
 				DirectLightingCommandList->BeginRenderPass(*_DirectLightingRenderPass);
-				DirectLightingCommandList->SetGraphicsPipeline(*_DirectLightingPipeline);
+				DirectLightingCommandList->SetGraphicsPipeline(*_Pipeline);
 				DirectLightingCommandList->SetGraphicsDescriptorTable(InContext, *_DirectLightingDescriptorTable);
 				DirectLightingCommandList->DrawInstanced(6);
 				DirectLightingCommandList->EndRenderPass();
 			}
-			DirectLightingCommandList->End();
 		}
 	}
 }

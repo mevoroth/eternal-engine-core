@@ -18,9 +18,7 @@ namespace Eternal
 
 		private:
 			
-			RootSignature*				_DirectLightingRootSignature		= nullptr;
 			RenderPass*					_DirectLightingRenderPass			= nullptr;
-			Pipeline*					_DirectLightingPipeline				= nullptr;
 			DescriptorTable*			_DirectLightingDescriptorTable		= nullptr;
 
 			MultiBuffered<Resource>*	_DirectLightingConstantBuffer		= nullptr;

@@ -16,8 +16,6 @@ namespace Eternal
 
 		private:
 
-			RootSignature* _TonemappingRootSignature		= nullptr;
-			Pipeline* _TonemappingPipeline					= nullptr;
 			DescriptorTable* _TonemappingDescriptorTable	= nullptr;
 
 		};
