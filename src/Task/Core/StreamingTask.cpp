@@ -35,6 +35,7 @@ namespace Eternal
 					Payload*& LastPayload = InOutStreamingPayloads[QueueType].back();
 					Loader->LoadPayload(Requests[RequestIndex], LastPayload);
 
+					ETERNAL_ASSERT(LastPayload);
 					_ProcessQueues(LastPayload->AdditionalRequests, InOutStreamingPayloads);
 
 					delete Requests[RequestIndex];

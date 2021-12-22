@@ -24,6 +24,7 @@ namespace Eternal
 		{
 			ETERNAL_PROFILER(BASIC)();
 			OutPayload = _ImportLevel->Import(InRequest->RequestPath);
+			ETERNAL_ASSERT(OutPayload);
 			LogWrite(LogInfo, LogImport, string("Loaded [") + InRequest->RequestPath + "]");
 		}
 
