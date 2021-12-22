@@ -103,9 +103,8 @@ namespace Eternal
 			if (MeshCollections.size() == 0)
 				return;
 
-			CommandList* OpaqueCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "OpaquePass");
+			CommandListScope OpaqueCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "OpaquePass");
 
-			OpaqueCommandList->Begin(InContext);
 			OpaqueCommandList->BeginRenderPass(*_OpaqueRenderPass);
 			OpaqueCommandList->SetGraphicsPipeline(*_Pipeline);
 
@@ -139,7 +138,6 @@ namespace Eternal
 			}
 			
 			OpaqueCommandList->EndRenderPass();
-			OpaqueCommandList->End();
 		}
 
 	}

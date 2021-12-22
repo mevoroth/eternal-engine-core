@@ -123,7 +123,7 @@ namespace Eternal
 
 		void DirectLightingPass::Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer)
 		{
-			CommandList* DirectLightingCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "DirectLighting");
+			CommandListScope DirectLightingCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "DirectLighting");
 
 			const vector<Light*>& Lights = InSystem.GetRenderFrame().Lights;
 			{
@@ -158,7 +158,6 @@ namespace Eternal
 			_DirectLightingDescriptorTable->SetDescriptor(6, DirectLightingLightsBufferView);
 			_DirectLightingDescriptorTable->SetDescriptor(7, InContext.GetPointClampSampler());
 
-			DirectLightingCommandList->Begin(InContext);
 			{
 				ResourceTransition Transitions[] =
 				{
@@ -175,7 +174,6 @@ namespace Eternal
 				DirectLightingCommandList->DrawInstanced(6);
 				DirectLightingCommandList->EndRenderPass();
 			}
-			DirectLightingCommandList->End();
 		}
 	}
 }

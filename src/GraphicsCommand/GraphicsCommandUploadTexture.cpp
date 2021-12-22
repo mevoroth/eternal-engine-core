@@ -22,8 +22,7 @@ namespace Eternal
 
 			if (!Cache.CachedTexture)
 			{
-				CommandList* UploadTextureCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "GraphicsCommandUploadTexture");
-				UploadTextureCommandList->Begin(InContext);
+				CommandListScope UploadTextureCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "GraphicsCommandUploadTexture");
 
 				//////////////////////////////////////////////////////////////////////////
 				// CPU Buffer
@@ -95,8 +94,6 @@ namespace Eternal
 				UploadTextureCommandList->Transition(
 					&TextureCopyWriteToShaderResource, 1
 				);
-
-				UploadTextureCommandList->End();
 			}
 
 			if (_Payload.MaterialToUpdate.MaterialToUpdate)

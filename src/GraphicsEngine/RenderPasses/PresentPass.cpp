@@ -41,12 +41,11 @@ namespace Eternal
 
 		void PresentPass::Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer)
 		{
-			CommandList* PresentCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "Present");
+			CommandListScope PresentCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "Present");
 
 			_PresentDescriptorTable->SetDescriptor(0, InRenderer.GetGlobalResources().GetGBufferLuminance().GetShaderResourceView());
 			_PresentDescriptorTable->SetDescriptor(1, InContext.GetPointClampSampler());
 
-			PresentCommandList->Begin(InContext);
 			{
 				ResourceTransition LuminanceToCopySource(InRenderer.GetGlobalResources().GetGBufferLuminance().GetShaderResourceView(), TransitionState::TRANSITION_PIXEL_SHADER_READ);
 				ResourceTransitionScope LuminanceToCopySourceScope(*PresentCommandList, &LuminanceToCopySource, 1);
@@ -57,7 +56,6 @@ namespace Eternal
 				PresentCommandList->DrawInstanced(6);
 				PresentCommandList->EndRenderPass();
 			}
-			PresentCommandList->End();
 		}
 	}
 }
