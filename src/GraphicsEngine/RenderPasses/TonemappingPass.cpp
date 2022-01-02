@@ -57,7 +57,7 @@ namespace Eternal
 
 		void TonemappingPass::Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer)
 		{
-			CommandListScope TonemappingCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "Tonemapping");
+			CommandListScope TonemappingCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "Tonemapping");
 
 			_TonemappingDescriptorTable->SetDescriptor(0, InRenderer.GetGlobalResources().GetViewConstantBufferView());
 			_TonemappingDescriptorTable->SetDescriptor(1, InRenderer.GetGlobalResources().GetGBufferLuminance().GetUnorderedAccessView());

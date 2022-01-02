@@ -10,18 +10,10 @@ namespace Eternal
 	{
 		using namespace Eternal::GraphicData;
 
+		static constexpr bool UseMeshPipeline = false;
+
 		OpaquePass::OpaquePass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 		{
-			ShaderCreateInformation OpaqueVSCreateInformation(
-				ShaderType::VS, "OpaqueVS", "object.vs.hlsl",
-				{
-					"OBJECT_NEEDS_NORMAL",		"1",
-					"OBJECT_NEEDS_TANGENT",		"1",
-					"OBJECT_NEEDS_BINORMAL",	"1",
-					"OBJECT_NEEDS_UV",			"1"
-				}
-			);
-			Shader* OpaqueVS = InContext.GetShader(OpaqueVSCreateInformation);
 			ShaderCreateInformation OpaquePSCreateInformation(
 				ShaderType::PS, "OpaquePS", "opaque.ps.hlsl",
 				{
@@ -78,14 +70,40 @@ namespace Eternal
 				)
 			);
 
-			GraphicsPipelineCreateInformation OpaquePipelineCreateInformation(
-				*_RootSignature,
-				_OpaqueInputLayout,
-				_OpaqueRenderPass,
-				OpaqueVS, OpaquePS,
-				DepthStencilTestWriteNone
-			);
-			_Pipeline = CreatePipeline(InContext, OpaquePipelineCreateInformation);
+			if (UseMeshPipeline)
+			{
+				ShaderCreateInformation OpaqueMSCreateInformation(
+					ShaderType::MS, "OpaqueMS", "object.ms.hlsl"
+				);
+				Shader* OpaqueMS = InContext.GetShader(OpaqueMSCreateInformation);
+				//MeshPipelineCreateInformation OpaquePipelineCreateInformation(
+				//	*_RootSignature,
+				//	_OpaqueRenderPass,
+
+				//);
+			}
+			else
+			{
+				ShaderCreateInformation OpaqueVSCreateInformation(
+					ShaderType::VS, "OpaqueVS", "object.vs.hlsl",
+					{
+						"OBJECT_NEEDS_NORMAL",		"1",
+						"OBJECT_NEEDS_TANGENT",		"1",
+						"OBJECT_NEEDS_BINORMAL",	"1",
+						"OBJECT_NEEDS_UV",			"1"
+					}
+				);
+				Shader* OpaqueVS = InContext.GetShader(OpaqueVSCreateInformation);
+
+				GraphicsPipelineCreateInformation OpaquePipelineCreateInformation(
+					*_RootSignature,
+					_OpaqueInputLayout,
+					_OpaqueRenderPass,
+					OpaqueVS, OpaquePS,
+					DepthStencilTestWriteNone
+				);
+				_Pipeline = CreatePipeline(InContext, OpaquePipelineCreateInformation);
+			}
 		}
 
 		OpaquePass::~OpaquePass()
@@ -103,9 +121,8 @@ namespace Eternal
 			if (MeshCollections.size() == 0)
 				return;
 
-			CommandListScope OpaqueCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "OpaquePass");
+			GraphicsCommandListScope OpaqueCommandList = InContext.CreateNewGraphicsCommandList(*_OpaqueRenderPass, "OpaquePass");
 
-			OpaqueCommandList->BeginRenderPass(*_OpaqueRenderPass);
 			OpaqueCommandList->SetGraphicsPipeline(*_Pipeline);
 
 			_OpaqueDescriptorTable->SetDescriptor(1, InRenderer.GetGlobalResources().GetViewConstantBufferView());
@@ -136,8 +153,6 @@ namespace Eternal
 					}
 				}
 			}
-			
-			OpaqueCommandList->EndRenderPass();
 		}
 
 	}
