@@ -27,5 +27,5 @@
 #include "Parallel/ThreadLocalStorage.hpp"
 
 struct ImGuiContext;
-extern ETERNAL_THREAD_LOCAL ImGuiContext* ThreadLocalImGui;
-#define GImGui	ThreadLocalImGui
+extern ImGuiContext* ThreadLocalImGui;
+//#define GImGui	ThreadLocalImGui

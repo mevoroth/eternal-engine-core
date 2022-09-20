@@ -127,8 +127,7 @@ namespace Eternal
 				Sleep(10);
 			}
 			GetParallelSystem().StartFrame();
-			GetImgui().SetContext(CurrentGameFrame.ImguiFrameContext);
-			GetImgui().Begin();
+			GetImgui().Begin(CurrentGameFrame.ImguiFrameContext);
 			GetStreaming().GatherPayloads();
 			// Delayed payloads delete
 			{
@@ -170,9 +169,7 @@ namespace Eternal
 			GfxContext.BeginFrame();
 
 			GetRenderer().Render(GfxContext, *this);
-
-			GetImgui().SetContext(CurrentRenderFrame.ImguiFrameContext);
-			GetImgui().Render(GfxContext);
+			GetImgui().Render(GfxContext, CurrentRenderFrame.ImguiFrameContext);
 
 			GetRenderer().Present(GfxContext, *this);
 
@@ -182,8 +179,10 @@ namespace Eternal
 		void System::EndFrame()
 		{
 			ETERNAL_PROFILER(BASIC)();
+			SystemFrame& CurrentGameFrame = GetGameFrame();
+
 			GetStreaming().CommitRequests();
-			GetImgui().End();
+			GetImgui().End(CurrentGameFrame.ImguiFrameContext);
 			GetParallelSystem().EndFrame();
 			GetGameFrame().SystemState->Store(SystemCanBeRendered);
 			AdvanceGame();

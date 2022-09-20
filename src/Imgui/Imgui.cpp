@@ -45,6 +45,13 @@ namespace Eternal
 			uint32_t					ImguiIndicesSize		= 0;
 		};
 
+		void ImguiContext::Reset()
+		{
+			for (int CmdListIndex = 0; CmdListIndex < DrawDataBuilderLayer0.size(); ++CmdListIndex)
+				IM_DELETE(DrawDataBuilderLayer0[CmdListIndex]);
+			DrawDataBuilderLayer0.shrink(0);
+		}
+
 		Imgui::Imgui(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer, _In_ Input* InInput)
 			: _Input(InInput)
 		{
@@ -231,7 +238,7 @@ namespace Eternal
 
 		ImguiContext Imgui::CreateContext(_In_ GraphicsContext& InContext)
 		{
-			ImguiContext Context = { ImGui::GetCurrentContext() ? ImGui::GetCurrentContext() : ImGui::CreateContext() };
+			ImguiContext Context = { ImGui::GetCurrentContext() };// ? ImGui::GetCurrentContext() : ImGui::CreateContext() };
 
 			ImGuiIO& IO = ImGui::GetIO();
 			IO.BackendPlatformName	= "PC";
@@ -283,14 +290,9 @@ namespace Eternal
 			);
 			IO.Fonts->SetTexID(reinterpret_cast<ImTextureID>(_ImguiFontTextureView));
 
-			ImGui::SetCurrentContext(nullptr);
+			//ImGui::SetCurrentContext(nullptr);
 
 			return Context;
-		}
-
-		void Imgui::SetContext(_In_ const ImguiContext& InContext)
-		{
-			ImGui::SetCurrentContext(InContext.Context);
 		}
 
 		void Imgui::DestroyContext(_In_ const ImguiContext& InContext)
@@ -298,23 +300,34 @@ namespace Eternal
 			ImGui::DestroyContext(InContext.Context);
 		}
 
-		void Imgui::Begin()
+		void Imgui::Begin(_In_ const ImguiContext& InContext)
 		{
+			ImGui::SetCurrentContext(InContext.Context);
+
 			_UpdateInputs();
 
 			ImGui::NewFrame();
 		}
 
-		void Imgui::End()
+		void Imgui::End(_In_ ImguiContext& InContext)
 		{
 			ImGui::Render();
+			
+			InContext.Reset();
+
+			ImDrawData* DrawData = ImGui::GetDrawData();
+			memcpy(&InContext.DrawData, DrawData, sizeof(ImDrawData));
+			InContext.DrawDataBuilderLayer0.resize(InContext.DrawData.CmdListsCount);
+			for (int CmdListIndex = 0; CmdListIndex < InContext.DrawData.CmdListsCount; ++CmdListIndex)
+				InContext.DrawDataBuilderLayer0[CmdListIndex] = InContext.DrawData.CmdLists[CmdListIndex]->CloneOutput();
+			InContext.DrawData.CmdLists = InContext.DrawDataBuilderLayer0.Data;
 		}
 
-		void Imgui::Render(_In_ GraphicsContext& InContext)
+		void Imgui::Render(_In_ GraphicsContext& InContext, _In_ const ImguiContext& InImguiContext)
 		{
 			ETERNAL_PROFILER(BASIC)();
 			_UploadFontTexture(InContext);
-			_Render(InContext);
+			_Render(InContext, InImguiContext);
 		}
 
 		void Imgui::_UploadFontTexture(_In_ GraphicsContext& InContext)
@@ -363,10 +376,10 @@ namespace Eternal
 			}
 		}
 
-		void Imgui::_Render(_In_ GraphicsContext& InContext)
+		void Imgui::_Render(_In_ GraphicsContext& InContext, _In_ const ImguiContext& InImguiContext)
 		{
-			ImDrawData* ImguiDrawData = ImGui::GetDrawData();
-			if (ImguiDrawData->DisplaySize.x <= 0 || ImguiDrawData->DisplaySize.y <= 0)
+			const ImDrawData& ImguiDrawData = InImguiContext.DrawData;
+			if (ImguiDrawData.DisplaySize.x <= 0 || ImguiDrawData.DisplaySize.y <= 0)
 				return;
 
 			ImguiRenderContext RenderContext;
@@ -449,11 +462,11 @@ namespace Eternal
 			_ProcessInputCharacter('/',					Input::Input::KPDIV);
 		}
 
-		void Imgui::_ImGui_FillBuffers(_In_ ImDrawData* DrawData, _In_ ImguiRenderContext& InImguiContext)
+		void Imgui::_ImGui_FillBuffers(_In_ const ImDrawData& InDrawData, _In_ ImguiRenderContext& InImguiContext)
 		{
-			for (int DrawListIndex = 0; DrawListIndex < DrawData->CmdListsCount; ++DrawListIndex)
+			for (int DrawListIndex = 0; DrawListIndex < InDrawData.CmdListsCount; ++DrawListIndex)
 			{
-				const ImDrawList* ImguiDrawList = DrawData->CmdLists[DrawListIndex];
+				const ImDrawList* ImguiDrawList = InDrawData.CmdLists[DrawListIndex];
 				memcpy(InImguiContext.GetVerticesPointer(), ImguiDrawList->VtxBuffer.Data, ImguiDrawList->VtxBuffer.Size * sizeof(ImDrawVert));
 				memcpy(InImguiContext.GetIndicesPointer(), ImguiDrawList->IdxBuffer.Data, ImguiDrawList->IdxBuffer.Size * sizeof(ImDrawIdx));
 
@@ -462,21 +475,21 @@ namespace Eternal
 			}
 		}
 
-		void Imgui::_ImGui_SetupRenderState(_In_ ImDrawData* InDrawData, _In_ ImguiRenderContext& InImguiContext, _In_ GraphicsContext& InContext, _In_ CommandList* InImguiCommandList)
+		void Imgui::_ImGui_SetupRenderState(_In_ const ImDrawData& InDrawData, _In_ ImguiRenderContext& InImguiContext, _In_ GraphicsContext& InContext, _In_ CommandList* InImguiCommandList)
 		{
 			Viewport* ImguiViewport = CreateViewport(
 				InContext,
-				static_cast<int32_t>(InDrawData->DisplaySize.x),
-				static_cast<int32_t>(InDrawData->DisplaySize.y)
+				static_cast<int32_t>(InDrawData.DisplaySize.x),
+				static_cast<int32_t>(InDrawData.DisplaySize.y)
 			);
 			InImguiCommandList->SetViewport(*ImguiViewport);
 			delete ImguiViewport;
 			ImguiViewport = nullptr;
 
-			float Left		= InDrawData->DisplayPos.x;
-			float Right		= InDrawData->DisplayPos.x + InDrawData->DisplaySize.x;
-			float Top		= InDrawData->DisplayPos.y;
-			float Bottom	= InDrawData->DisplayPos.y + InDrawData->DisplaySize.y;
+			float Left		= InDrawData.DisplayPos.x;
+			float Right		= InDrawData.DisplayPos.x + InDrawData.DisplaySize.x;
+			float Top		= InDrawData.DisplayPos.y;
+			float Bottom	= InDrawData.DisplayPos.y + InDrawData.DisplaySize.y;
 
 			ImguiProjectionConstants& Constants = InImguiContext.ImguiConstantsPointer[InImguiContext.ImguiProjectionCount];
 			Constants.ProjectionMatrix = Matrix4x4(
@@ -511,10 +524,10 @@ namespace Eternal
 			//ctx->OMSetBlendFactor(blend_factor);
 		}
 
-		void Imgui::_ImGui_Render(_In_ ImDrawData* InDrawData, _In_ ImguiRenderContext& InImguiContext, _In_ GraphicsContext& InContext, _In_ CommandList* InImguiCommandList)
+		void Imgui::_ImGui_Render(_In_ const ImDrawData& InDrawData, _In_ ImguiRenderContext& InImguiContext, _In_ GraphicsContext& InContext, _In_ CommandList* InImguiCommandList)
 		{
-			int ViewportWidth = (int)(InDrawData->DisplaySize.x * InDrawData->FramebufferScale.x);
-			int ViewportHeight = (int)(InDrawData->DisplaySize.y * InDrawData->FramebufferScale.y);
+			int ViewportWidth = (int)(InDrawData.DisplaySize.x * InDrawData.FramebufferScale.x);
+			int ViewportHeight = (int)(InDrawData.DisplaySize.y * InDrawData.FramebufferScale.y);
 			if (ViewportWidth <= 0 || ViewportHeight <= 0)
 				return;
 
@@ -527,12 +540,12 @@ namespace Eternal
 
 			int GlobalVertexOffset = 0;
 			int GlobalIndexOffset = 0;
-			ImVec2 ClipOffset = InDrawData->DisplayPos;
-			ImVec2 ClipScale = InDrawData->FramebufferScale;
+			ImVec2 ClipOffset = InDrawData.DisplayPos;
+			ImVec2 ClipScale = InDrawData.FramebufferScale;
 
-			for (int DrawListIndex = 0; DrawListIndex < InDrawData->CmdListsCount; ++DrawListIndex)
+			for (int DrawListIndex = 0; DrawListIndex < InDrawData.CmdListsCount; ++DrawListIndex)
 			{
-				const ImDrawList* ImguiDrawList = InDrawData->CmdLists[DrawListIndex];
+				const ImDrawList* ImguiDrawList = InDrawData.CmdLists[DrawListIndex];
 				for (int CommandIndex = 0; CommandIndex < ImguiDrawList->CmdBuffer.Size; ++CommandIndex)
 				{
 					const ImDrawCmd* ImguiCommand = &ImguiDrawList->CmdBuffer[CommandIndex];

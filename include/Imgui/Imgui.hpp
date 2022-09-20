@@ -6,6 +6,7 @@
 
 enum ImGuiKey_;
 struct ImDrawData;
+struct ImDrawList;
 
 namespace Eternal
 {
@@ -24,7 +25,16 @@ namespace Eternal
 
 		struct ImguiContext
 		{
+			~ImguiContext()
+			{
+				Reset();
+			}
+
 			ImGuiContext* Context = nullptr;
+			ImDrawData DrawData;
+			ImVector<ImDrawList*> DrawDataBuilderLayer0;
+
+			void Reset();
 		};
 
 		class Imgui
@@ -37,26 +47,26 @@ namespace Eternal
 			Imgui(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer, _In_ Input* InInput);
 			~Imgui();
 
-			void Begin();
-			void End();
+			void Begin(_In_ const ImguiContext& InContext);
+			void End(_In_ ImguiContext& InContext);
 
 			ImguiContext CreateContext(_In_ GraphicsContext& InContext);
-			void SetContext(_In_ const ImguiContext& InContext);
 			void DestroyContext(_In_ const ImguiContext& InContext);
 
-			void Render(_In_ GraphicsContext& InContext);
+			void Render(_In_ GraphicsContext& InContext, _In_ const ImguiContext& InImguiContext);
 
 		private:
 			void _Map(_In_ const Input::Key& EternalKey, _In_ const ImGuiKey_& ImguiKey);
 			void _ProcessInputCharacter(_In_ const ImWchar& ImguiKey, _In_ const Input::Key& KeyName);
 			void _ProcessInputCharacterRange(_In_ const ImWchar& ImguiKeyStart, _In_ const Input::Key& KeyNameStart, _In_ uint32_t Range);
 			void _UpdateInputs();
-			void _Render(_In_ GraphicsContext& InContext);
+			void _Render(_In_ GraphicsContext& InContext, _In_ const ImguiContext& InImguiContext);
 			void _UploadFontTexture(_In_ GraphicsContext& InContext);
 
-			void _ImGui_FillBuffers(_In_ ImDrawData* DrawData, _In_ ImguiRenderContext& InImguiContext);
-			void _ImGui_SetupRenderState(_In_ ImDrawData* InDrawData, _In_ ImguiRenderContext& InImguiContext, _In_ GraphicsContext& InContext, _In_ CommandList* InImguiCommandList);
-			void _ImGui_Render(_In_ ImDrawData* InDrawData, _In_ ImguiRenderContext& InImguiContext, _In_ GraphicsContext& InContext, _In_ CommandList* InImguiCommandList);
+			//void _ImGui_GetDrawData();
+			void _ImGui_FillBuffers(_In_ const ImDrawData& InDrawData, _In_ ImguiRenderContext& InImguiContext);
+			void _ImGui_SetupRenderState(_In_ const ImDrawData& InDrawData, _In_ ImguiRenderContext& InImguiContext, _In_ GraphicsContext& InContext, _In_ CommandList* InImguiCommandList);
+			void _ImGui_Render(_In_ const ImDrawData& InDrawData, _In_ ImguiRenderContext& InImguiContext, _In_ GraphicsContext& InContext, _In_ CommandList* InImguiCommandList);
 
 			struct ImguiFontMetaData
 			{
