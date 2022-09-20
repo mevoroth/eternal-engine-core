@@ -22,7 +22,7 @@ namespace Eternal
 
 			if (!Cache.CachedTexture)
 			{
-				CommandListScope UploadTextureCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "GraphicsCommandUploadTexture");
+				CommandListScope UploadTextureCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "GraphicsCommandUploadTexture");
 
 				//////////////////////////////////////////////////////////////////////////
 				// CPU Buffer

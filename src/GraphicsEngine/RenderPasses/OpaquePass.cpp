@@ -10,40 +10,47 @@ namespace Eternal
 	{
 		using namespace Eternal::GraphicData;
 
+		static constexpr bool UseMeshPipeline = true;
+
 		OpaquePass::OpaquePass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 		{
-			ShaderCreateInformation OpaqueVSCreateInformation(
-				ShaderType::VS, "OpaqueVS", "object.vs.hlsl",
-				{
-					"OBJECT_NEEDS_NORMAL",		"1",
-					"OBJECT_NEEDS_TANGENT",		"1",
-					"OBJECT_NEEDS_BINORMAL",	"1",
-					"OBJECT_NEEDS_UV",			"1"
-				}
-			);
-			Shader* OpaqueVS = InContext.GetShader(OpaqueVSCreateInformation);
-			ShaderCreateInformation OpaquePSCreateInformation(
-				ShaderType::PS, "OpaquePS", "opaque.ps.hlsl",
-				{
-					"OBJECT_NEEDS_NORMAL",		"1",
-					"OBJECT_NEEDS_TANGENT",		"1",
-					"OBJECT_NEEDS_BINORMAL",	"1",
-					"OBJECT_NEEDS_UV",			"1"
-				}
-			);
+			vector<string> Defines =
+			{
+				"OBJECT_NEEDS_NORMAL",		"1",
+				"OBJECT_NEEDS_TANGENT",		"1",
+				"OBJECT_NEEDS_BINORMAL",	"1",
+				"OBJECT_NEEDS_UV",			"1"
+			};
+
+			ShaderCreateInformation OpaquePSCreateInformation(ShaderType::PS, "OpaquePS", "opaque.ps.hlsl", Defines);
 			Shader* OpaquePS = InContext.GetShader(OpaquePSCreateInformation);
+
+			vector<RootSignatureParameter> ParametersVSPS =
+			{
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_SAMPLER,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS)
+			};
+
+			vector<RootSignatureParameter> ParametersMSPS =
+			{
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_SAMPLER,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS)
+			};
 
 			_RootSignature = CreateRootSignature(
 				InContext,
 				RootSignatureCreateInformation(
-					{
-						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VS),
-						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VS),
-						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
-						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
-						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
-						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_SAMPLER,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS)
-					},
+					UseMeshPipeline ? ParametersMSPS : ParametersVSPS,
 					{}, {},
 					/*InHasInputAssembler=*/ true
 				)
@@ -78,14 +85,33 @@ namespace Eternal
 				)
 			);
 
-			GraphicsPipelineCreateInformation OpaquePipelineCreateInformation(
-				*_RootSignature,
-				_OpaqueInputLayout,
-				_OpaqueRenderPass,
-				OpaqueVS, OpaquePS,
-				DepthStencilTestWriteNone
-			);
-			_Pipeline = CreatePipeline(InContext, OpaquePipelineCreateInformation);
+			if (UseMeshPipeline)
+			{
+				ShaderCreateInformation OpaqueMSCreateInformation(ShaderType::MS, "OpaqueMS", "object.ms.hlsl", Defines);
+				Shader* OpaqueMS = InContext.GetShader(OpaqueMSCreateInformation);
+				
+				MeshPipelineCreateInformation OpaquePipelineCreateInformation(
+					*_RootSignature,
+					_OpaqueRenderPass,
+					OpaqueMS, OpaquePS,
+					DepthStencilTestWriteNone
+				);
+				_Pipeline = CreatePipeline(InContext, OpaquePipelineCreateInformation);
+			}
+			else
+			{
+				ShaderCreateInformation OpaqueVSCreateInformation(ShaderType::VS, "OpaqueVS", "object.vs.hlsl", Defines);
+				Shader* OpaqueVS = InContext.GetShader(OpaqueVSCreateInformation);
+
+				GraphicsPipelineCreateInformation OpaquePipelineCreateInformation(
+					*_RootSignature,
+					_OpaqueInputLayout,
+					_OpaqueRenderPass,
+					OpaqueVS, OpaquePS,
+					DepthStencilTestWriteNone
+				);
+				_Pipeline = CreatePipeline(InContext, OpaquePipelineCreateInformation);
+			}
 		}
 
 		OpaquePass::~OpaquePass()
@@ -103,9 +129,8 @@ namespace Eternal
 			if (MeshCollections.size() == 0)
 				return;
 
-			CommandListScope OpaqueCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "OpaquePass");
+			GraphicsCommandListScope OpaqueCommandList = InContext.CreateNewGraphicsCommandList(*_OpaqueRenderPass, "OpaquePass");
 
-			OpaqueCommandList->BeginRenderPass(*_OpaqueRenderPass);
 			OpaqueCommandList->SetGraphicsPipeline(*_Pipeline);
 
 			_OpaqueDescriptorTable->SetDescriptor(1, InRenderer.GetGlobalResources().GetViewConstantBufferView());
@@ -118,26 +143,39 @@ namespace Eternal
 				{
 					GPUMesh& CurrentGPUMesh = Meshes[MeshIndex]->GetGPUMesh();
 					const Resource* MeshVertexBuffer = CurrentGPUMesh.MeshVertexBuffer;
-					OpaqueCommandList->SetIndexBuffer(*CurrentGPUMesh.MeshIndexBuffer);
-					OpaqueCommandList->SetVertexBuffers(&MeshVertexBuffer);
+					if (UseMeshPipeline)
+					{
+						_OpaqueDescriptorTable->SetDescriptor(6, CurrentGPUMesh.MeshVertexStructuredBufferView);
+						_OpaqueDescriptorTable->SetDescriptor(7, CurrentGPUMesh.MeshIndexStructuredBufferView);
+					}
+					else
+					{
+						OpaqueCommandList->SetIndexBuffer(*CurrentGPUMesh.MeshIndexBuffer);
+						OpaqueCommandList->SetVertexBuffers(&MeshVertexBuffer);
+					}
 					for (uint32_t DrawIndex = 0; DrawIndex < CurrentGPUMesh.PerDrawInformations.size(); ++DrawIndex)
 					{
 						GPUMesh::PerDrawInformation& DrawInformation = CurrentGPUMesh.PerDrawInformations[DrawIndex];
 
 						DrawInformation.PerDrawMaterial->CommitMaterial(*_OpaqueDescriptorTable);
 
-						_OpaqueDescriptorTable->SetDescriptor(0, DrawInformation.PerDrawConstantBufferVS);
+						_OpaqueDescriptorTable->SetDescriptor(0, DrawInformation.PerDrawConstantBufferMSVS);
 						OpaqueCommandList->SetGraphicsDescriptorTable(InContext, *_OpaqueDescriptorTable);
-						OpaqueCommandList->DrawIndexedInstanced(
-							DrawInformation.IndicesCount, 1,
-							DrawInformation.IndicesOffset,
-							DrawInformation.VerticesOffset
-						);
+						if (UseMeshPipeline)
+						{
+
+						}
+						else
+						{
+							OpaqueCommandList->DrawIndexedInstanced(
+								DrawInformation.IndicesCount, 1,
+								DrawInformation.IndicesOffset,
+								DrawInformation.VerticesOffset
+							);
+						}
 					}
 				}
 			}
-			
-			OpaqueCommandList->EndRenderPass();
 		}
 
 	}

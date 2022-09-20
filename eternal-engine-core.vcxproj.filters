@@ -279,7 +279,9 @@
     <ClCompile Include="src\GameObjects\CameraGameObject.cpp">
       <Filter>GameObjects</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsEngine\Pass.cpp" />
+    <ClCompile Include="src\GraphicsEngine\Pass.cpp">
+      <Filter>GraphicsEngine</Filter>
+    </ClCompile>
     <ClCompile Include="src\GraphicsEngine\RenderPasses\VollumetricCloudsPass.cpp">
       <Filter>GraphicsEngine\RenderPasses</Filter>
     </ClCompile>

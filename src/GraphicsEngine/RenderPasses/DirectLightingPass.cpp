@@ -123,7 +123,7 @@ namespace Eternal
 
 		void DirectLightingPass::Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer)
 		{
-			CommandListScope DirectLightingCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "DirectLighting");
+			GraphicsCommandListScope DirectLightingCommandList = InContext.CreateNewGraphicsCommandList(*_DirectLightingRenderPass, "DirectLighting");
 
 			const vector<Light*>& Lights = InSystem.GetRenderFrame().Lights;
 			{
@@ -168,11 +168,9 @@ namespace Eternal
 				};
 				ResourceTransitionScope GBufferToShaderReadScope(*DirectLightingCommandList, Transitions, ETERNAL_ARRAYSIZE(Transitions));
 
-				DirectLightingCommandList->BeginRenderPass(*_DirectLightingRenderPass);
 				DirectLightingCommandList->SetGraphicsPipeline(*_Pipeline);
 				DirectLightingCommandList->SetGraphicsDescriptorTable(InContext, *_DirectLightingDescriptorTable);
 				DirectLightingCommandList->DrawInstanced(6);
-				DirectLightingCommandList->EndRenderPass();
 			}
 		}
 	}

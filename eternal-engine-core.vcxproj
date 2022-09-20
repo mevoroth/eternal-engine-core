@@ -117,7 +117,7 @@
       <SDLCheck>true</SDLCheck>
       <MinimalRebuild>false</MinimalRebuild>
       <ForcedIncludeFiles>sal.h;Types/HLSLReflection.hpp;CoreSettings.hpp;optick.h</ForcedIncludeFiles>
-      <AdditionalIncludeDirectories>D:\Code\FBX\FBX SDK\2020.0.1\include;$(SolutionDir)\eternal-engine-shaders\ShadersReflection;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Code\FBX\FBX SDK\2020.0.1\include;$(SolutionDir)eternal-engine-shaders\ShadersReflection;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <DisableSpecificWarnings>4189;4100</DisableSpecificWarnings>

@@ -360,7 +360,7 @@ namespace Eternal
 					memcpy(UploadBufferMapScope.GetDataPointer(), _ImguiFontMetaData.Pixels, UploadBufferSize);
 				}
 
-				CommandListScope UploadFontCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "CopyImguiFontFromCPUToGPU");
+				CommandListScope UploadFontCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "CopyImguiFontFromCPUToGPU");
 
 				CopyRegion ImguiFontCopyRegion(
 					TextureFromBufferRegion(
@@ -394,15 +394,15 @@ namespace Eternal
 
 			_ImGui_FillBuffers(ImguiDrawData, RenderContext);
 
-			CommandListScope ImguiCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHIC, "RenderImgui");
-
-			ResourceTransition Transitions[] =
-			{
-				ResourceTransition(*_ImguiIndexBuffer,	TransitionState::TRANSITION_INDEX_READ),
-				ResourceTransition(*_ImguiVertexBuffer,	TransitionState::TRANSITION_VERTEX_BUFFER_READ)
-			};
+			//ResourceTransition Transitions[] =
+			//{
+			//	ResourceTransition(*_ImguiIndexBuffer,	TransitionState::TRANSITION_INDEX_READ),
+			//	ResourceTransition(*_ImguiVertexBuffer,	TransitionState::TRANSITION_VERTEX_BUFFER_READ)
+			//};
 
 			{
+				CommandListScope ImguiCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "RenderImgui");
+
 				ImguiCommandList->BeginRenderPass(*_ImguiRenderPass);
 				ImguiCommandList->SetGraphicsPipeline(*_ImguiPipeline);
 

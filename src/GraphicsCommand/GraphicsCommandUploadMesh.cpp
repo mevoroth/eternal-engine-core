@@ -28,13 +28,31 @@ namespace Eternal
 				BufferResourceCreateInformation MeshVerticesResourceCreateInformation(
 					InContext.GetDevice(),
 					CurrentMesh->GetName(),
-					VertexBufferCreateInformation(
+					//VertexBufferCreateInformation(
+					//	VertexStride,
+					//	VerticesCount
+					//),
+					BufferCreateInformation(
+						Format::FORMAT_UNKNOWN,
+						BufferResourceUsage::BUFFER_RESOURCE_USAGE_VERTEX_BUFFER | BufferResourceUsage::BUFFER_RESOURCE_USAGE_STRUCTURED_BUFFER,
 						VertexStride,
 						VerticesCount
 					),
 					ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
 				);
 				Resource* MeshVertexBuffer = CreateBuffer(MeshVerticesResourceCreateInformation);
+				ViewMetaData MeshVertexStructuredBufferViewMetaData;
+				MeshVertexStructuredBufferViewMetaData.ShaderResourceViewBuffer.FirstElement		= 0;
+				MeshVertexStructuredBufferViewMetaData.ShaderResourceViewBuffer.NumElements			= VerticesCount;
+				MeshVertexStructuredBufferViewMetaData.ShaderResourceViewBuffer.StructureByteStride	= VertexStride;
+
+				View* MeshVertexStructuredBufferView = CreateShaderResourceView(
+					ShaderResourceViewStructuredBufferCreateInformation(
+						InContext,
+						MeshVertexBuffer,
+						MeshVertexStructuredBufferViewMetaData
+					)
+				);
 				// Upload
 				{
 					uint32_t ActualVertexStride = MeshVertexBuffer->GetBufferStride();
@@ -49,21 +67,42 @@ namespace Eternal
 						memcpy(DestinationOffset, SourceOffset, VertexStride);
 					}
 				}
+				CurrentMesh->SetMeshVertexStructuredBufferView(MeshVertexStructuredBufferView);
 				CurrentMesh->SetMeshVertexBuffer(MeshVertexBuffer);
 
 				// Index buffer
-				uint32_t IndexBufferSize = CurrentMesh->GetIndexStride() * CurrentMesh->GetIndicesCount();
+				uint32_t IndicesCount = CurrentMesh->GetIndicesCount();
+				uint32_t IndexStride = CurrentMesh->GetIndexStride();
+				uint32_t IndexBufferSize = IndexStride * IndicesCount;
 
 				BufferResourceCreateInformation MeshIndicesResourceCreateInformation(
 					InContext.GetDevice(),
 					CurrentMesh->GetName(),
-					IndexBufferCreateInformation(
-						CurrentMesh->GetIndexStride(),
-						IndexBufferSize
+					//IndexBufferCreateInformation(
+					//	IndexStride,
+					//	IndicesCount
+					//),
+					BufferCreateInformation(
+						CurrentMesh->GetIndexStride() == sizeof(uint16_t) ? Format::FORMAT_R16_UINT : Format::FORMAT_R32_UINT,
+						BufferResourceUsage::BUFFER_RESOURCE_USAGE_INDEX_BUFFER | BufferResourceUsage::BUFFER_RESOURCE_USAGE_STRUCTURED_BUFFER,
+						IndexStride,
+						IndicesCount
 					),
 					ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
 				);
 				Resource* MeshIndexBuffer = CreateBuffer(MeshIndicesResourceCreateInformation);
+				ViewMetaData MeshIndexStructuredBufferViewMetaData;
+				MeshIndexStructuredBufferViewMetaData.ShaderResourceViewBuffer.FirstElement			= 0;
+				MeshIndexStructuredBufferViewMetaData.ShaderResourceViewBuffer.NumElements			= IndicesCount / 3;
+				MeshIndexStructuredBufferViewMetaData.ShaderResourceViewBuffer.StructureByteStride	= IndexStride * 3;
+
+				View* MeshIndexStructuredBufferView = CreateShaderResourceView(
+					ShaderResourceViewStructuredBufferCreateInformation(
+						InContext,
+						MeshIndexBuffer,
+						MeshIndexStructuredBufferViewMetaData
+					)
+				);
 				// Upload
 				{
 					MapRange MeshIndexBufferRange(IndexBufferSize);
@@ -71,6 +110,7 @@ namespace Eternal
 					memcpy(MeshIndexBufferMapScope.GetDataPointer(), CurrentMesh->GetIndicesData(), IndexBufferSize);
 				}
 				CurrentMesh->SetMeshIndexBuffer(MeshIndexBuffer);
+				CurrentMesh->SetMeshIndexStructuredBufferView(MeshIndexStructuredBufferView);
 
 				// Constant buffer
 				uint32_t ConstantBufferStride = CurrentMesh->GetConstantBufferStride();
@@ -115,7 +155,7 @@ namespace Eternal
 						MetaData
 					);
 					View* PerDrawConstantBufferView = CreateConstantBufferView(PerDrawConstantBufferViewCreateInformation);
-					CurrentMesh->SetPerDrawConstantBufferViewVS(ConstantBufferViewIndex, PerDrawConstantBufferView);
+					CurrentMesh->SetPerDrawConstantBufferViewMSVS(ConstantBufferViewIndex, PerDrawConstantBufferView);
 				}
 			}
 		}
