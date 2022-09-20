@@ -168,6 +168,9 @@
     <ClInclude Include="include\GameObjects\CameraGameObject.hpp">
       <Filter>GameObjects</Filter>
     </ClInclude>
+    <ClInclude Include="include\GraphicsEngine\RenderPasses\VolumetricCloudsPass.hpp">
+      <Filter>GraphicsEngine\RenderPasses</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Game.cpp">
@@ -275,6 +278,10 @@
     </ClCompile>
     <ClCompile Include="src\GameObjects\CameraGameObject.cpp">
       <Filter>GameObjects</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\Pass.cpp" />
+    <ClCompile Include="src\GraphicsEngine\RenderPasses\VollumetricCloudsPass.cpp">
+      <Filter>GraphicsEngine\RenderPasses</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
