@@ -10,7 +10,7 @@ namespace Eternal
 	{
 		using namespace Eternal::GraphicData;
 
-		static constexpr bool UseMeshPipeline = true;
+		static constexpr bool UseMeshPipeline = false;
 
 		OpaquePass::OpaquePass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 		{
@@ -163,7 +163,7 @@ namespace Eternal
 						OpaqueCommandList->SetGraphicsDescriptorTable(InContext, *_OpaqueDescriptorTable);
 						if (UseMeshPipeline)
 						{
-
+							OpaqueCommandList->DispatchMesh();
 						}
 						else
 						{
