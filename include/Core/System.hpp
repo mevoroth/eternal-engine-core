@@ -215,6 +215,8 @@ namespace Eternal
 			void Update();
 			void Render();
 
+			void DebugRender();
+
 		private:
 			void _LoadBuiltin();
 			

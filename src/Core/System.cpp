@@ -176,6 +176,11 @@ namespace Eternal
 			GfxContext.EndFrame();
 		}
 
+		void System::DebugRender()
+		{
+			GetRenderer().DebugRender();
+		}
+
 		void System::EndFrame()
 		{
 			ETERNAL_PROFILER(BASIC)();

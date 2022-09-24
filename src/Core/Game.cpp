@@ -50,6 +50,10 @@ namespace Eternal
 					ETERNAL_PROFILER(BASIC)("GameState Debug Update");
 					_CurrentGameState->UpdateDebug();
 				}
+				{
+					ETERNAL_PROFILER(BASIC)("GameState Debug Graphics");
+					GetSystem().DebugRender();
+				}
 				UpdateDebug();
 				GetSystem().EndFrame();
 
