@@ -6,7 +6,7 @@ namespace Eternal
 {
 	namespace GraphicsEngine
 	{
-		class PresentPass : public Pass
+		class PresentPass final : public Pass
 		{
 		public:
 			PresentPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer);

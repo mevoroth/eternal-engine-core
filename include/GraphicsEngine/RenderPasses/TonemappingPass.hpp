@@ -6,7 +6,7 @@ namespace Eternal
 {
 	namespace GraphicsEngine
 	{
-		class TonemappingPass : public Pass
+		class TonemappingPass final : public Pass
 		{
 		public:
 			TonemappingPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer);
