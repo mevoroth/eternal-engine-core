@@ -282,7 +282,7 @@
     <ClCompile Include="src\GraphicsEngine\Pass.cpp">
       <Filter>GraphicsEngine</Filter>
     </ClCompile>
-    <ClCompile Include="src\GraphicsEngine\RenderPasses\VollumetricCloudsPass.cpp">
+    <ClCompile Include="src\GraphicsEngine\RenderPasses\VolumetricCloudsPass.cpp">
       <Filter>GraphicsEngine\RenderPasses</Filter>
     </ClCompile>
   </ItemGroup>

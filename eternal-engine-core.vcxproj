@@ -233,7 +233,7 @@
     <ClCompile Include="src\GraphicsEngine\RenderPasses\OpaquePass.cpp" />
     <ClCompile Include="src\GraphicsEngine\RenderPasses\PresentPass.cpp" />
     <ClCompile Include="src\GraphicsEngine\RenderPasses\TonemappingPass.cpp" />
-    <ClCompile Include="src\GraphicsEngine\RenderPasses\VollumetricCloudsPass.cpp" />
+    <ClCompile Include="src\GraphicsEngine\RenderPasses\VolumetricCloudsPass.cpp" />
     <ClCompile Include="src\Imgui\Imgui.cpp" />
     <ClCompile Include="src\Imgui\ImguiConfig.cpp" />
     <ClCompile Include="src\Import\ImportLevel.cpp" />

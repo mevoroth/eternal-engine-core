@@ -6,17 +6,20 @@ namespace Eternal
 {
 	namespace GraphicsEngine
 	{
-		class VolumetricCloudPass : public Pass
+		class VolumetricCloudsPass final : public Pass
 		{
 		public:
-			VolumetricCloudPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer);
-			~VolumetricCloudPass();
+			VolumetricCloudsPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer);
+			~VolumetricCloudsPass();
 
 			virtual void Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer) override final;
+			virtual void DebugRender() override final;
 
 		private:
 
-			//DescriptorTable* _TonemappingDescriptorTable = nullptr;
+			DescriptorTable*			_VolumetricCloudsDescriptorTable	= nullptr;
+			MultiBuffered<Resource>*	_VolumetricCloudsConstantBuffer		= nullptr;
+			MultiBuffered<View>*		_VolumetricCloudsConstantBufferView	= nullptr;
 
 		};
 	}
