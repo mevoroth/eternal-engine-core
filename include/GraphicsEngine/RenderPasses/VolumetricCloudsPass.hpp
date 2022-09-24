@@ -13,7 +13,7 @@ namespace Eternal
 			~VolumetricCloudsPass();
 
 			virtual void Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer) override final;
-			virtual void DebugRender() override final;
+			virtual void RenderDebug() override final;
 
 		private:
 

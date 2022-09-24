@@ -139,7 +139,7 @@ namespace Eternal
 			}
 		}
 
-		void VolumetricCloudsPass::DebugRender()
+		void VolumetricCloudsPass::RenderDebug()
 		{
 			ImGui::Begin("Volumetric Clouds");
 			ImGui::SliderFloat("Clouds bottom layer (m)", &VolumetricCloudsBottomLayerMeters, 0.0f, 1000.0f);

@@ -54,11 +54,11 @@ namespace Eternal
 			_PresentPass->Render(InContext, InSystem, *this);
 		}
 
-		void Renderer::DebugRender()
+		void Renderer::RenderDebug()
 		{
 			for (uint32_t PassIndex = 0; PassIndex < _Passes.size(); ++PassIndex)
-				_Passes[PassIndex]->DebugRender();
-			_PresentPass->DebugRender();
+				_Passes[PassIndex]->RenderDebug();
+			_PresentPass->RenderDebug();
 		}
 	}
 }

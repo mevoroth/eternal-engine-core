@@ -176,9 +176,9 @@ namespace Eternal
 			GfxContext.EndFrame();
 		}
 
-		void System::DebugRender()
+		void System::RenderDebug()
 		{
-			GetRenderer().DebugRender();
+			GetRenderer().RenderDebug();
 		}
 
 		void System::EndFrame()

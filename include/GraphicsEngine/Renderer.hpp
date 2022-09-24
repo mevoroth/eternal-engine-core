@@ -37,7 +37,7 @@ namespace Eternal
 
 			void Render(_In_ GraphicsContext& InContext, _In_ System& InSystem);
 			void Present(_In_ GraphicsContext& InContext, _In_ System& InSystem);
-			void DebugRender();
+			void RenderDebug();
 
 			GlobalResources& GetGlobalResources()
 			{

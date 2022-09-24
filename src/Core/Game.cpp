@@ -52,7 +52,7 @@ namespace Eternal
 				}
 				{
 					ETERNAL_PROFILER(BASIC)("GameState Debug Graphics");
-					GetSystem().DebugRender();
+					GetSystem().RenderDebug();
 				}
 				UpdateDebug();
 				GetSystem().EndFrame();
