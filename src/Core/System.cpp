@@ -16,6 +16,7 @@
 #include "Resources/LevelLoader.hpp"
 #include "Resources/Payload.hpp"
 #include "Optick/Optick.hpp"
+#include "GraphicData/Texture.hpp"
 
 namespace Eternal
 {
@@ -114,6 +115,13 @@ namespace Eternal
 					"black"
 				)
 			);
+			_Streaming->EnqueueRequest(
+				new TextureRequest(
+					FilePath::Find("noise_curl_3d_xyzw.dds", FileType::FILE_TYPE_TEXTURES),
+					"noise_curl_3d_xyzw",
+					"noise_curl_3d_xyzw"
+				)
+			);
 			_Streaming->CommitRequests();
 		}
 
@@ -174,6 +182,53 @@ namespace Eternal
 			GetRenderer().Present(GfxContext, *this);
 
 			GfxContext.EndFrame();
+		}
+		void System::UpdateDebug()
+		{
+			{
+				const TextureCacheStorage& Textures = GetTextureFactory().GetTextures();
+
+				ImGui::Begin("Texture Cache");
+				if (ImGui::BeginTable("Textures", 3, ImGuiTableFlags_Resizable | ImGuiTableFlags_Borders))
+				{
+					for (auto TexturesIterator = Textures.cbegin(); TexturesIterator != Textures.cend(); ++TexturesIterator)
+					{
+						ImGui::TableNextRow();
+						{
+							ImGui::TableNextColumn();
+							ImGui::Text(TexturesIterator->first.c_str());
+						}
+						{
+							ImGui::TableNextColumn();
+							if (TexturesIterator->second.CachedTexture)
+							{
+								const Resource& CurrentTexture = TexturesIterator->second.CachedTexture->GetTexture();
+								ImGui::Text(
+									"%dx%dx%d [%d]",
+									CurrentTexture.GetWidth(),
+									CurrentTexture.GetHeight(),
+									CurrentTexture.GetArraySize(),
+									static_cast<int>(CurrentTexture.GetFormat())
+								);
+							}
+							else
+								ImGui::Text("UNLOADED");
+						}
+						{
+							ImGui::TableNextColumn();
+							if (TexturesIterator->second.CachedTexture)
+							{
+								const View* CurrentTexture = TexturesIterator->second.CachedTexture->GetShaderResourceView();
+								ImGui::Image(static_cast<ImTextureID>(const_cast<View*>(CurrentTexture)), ImVec2(32.0f, 32.0f));
+							}
+							else
+								ImGui::Text("X");
+						}
+					}
+					ImGui::EndTable();
+				}
+				ImGui::End();
+			}
 		}
 
 		void System::RenderDebug()

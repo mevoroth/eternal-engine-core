@@ -215,6 +215,7 @@ namespace Eternal
 			void Update();
 			void Render();
 
+			void UpdateDebug();
 			void RenderDebug();
 
 		private:

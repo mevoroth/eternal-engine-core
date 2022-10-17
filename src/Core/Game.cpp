@@ -94,6 +94,7 @@ namespace Eternal
 			ETERNAL_PROFILER(BASIC)();
 
 			_World.UpdateDebug();
+			GetSystem().UpdateDebug();
 		}
 
 		void Game::ProcessStreamingPayloads()
