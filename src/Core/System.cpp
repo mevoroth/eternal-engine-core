@@ -207,7 +207,7 @@ namespace Eternal
 									"%dx%dx%d [%d]",
 									CurrentTexture.GetWidth(),
 									CurrentTexture.GetHeight(),
-									CurrentTexture.GetArraySize(),
+									CurrentTexture.GetDepth(),
 									static_cast<int>(CurrentTexture.GetFormat())
 								);
 							}
