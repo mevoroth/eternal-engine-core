@@ -58,8 +58,8 @@ namespace Eternal
 					InContext.GetDevice(),
 					_Payload.MaterialToUpdate.Key,
 					TextureCreateInformation(
-						ResourceDimension::RESOURCE_DIMENSION_TEXTURE_2D,
-						Format::FORMAT_BGRA8888_UNORM,
+						InTextureData.Dimension,
+						InTextureData.TextureFormat,
 						TextureResourceUsage::TEXTURE_RESOURCE_USAGE_SHADER_RESOURCE | TextureResourceUsage::TEXTURE_RESOURCE_USAGE_COPY_WRITE,
 						InTextureData.Width,
 						InTextureData.Height,
