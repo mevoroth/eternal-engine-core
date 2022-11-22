@@ -323,11 +323,11 @@ namespace Eternal
 			InContext.DrawData.CmdLists = InContext.DrawDataBuilderLayer0.Data;
 		}
 
-		void Imgui::Render(_In_ GraphicsContext& InContext, _In_ const ImguiContext& InImguiContext)
+		void Imgui::Render(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer, _In_ const ImguiContext& InImguiContext)
 		{
 			ETERNAL_PROFILER(BASIC)();
 			_UploadFontTexture(InContext);
-			_Render(InContext, InImguiContext);
+			_Render(InContext, InRenderer, InImguiContext);
 		}
 
 		void Imgui::_UploadFontTexture(_In_ GraphicsContext& InContext)
@@ -368,6 +368,8 @@ namespace Eternal
 						UploadBufferSize
 					)
 				);
+				ResourceTransition TransitionToCopyWrite(_ImguiFontTexture, TransitionState::TRANSITION_COPY_WRITE);
+				UploadFontCommandList->Transition(&TransitionToCopyWrite, 1);
 				UploadFontCommandList->CopyResource(*_ImguiFontTexture, *ImguiFontUploadTexture, ImguiFontCopyRegion);
 				ResourceTransition TransitionToShaderRead(_ImguiFontTexture, TransitionState::TRANSITION_PIXEL_SHADER_READ);
 				UploadFontCommandList->Transition(&TransitionToShaderRead, 1);
@@ -376,7 +378,7 @@ namespace Eternal
 			}
 		}
 
-		void Imgui::_Render(_In_ GraphicsContext& InContext, _In_ const ImguiContext& InImguiContext)
+		void Imgui::_Render(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer, _In_ const ImguiContext& InImguiContext)
 		{
 			const ImDrawData& ImguiDrawData = InImguiContext.DrawData;
 			if (ImguiDrawData.DisplaySize.x <= 0 || ImguiDrawData.DisplaySize.y <= 0)
@@ -402,6 +404,13 @@ namespace Eternal
 
 			{
 				CommandListScope ImguiCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "RenderImgui");
+
+				ResourceTransition ImguiResourceTransitions[] =
+				{
+					ResourceTransition(*_ImguiConstantBuffer,																	TransitionState::TRANSITION_CONSTANT_BUFFER_READ),
+					ResourceTransition(InRenderer.GetGlobalResources().GetGBufferLuminance().GetRenderTargetDepthStencilView(),	TransitionState::TRANSITION_RENDER_TARGET)
+				};
+				ImguiCommandList->Transition(ImguiResourceTransitions, ETERNAL_ARRAYSIZE(ImguiResourceTransitions));
 
 				ImguiCommandList->BeginRenderPass(*_ImguiRenderPass);
 				ImguiCommandList->SetGraphicsPipeline(*_ImguiPipeline);

@@ -177,7 +177,7 @@ namespace Eternal
 			GfxContext.BeginFrame();
 
 			GetRenderer().Render(GfxContext, *this);
-			GetImgui().Render(GfxContext, CurrentRenderFrame.ImguiFrameContext);
+			GetImgui().Render(GfxContext, GetRenderer(), CurrentRenderFrame.ImguiFrameContext);
 
 			GetRenderer().Present(GfxContext, *this);
 

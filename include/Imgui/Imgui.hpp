@@ -53,14 +53,14 @@ namespace Eternal
 			ImguiContext CreateContext(_In_ GraphicsContext& InContext);
 			void DestroyContext(_In_ const ImguiContext& InContext);
 
-			void Render(_In_ GraphicsContext& InContext, _In_ const ImguiContext& InImguiContext);
+			void Render(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer, _In_ const ImguiContext& InImguiContext);
 
 		private:
 			void _Map(_In_ const Input::Key& EternalKey, _In_ const ImGuiKey_& ImguiKey);
 			void _ProcessInputCharacter(_In_ const ImWchar& ImguiKey, _In_ const Input::Key& KeyName);
 			void _ProcessInputCharacterRange(_In_ const ImWchar& ImguiKeyStart, _In_ const Input::Key& KeyNameStart, _In_ uint32_t Range);
 			void _UpdateInputs();
-			void _Render(_In_ GraphicsContext& InContext, _In_ const ImguiContext& InImguiContext);
+			void _Render(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer, _In_ const ImguiContext& InImguiContext);
 			void _UploadFontTexture(_In_ GraphicsContext& InContext);
 
 			//void _ImGui_GetDrawData();
