@@ -73,6 +73,16 @@ namespace Eternal
 				Cache.CachedTexture = new Texture(InContext, GPUTextureCreateInformation);
 
 				//////////////////////////////////////////////////////////////////////////
+				// Transition
+				ResourceTransition TextureToCopyWrite(
+					Cache.CachedTexture->GetShaderResourceView(),
+					TransitionState::TRANSITION_COPY_WRITE
+				);
+				UploadTextureCommandList->Transition(
+					&TextureToCopyWrite, 1
+				);
+
+				//////////////////////////////////////////////////////////////////////////
 				// Upload
 				UploadTextureCommandList->CopyResource(
 					Cache.CachedTexture->GetTexture(),
