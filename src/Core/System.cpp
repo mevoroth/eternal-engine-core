@@ -216,7 +216,7 @@ namespace Eternal
 						}
 						{
 							ImGui::TableNextColumn();
-							if (TexturesIterator->second.CachedTexture)
+							if (TexturesIterator->second.CachedTexture && TexturesIterator->second.CachedTexture->GetTexture().GetResourceDimension() == ResourceDimension::RESOURCE_DIMENSION_TEXTURE_2D)
 							{
 								const View* CurrentTexture = TexturesIterator->second.CachedTexture->GetShaderResourceView();
 								ImGui::Image(static_cast<ImTextureID>(const_cast<View*>(CurrentTexture)), ImVec2(32.0f, 32.0f));
