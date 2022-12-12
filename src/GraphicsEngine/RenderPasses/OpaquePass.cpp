@@ -76,12 +76,12 @@ namespace Eternal
 				RenderPassCreateInformation(
 					InContext.GetMainViewport(),
 					{
-						RenderTargetInformation(BlendStateAdditive, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferLuminance().GetRenderTargetDepthView()),
-						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferAlbedo().GetRenderTargetDepthView()),
-						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferNormals().GetRenderTargetDepthView()),
-						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferRoughnessMetallicSpecular().GetRenderTargetDepthView())
+						RenderTargetInformation(BlendStateAdditive, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferLuminance().GetRenderTargetDepthStencilView()),
+						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferAlbedo().GetRenderTargetDepthStencilView()),
+						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferNormals().GetRenderTargetDepthStencilView()),
+						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferRoughnessMetallicSpecular().GetRenderTargetDepthStencilView())
 					},
-					InGlobalResources.GetGBufferDepthStencil().GetRenderTargetDepthView(), RenderTargetOperator::Clear_Store
+					InGlobalResources.GetGBufferDepthStencil().GetRenderTargetDepthStencilView(), RenderTargetOperator::Clear_Store
 				)
 			);
 
@@ -129,8 +129,19 @@ namespace Eternal
 			if (MeshCollections.size() == 0)
 				return;
 
-			GraphicsCommandListScope OpaqueCommandList = InContext.CreateNewGraphicsCommandList(*_OpaqueRenderPass, "OpaquePass");
+			//GraphicsCommandListScope OpaqueCommandList = InContext.CreateNewGraphicsCommandList(*_OpaqueRenderPass, "OpaquePass");
+			CommandListScope OpaqueCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "OpaquePass");
 
+			ResourceTransition Transitions[] =
+			{
+				ResourceTransition(InRenderer.GetGlobalResources().GetGBufferAlbedo().GetRenderTargetDepthStencilView(),					TransitionState::TRANSITION_RENDER_TARGET),
+				ResourceTransition(InRenderer.GetGlobalResources().GetGBufferNormals().GetRenderTargetDepthStencilView(),					TransitionState::TRANSITION_RENDER_TARGET),
+				ResourceTransition(InRenderer.GetGlobalResources().GetGBufferRoughnessMetallicSpecular().GetRenderTargetDepthStencilView(),	TransitionState::TRANSITION_RENDER_TARGET),
+				ResourceTransition(InRenderer.GetGlobalResources().GetGBufferDepthStencil().GetRenderTargetDepthStencilView(),				TransitionState::TRANSITION_DEPTH_STENCIL_WRITE)
+			};
+			OpaqueCommandList->Transition(Transitions, ETERNAL_ARRAYSIZE(Transitions));
+			
+			OpaqueCommandList->BeginRenderPass(*_OpaqueRenderPass);
 			OpaqueCommandList->SetGraphicsPipeline(*_Pipeline);
 
 			_OpaqueDescriptorTable->SetDescriptor(1, InRenderer.GetGlobalResources().GetViewConstantBufferView());
@@ -176,6 +187,7 @@ namespace Eternal
 					}
 				}
 			}
+			OpaqueCommandList->EndRenderPass();
 		}
 
 	}

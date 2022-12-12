@@ -42,7 +42,7 @@ namespace Eternal
 				RenderPassCreateInformation(
 					InContext.GetMainViewport(),
 					{
-						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Load_Store, InRenderer.GetGlobalResources().GetGBufferLuminance().GetRenderTargetDepthView())
+						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Load_Store, InRenderer.GetGlobalResources().GetGBufferLuminance().GetRenderTargetDepthStencilView())
 					}
 				)
 			);
@@ -152,7 +152,7 @@ namespace Eternal
 			View* DirectLightingLightsBufferView = *_DirectLightingLightsBufferView;
 			_DirectLightingDescriptorTable->SetDescriptor(0, DirectLightingConstantBufferView);
 			_DirectLightingDescriptorTable->SetDescriptor(1, InRenderer.GetGlobalResources().GetViewConstantBufferView());
-			_DirectLightingDescriptorTable->SetDescriptor(2, InRenderer.GetGlobalResources().GetGBufferDepthStencil().GetRenderTargetDepthView());
+			_DirectLightingDescriptorTable->SetDescriptor(2, InRenderer.GetGlobalResources().GetGBufferDepthStencil().GetShaderResourceView());
 			_DirectLightingDescriptorTable->SetDescriptor(3, InRenderer.GetGlobalResources().GetGBufferAlbedo().GetShaderResourceView());
 			_DirectLightingDescriptorTable->SetDescriptor(4, InRenderer.GetGlobalResources().GetGBufferNormals().GetShaderResourceView());
 			_DirectLightingDescriptorTable->SetDescriptor(5, InRenderer.GetGlobalResources().GetGBufferRoughnessMetallicSpecular().GetShaderResourceView());
@@ -162,12 +162,13 @@ namespace Eternal
 			{
 				ResourceTransition Transitions[] =
 				{
-					ResourceTransition(InRenderer.GetGlobalResources().GetGBufferAlbedo().GetRenderTargetDepthView(),						TransitionState::TRANSITION_PIXEL_SHADER_READ),
-					ResourceTransition(InRenderer.GetGlobalResources().GetGBufferNormals().GetRenderTargetDepthView(),						TransitionState::TRANSITION_PIXEL_SHADER_READ),
-					ResourceTransition(InRenderer.GetGlobalResources().GetGBufferRoughnessMetallicSpecular().GetRenderTargetDepthView(),	TransitionState::TRANSITION_PIXEL_SHADER_READ),
-					ResourceTransition(InRenderer.GetGlobalResources().GetGBufferDepthStencil().GetRenderTargetDepthView(),					TransitionState::TRANSITION_PIXEL_SHADER_READ)
+					ResourceTransition(InRenderer.GetGlobalResources().GetGBufferAlbedo().GetRenderTargetDepthStencilView(),					TransitionState::TRANSITION_PIXEL_SHADER_READ),
+					ResourceTransition(InRenderer.GetGlobalResources().GetGBufferNormals().GetRenderTargetDepthStencilView(),					TransitionState::TRANSITION_PIXEL_SHADER_READ),
+					ResourceTransition(InRenderer.GetGlobalResources().GetGBufferRoughnessMetallicSpecular().GetRenderTargetDepthStencilView(),	TransitionState::TRANSITION_PIXEL_SHADER_READ),
+					ResourceTransition(InRenderer.GetGlobalResources().GetGBufferDepthStencil().GetRenderTargetDepthStencilView(),				TransitionState::TRANSITION_PIXEL_SHADER_READ)
 				};
-				ResourceTransitionScope GBufferToShaderReadScope(*DirectLightingCommandList, Transitions, ETERNAL_ARRAYSIZE(Transitions));
+				//ResourceTransitionScope GBufferToShaderReadScope(*DirectLightingCommandList, Transitions, ETERNAL_ARRAYSIZE(Transitions));
+				DirectLightingCommandList->Transition(Transitions, ETERNAL_ARRAYSIZE(Transitions));
 
 				DirectLightingCommandList->BeginRenderPass(*_DirectLightingRenderPass);
 				DirectLightingCommandList->SetGraphicsPipeline(*_Pipeline);

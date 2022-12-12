@@ -98,7 +98,7 @@ namespace Eternal
 			RenderPassCreateInformation ImguiRenderPassCreateInformation(
 				InContext.GetMainViewport(),
 				{
-					RenderTargetInformation(*_ImguiBlendState, RenderTargetOperator::Load_Store, InRenderer.GetGlobalResources().GetGBufferLuminance().GetRenderTargetDepthView())
+					RenderTargetInformation(*_ImguiBlendState, RenderTargetOperator::Load_Store, InRenderer.GetGlobalResources().GetGBufferLuminance().GetRenderTargetDepthStencilView())
 				}
 			);
 			_ImguiRenderPass = CreateRenderPass(InContext, ImguiRenderPassCreateInformation);
@@ -408,7 +408,7 @@ namespace Eternal
 				ResourceTransition ImguiResourceTransitions[] =
 				{
 					ResourceTransition(*_ImguiConstantBuffer,																	TransitionState::TRANSITION_CONSTANT_BUFFER_READ),
-					ResourceTransition(InRenderer.GetGlobalResources().GetGBufferLuminance().GetRenderTargetDepthView(),	TransitionState::TRANSITION_RENDER_TARGET)
+					ResourceTransition(InRenderer.GetGlobalResources().GetGBufferLuminance().GetRenderTargetDepthStencilView(),	TransitionState::TRANSITION_RENDER_TARGET)
 				};
 				ImguiCommandList->Transition(ImguiResourceTransitions, ETERNAL_ARRAYSIZE(ImguiResourceTransitions));
 
