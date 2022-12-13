@@ -486,7 +486,7 @@ namespace Eternal
 
 		void Imgui::_ImGui_SetupRenderState(_In_ const ImDrawData& InDrawData, _In_ ImguiRenderContext& InImguiContext, _In_ GraphicsContext& InContext, _In_ CommandList* InImguiCommandList)
 		{
-			Viewport* ImguiViewport = CreateViewport(
+			Viewport* ImguiViewport = CreateInvertedViewport(
 				InContext,
 				static_cast<int32_t>(InDrawData.DisplaySize.x),
 				static_cast<int32_t>(InDrawData.DisplaySize.y)
