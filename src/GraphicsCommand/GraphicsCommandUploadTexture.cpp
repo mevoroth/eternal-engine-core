@@ -25,34 +25,6 @@ namespace Eternal
 				CommandListScope UploadTextureCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "GraphicsCommandUploadTexture");
 
 				//////////////////////////////////////////////////////////////////////////
-				// CPU Buffer
-				std::string UploadBufferName = "AnonymousTextureBuffer";
-				const uint32_t UploadBufferSize = InTextureData.Width * InTextureData.Height * InTextureData.DepthOrArraySize;
-				const uint32_t UploadBufferSizeBytes = UploadBufferSize * InTextureData.Stride;
-				//TextureResourceCreateInformation UploadBufferTextureInformation(
-				BufferResourceCreateInformation UploadBufferTextureInformation(
-					InContext.GetDevice(),
-					UploadBufferName,
-					BufferCreateInformation(
-						Format::FORMAT_BGRA8888_UNORM,
-						BufferResourceUsage::BUFFER_RESOURCE_USAGE_COPY_READ,
-						InTextureData.Stride,
-						UploadBufferSize
-					),
-					ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
-				);
-
-				Resource* UploadTexture = CreateBuffer(UploadBufferTextureInformation);
-
-				//////////////////////////////////////////////////////////////////////////
-				// Map
-				MapRange UploadTextureMapRange(UploadBufferSizeBytes);
-				void* UploadTextureDataPtr = UploadTexture->Map<>(UploadTextureMapRange);
-				memcpy(UploadTextureDataPtr, InTextureData.TextureData, UploadBufferSizeBytes);
-				UploadTexture->Unmap(UploadTextureMapRange);
-				InContext.DelayedDelete(UploadTexture);
-
-				//////////////////////////////////////////////////////////////////////////
 				// GPU Texture
 				TextureResourceCreateInformation GPUTextureCreateInformation(
 					InContext.GetDevice(),
@@ -71,6 +43,36 @@ namespace Eternal
 				);
 				ETERNAL_ASSERT(!Cache.CachedTexture);
 				Cache.CachedTexture = new Texture(InContext, GPUTextureCreateInformation);
+				
+				//////////////////////////////////////////////////////////////////////////
+				// CPU Buffer
+				std::string UploadBufferName = "AnonymousTextureBuffer";
+				//const uint32_t UploadBufferSize = InTextureData.Width * InTextureData.Height * InTextureData.DepthOrArraySize;
+				//const uint32_t UploadBufferSizeBytes = UploadBufferSize * InTextureData.Stride;
+				const uint32_t UploadBufferSizeBytes = Cache.CachedTexture->GetTexture().GetTextureToBufferMemoryFootprint(InContext.GetDevice());
+				const uint32_t UploadBufferSize = UploadBufferSizeBytes / InTextureData.Stride;
+				
+				BufferResourceCreateInformation UploadBufferTextureInformation(
+					InContext.GetDevice(),
+					UploadBufferName,
+					BufferCreateInformation(
+						InTextureData.TextureFormat,
+						BufferResourceUsage::BUFFER_RESOURCE_USAGE_COPY_READ,
+						InTextureData.Stride,
+						UploadBufferSize
+					),
+					ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
+				);
+
+				Resource* UploadTexture = CreateBuffer(UploadBufferTextureInformation);
+
+				//////////////////////////////////////////////////////////////////////////
+				// Map
+				MapRange UploadTextureMapRange(UploadBufferSizeBytes);
+				void* UploadTextureDataPtr = UploadTexture->Map<>(UploadTextureMapRange);
+				memcpy(UploadTextureDataPtr, InTextureData.TextureData, UploadBufferSizeBytes);
+				UploadTexture->Unmap(UploadTextureMapRange);
+				InContext.DelayedDelete(UploadTexture);
 
 				//////////////////////////////////////////////////////////////////////////
 				// Transition
