@@ -49,8 +49,9 @@ namespace Eternal
 				std::string UploadBufferName = "AnonymousTextureBuffer";
 				//const uint32_t UploadBufferSize = InTextureData.Width * InTextureData.Height * InTextureData.DepthOrArraySize;
 				//const uint32_t UploadBufferSizeBytes = UploadBufferSize * InTextureData.Stride;
-				const uint32_t UploadBufferSizeBytes = Cache.CachedTexture->GetTexture().GetTextureToBufferMemoryFootprint(InContext.GetDevice());
-				const uint32_t UploadBufferSize = UploadBufferSizeBytes / InTextureData.Stride;
+				TextureToBufferMemoryFootprint Footprint = Cache.CachedTexture->GetTexture().GetTextureToBufferMemoryFootprint(InContext.GetDevice());
+				const uint32_t UploadBufferAlignedSizeBytes = Footprint.TotalBytes;
+				const uint32_t UploadBufferAlignedSize = UploadBufferAlignedSizeBytes / InTextureData.Stride;
 				
 				BufferResourceCreateInformation UploadBufferTextureInformation(
 					InContext.GetDevice(),
@@ -59,7 +60,7 @@ namespace Eternal
 						InTextureData.TextureFormat,
 						BufferResourceUsage::BUFFER_RESOURCE_USAGE_COPY_READ,
 						InTextureData.Stride,
-						UploadBufferSize
+						UploadBufferAlignedSize
 					),
 					ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
 				);
@@ -68,9 +69,15 @@ namespace Eternal
 
 				//////////////////////////////////////////////////////////////////////////
 				// Map
-				MapRange UploadTextureMapRange(UploadBufferSizeBytes);
-				void* UploadTextureDataPtr = UploadTexture->Map<>(UploadTextureMapRange);
-				memcpy(UploadTextureDataPtr, InTextureData.TextureData, UploadBufferSizeBytes);
+				MapRange UploadTextureMapRange(UploadBufferAlignedSizeBytes);
+				uint8_t* UploadTextureDataPtr = UploadTexture->Map<uint8_t>(UploadTextureMapRange);
+				uint8_t* SourceTextureDataPtr = reinterpret_cast<uint8_t*>(InTextureData.TextureData);
+				for (int Row = 0, RowCount = InTextureData.Height * InTextureData.DepthOrArraySize; Row < RowCount; ++Row)
+				{
+					memcpy(UploadTextureDataPtr, SourceTextureDataPtr, InTextureData.Width * InTextureData.Stride);
+					UploadTextureDataPtr += Footprint.RowPitch;
+					SourceTextureDataPtr += InTextureData.Width * InTextureData.Stride;
+				}
 				UploadTexture->Unmap(UploadTextureMapRange);
 				InContext.DelayedDelete(UploadTexture);
 
@@ -92,7 +99,7 @@ namespace Eternal
 					CopyRegion(
 						TextureFromBufferRegion(
 							Extent3D(InTextureData.Width, InTextureData.Height, InTextureData.DepthOrArraySize),
-							UploadBufferSizeBytes
+							UploadBufferAlignedSizeBytes
 						)
 					)
 				);
