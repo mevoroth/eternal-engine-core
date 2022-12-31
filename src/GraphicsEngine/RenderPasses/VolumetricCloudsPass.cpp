@@ -1,6 +1,7 @@
 #include "GraphicsEngine/RenderPasses/VolumetricCloudsPass.hpp"
 #include "HLSLVolumetricClouds.hpp"
 #include "imgui.h"
+#include "Core/System.hpp"
 
 namespace Eternal
 {
@@ -17,6 +18,8 @@ namespace Eternal
 		static int VolumetricCloudsMaxSteps				= 64;
 		static float VolumetricCloudsPhaseG[]			= { 0.0f, 0.0f };
 		static float VolumetricCloudsBlend				= 0.5f;
+		static float VolumetricCloudsDensity			= 0.1f;
+		static float VolumetricCloudsNoiseScale			= 1.0f;
 
 		ETERNAL_STATIC_ASSERT(ETERNAL_ARRAYSIZE(VolumetricCloudsPhaseG) == VOLUMETRIC_PHASE_COUNT, "VolumeetricCloudsPhaseG not matching count");
 
@@ -47,6 +50,8 @@ namespace Eternal
 						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_CS),
 						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_CS),
 						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_CS),
+						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_CS),
+						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_SAMPLER,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_CS),
 						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_RW_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_CS)
 					}
 				)
@@ -104,21 +109,27 @@ namespace Eternal
 			{
 				MapRange VolumetricCloudsMapRange(sizeof(VolumetricCloudsConstants));
 				MapScope<VolumetricCloudsConstants> VolumetricCloudsConstantsMapScope(*_VolumetricCloudsConstantBuffer, VolumetricCloudsMapRange);
-				VolumetricCloudsConstantsMapScope->BottomLayerRadiusMetersSquared	= VolumetricCloudsBottomLayerMeters * VolumetricCloudsBottomLayerMeters;
-				VolumetricCloudsConstantsMapScope->TopLayerRadiusMetersSquared		= VolumetricCloudsTopLayerMeters * VolumetricCloudsTopLayerMeters;
-				VolumetricCloudsConstantsMapScope->MaxStepsRcp						= 1.0f / static_cast<float>(VolumetricCloudsMaxSteps);
-				VolumetricCloudsConstantsMapScope->MaxSteps							= VolumetricCloudsMaxSteps;
+				VolumetricCloudsConstantsMapScope->CloudsBottomLayerRadiusMeters		= VolumetricCloudsBottomLayerMeters;
+				VolumetricCloudsConstantsMapScope->CloudsTopLayerRadiusMeters			= VolumetricCloudsTopLayerMeters;
+				VolumetricCloudsConstantsMapScope->CloudsBottomLayerRadiusMetersSquared	= VolumetricCloudsBottomLayerMeters * VolumetricCloudsBottomLayerMeters;
+				VolumetricCloudsConstantsMapScope->CloudsTopLayerRadiusMetersSquared	= VolumetricCloudsTopLayerMeters * VolumetricCloudsTopLayerMeters;
+				VolumetricCloudsConstantsMapScope->CloudsMaxStepsRcp					= 1.0f / static_cast<float>(VolumetricCloudsMaxSteps);
+				VolumetricCloudsConstantsMapScope->CloudsMaxSteps						= VolumetricCloudsMaxSteps;
 
 				for (int PhaseGIndex = 0; PhaseGIndex < VOLUMETRIC_PHASE_COUNT; ++PhaseGIndex)
-					VolumetricCloudsConstantsMapScope->PhaseG[PhaseGIndex]	= VolumetricCloudsPhaseG[PhaseGIndex];
-				VolumetricCloudsConstantsMapScope->PhaseBlend				= VolumetricCloudsBlend;
+					VolumetricCloudsConstantsMapScope->CloudsPhaseG[PhaseGIndex]		= 1.0f - VolumetricCloudsPhaseG[PhaseGIndex];
+				VolumetricCloudsConstantsMapScope->CloudsPhaseBlend						= VolumetricCloudsBlend;
+				VolumetricCloudsConstantsMapScope->CloudsDensity						= VolumetricCloudsDensity;
+				VolumetricCloudsConstantsMapScope->CloudsNoiseScale						= VolumetricCloudsNoiseScale;
 			}
 
 			View* VolumetricCloudsConstantBufferView = *_VolumetricCloudsConstantBufferView;
 			_VolumetricCloudsDescriptorTable->SetDescriptor(0, InRenderer.GetGlobalResources().GetViewConstantBufferView());
 			_VolumetricCloudsDescriptorTable->SetDescriptor(1, VolumetricCloudsConstantBufferView);
 			_VolumetricCloudsDescriptorTable->SetDescriptor(2, InRenderer.GetGlobalResources().GetGBufferDepthStencil().GetShaderResourceView());
-			_VolumetricCloudsDescriptorTable->SetDescriptor(3, InRenderer.GetGlobalResources().GetGBufferLuminance().GetUnorderedAccessView());
+			_VolumetricCloudsDescriptorTable->SetDescriptor(3, InSystem.GetTextureFactory().GetTextureCache("cloud_base").CachedTexture->GetShaderResourceView());
+			_VolumetricCloudsDescriptorTable->SetDescriptor(4, InContext.GetBilinearWrapSampler());
+			_VolumetricCloudsDescriptorTable->SetDescriptor(5, InRenderer.GetGlobalResources().GetGBufferLuminance().GetUnorderedAccessView());
 
 			{
 				
@@ -142,7 +153,7 @@ namespace Eternal
 		void VolumetricCloudsPass::RenderDebug()
 		{
 			ImGui::Begin("Volumetric Clouds");
-			ImGui::SliderFloat("Clouds bottom layer (m)", &VolumetricCloudsBottomLayerMeters, 0.0f, 1000.0f);
+			ImGui::SliderFloat("Clouds bottom layer (m)", &VolumetricCloudsBottomLayerMeters, 0.0f, 10000.0f);
 			ImGui::SliderFloat("Clouds top layer (m)", &VolumetricCloudsTopLayerMeters, 10000.0f, 20000.0f);
 			for (int PhaseGIndex = 0; PhaseGIndex < VOLUMETRIC_PHASE_COUNT; ++PhaseGIndex)
 			{
@@ -151,6 +162,8 @@ namespace Eternal
 				ImGui::SliderFloat(PhaseLabel, &VolumetricCloudsPhaseG[PhaseGIndex], -1.0f, 1.0f);
 			}
 			ImGui::SliderFloat("Clouds Phase Blend", &VolumetricCloudsBlend, 0.0f, 1.0f);
+			ImGui::SliderFloat("Clouds Density", &VolumetricCloudsDensity, 0.0f, 0.1f);
+			ImGui::SliderFloat("Clouds Noise scale", &VolumetricCloudsNoiseScale, 0.0f, 10.0f);
 			ImGui::End();
 		}
 	}
