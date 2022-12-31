@@ -122,6 +122,13 @@ namespace Eternal
 					"noise_curl_3d_xyzw"
 				)
 			);
+			_Streaming->EnqueueRequest(
+				new TextureRequest(
+					FilePath::Find("cloud_base.dds", FileType::FILE_TYPE_TEXTURES),
+					"cloud_base",
+					"cloud_base"
+				)
+			);
 			_Streaming->CommitRequests();
 		}
 
