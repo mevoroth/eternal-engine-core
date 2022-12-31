@@ -108,7 +108,7 @@ namespace Eternal
 				// Transition
 				ResourceTransition TextureCopyWriteToShaderResource(
 					Cache.CachedTexture->GetShaderResourceView(),
-					TransitionState::TRANSITION_PIXEL_SHADER_READ
+					TransitionState::TRANSITION_PIXEL_SHADER_READ | TransitionState::TRANSITION_NON_PIXEL_SHADER_READ
 				);
 				UploadTextureCommandList->Transition(
 					&TextureCopyWriteToShaderResource, 1
