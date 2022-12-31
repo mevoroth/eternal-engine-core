@@ -1,5 +1,6 @@
 #include "GraphicsEngine/Renderer.hpp"
 #include "GraphicData/GlobalResources.hpp"
+#include "GraphicsEngine/RenderPasses/ShadowMapPass.hpp"
 #include "GraphicsEngine/RenderPasses/OpaquePass.hpp"
 #include "GraphicsEngine/RenderPasses/DirectLightingPass.hpp"
 #include "GraphicsEngine/RenderPasses/VolumetricCloudsPass.hpp"
@@ -21,6 +22,7 @@ namespace Eternal
 		Renderer::Renderer(_In_ GraphicsContext& InContext)
 			: _GlobalResources(new GlobalResources(InContext))
 			, _Passes({
+				new ShadowMapPass(InContext, *this),
 				new OpaquePass(InContext, *this),
 				new DirectLightingPass(InContext, *this),
 				new VolumetricCloudsPass(InContext, *this),
