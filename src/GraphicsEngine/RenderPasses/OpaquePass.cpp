@@ -12,116 +12,59 @@ namespace Eternal
 
 		const string OpaquePass::OpaquePassName = "OpaquePass";
 
-		static constexpr bool UseMeshPipeline = false;
-
 		OpaquePass::OpaquePass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
-			: ObjectPass(InContext, InRenderer)
 		{
-			//vector<string> Defines =
-			//{
-			//	"OBJECT_NEEDS_NORMAL",		"1",
-			//	"OBJECT_NEEDS_TANGENT",		"1",
-			//	"OBJECT_NEEDS_BINORMAL",	"1",
-			//	"OBJECT_NEEDS_UV",			"1"
-			//};
+			GlobalResources& InGlobalResources = InRenderer.GetGlobalResources();
 
-			//ShaderCreateInformation OpaquePSCreateInformation(ShaderType::PS, "OpaquePS", "opaque.ps.hlsl", Defines);
-			//Shader* OpaquePS = InContext.GetShader(OpaquePSCreateInformation);
+			vector<string> Defines =
+			{
+				"OBJECT_NEEDS_NORMAL",		"1",
+				"OBJECT_NEEDS_TANGENT",		"1",
+				"OBJECT_NEEDS_BINORMAL",	"1",
+				"OBJECT_NEEDS_UV",			"1"
+			};
 
-			//vector<RootSignatureParameter> ParametersVSPS =
-			//{
-			//	RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VS),
-			//	RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VS),
-			//	RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
-			//	RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
-			//	RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
-			//	RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_SAMPLER,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS)
-			//};
+			ShaderCreateInformation OpaquePSCreateInformation(ShaderType::PS, "OpaquePS", "opaque.ps.hlsl", Defines);
 
-			//vector<RootSignatureParameter> ParametersMSPS =
-			//{
-			//	RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS),
-			//	RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS),
-			//	RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
-			//	RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
-			//	RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
-			//	RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_SAMPLER,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
-			//	RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS),
-			//	RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS)
-			//};
+			vector<RootSignatureParameter> ParametersVSPS =
+			{
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_SAMPLER,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS)
+			};
 
-			//_RootSignature = CreateRootSignature(
-			//	InContext,
-			//	RootSignatureCreateInformation(
-			//		UseMeshPipeline ? ParametersMSPS : ParametersVSPS,
-			//		{}, {},
-			//		/*InHasInputAssembler=*/ true
-			//	)
-			//);
-			//_OpaqueDescriptorTable = _RootSignature->CreateRootDescriptorTable(InContext);
-			//
-			//_OpaqueInputLayout = CreateInputLayout(
-			//	InContext,
-			//	{
-			//		VertexStream<PositionNormalTangentBinormalUVVertex>({
-			//			{ Format::FORMAT_RGBA32323232_FLOAT,	VertexDataType::VERTEX_DATA_TYPE_POSITION },
-			//			{ Format::FORMAT_RGB323232_FLOAT,		VertexDataType::VERTEX_DATA_TYPE_NORMAL },
-			//			{ Format::FORMAT_RGB323232_FLOAT,		VertexDataType::VERTEX_DATA_TYPE_TANGENT },
-			//			{ Format::FORMAT_RGB323232_FLOAT,		VertexDataType::VERTEX_DATA_TYPE_BINORMAL },
-			//			{ Format::FORMAT_RG3232_FLOAT,			VertexDataType::VERTEX_DATA_TYPE_UV }
-			//		})
-			//	}
-			//);
+			vector<RootSignatureParameter> ParametersMSPS =
+			{
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_SAMPLER,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS)
+			};
 
-			//GlobalResources& InGlobalResources = InRenderer.GetGlobalResources();
-			//_OpaqueRenderPass = CreateRenderPass(
-			//	InContext,
-			//	RenderPassCreateInformation(
-			//		InContext.GetMainViewport(),
-			//		{
-			//			RenderTargetInformation(BlendStateAdditive, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferLuminance().GetRenderTargetDepthStencilView()),
-			//			RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferAlbedo().GetRenderTargetDepthStencilView()),
-			//			RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferNormals().GetRenderTargetDepthStencilView()),
-			//			RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferRoughnessMetallicSpecular().GetRenderTargetDepthStencilView())
-			//		},
-			//		InGlobalResources.GetGBufferDepthStencil().GetRenderTargetDepthStencilView(), RenderTargetOperator::Clear_Store
-			//	)
-			//);
-
-			//if (UseMeshPipeline)
-			//{
-			//	ShaderCreateInformation OpaqueMSCreateInformation(ShaderType::MS, "ObjectMS", "object.ms.hlsl", Defines);
-			//	Shader* OpaqueMS = InContext.GetShader(OpaqueMSCreateInformation);
-			//	
-			//	MeshPipelineCreateInformation OpaquePipelineCreateInformation(
-			//		*_RootSignature,
-			//		_OpaqueRenderPass,
-			//		OpaqueMS, OpaquePS,
-			//		DepthStencilTestWriteNone
-			//	);
-			//	_Pipeline = CreatePipeline(InContext, OpaquePipelineCreateInformation);
-			//}
-			//else
-			//{
-			//	ShaderCreateInformation OpaqueVSCreateInformation(ShaderType::VS, "ObjectVS", "object.vs.hlsl", Defines);
-			//	Shader* OpaqueVS = InContext.GetShader(OpaqueVSCreateInformation);
-
-			//	GraphicsPipelineCreateInformation OpaquePipelineCreateInformation(
-			//		*_RootSignature,
-			//		_OpaqueInputLayout,
-			//		_OpaqueRenderPass,
-			//		OpaqueVS, OpaquePS,
-			//		DepthStencilTestWriteNone
-			//	);
-			//	_Pipeline = CreatePipeline(InContext, OpaquePipelineCreateInformation);
-			//}
-		}
-
-		OpaquePass::~OpaquePass()
-		{
-			//DestroyRenderPass(_OpaqueRenderPass);
-			//DestroyInputLayout(_OpaqueInputLayout);
-			//DestroyDescriptorTable(_OpaqueDescriptorTable);
+			ObjectPassCreateInformation ObjectPassInformation =
+			{
+				Defines,
+				UseMeshPipeline ? ParametersMSPS : ParametersVSPS,
+				RenderPassCreateInformation(
+					InContext.GetMainViewport(),
+					{
+						RenderTargetInformation(BlendStateAdditive, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferLuminance().GetRenderTargetDepthStencilView()),
+						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferAlbedo().GetRenderTargetDepthStencilView()),
+						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferNormals().GetRenderTargetDepthStencilView()),
+						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferRoughnessMetallicSpecular().GetRenderTargetDepthStencilView())
+					},
+					InGlobalResources.GetGBufferDepthStencil().GetRenderTargetDepthStencilView(), RenderTargetOperator::Clear_Store
+				),
+				InContext.GetShader(OpaquePSCreateInformation)
+			};
+			_InitializeObjectPass(InContext, ObjectPassInformation);
 		}
 
 		void OpaquePass::Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer)
@@ -148,12 +91,20 @@ namespace Eternal
 				}
 			);
 
-			_RenderInternal<TransitionFunctorType, PerPassFunctorType>(
+			PerDrawFunctorType PerDrawFunctionOpaque(
+				[this](_In_ Material* InPerDrawMaterial)
+				{
+					InPerDrawMaterial->CommitMaterial(*_ObjectDescriptorTable);
+				}
+			);
+
+			_RenderInternal<TransitionFunctorType, PerPassFunctorType, PerDrawFunctorType>(
 				InContext,
 				InSystem,
 				InRenderer,
 				TransitionFunctionOpaque,
-				PerPassFunctionOpaque
+				PerPassFunctionOpaque,
+				PerDrawFunctionOpaque
 			);
 		}
 

@@ -10,47 +10,19 @@ namespace Eternal
 	{
 		using namespace Eternal::GraphicData;
 
-		static constexpr bool UseMeshPipeline = false;
-
-		ObjectPass::ObjectPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
+		ObjectPass::~ObjectPass()
 		{
-			vector<string> Defines =
-			{
-				"OBJECT_NEEDS_NORMAL",		"1",
-				"OBJECT_NEEDS_TANGENT",		"1",
-				"OBJECT_NEEDS_BINORMAL",	"1",
-				"OBJECT_NEEDS_UV",			"1"
-			};
+			DestroyRenderPass(_ObjectRenderPass);
+			DestroyInputLayout(_ObjectInputLayout);
+			DestroyDescriptorTable(_ObjectDescriptorTable);
+		}
 
-			ShaderCreateInformation OpaquePSCreateInformation(ShaderType::PS, "OpaquePS", "opaque.ps.hlsl", Defines);
-			Shader* OpaquePS = InContext.GetShader(OpaquePSCreateInformation);
-
-			vector<RootSignatureParameter> ParametersVSPS =
-			{
-				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VS),
-				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VS),
-				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
-				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
-				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
-				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_SAMPLER,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS)
-			};
-
-			vector<RootSignatureParameter> ParametersMSPS =
-			{
-				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS),
-				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS),
-				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
-				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
-				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
-				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_SAMPLER,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PS),
-				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS),
-				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS)
-			};
-
+		void ObjectPass::_InitializeObjectPass(_In_ GraphicsContext& InContext, _In_ const ObjectPassCreateInformation& InObjectPassCreateInformation)
+		{
 			_RootSignature = CreateRootSignature(
 				InContext,
 				RootSignatureCreateInformation(
-					UseMeshPipeline ? ParametersMSPS : ParametersVSPS,
+					InObjectPassCreateInformation.RootSignatureParameters,
 					{}, {},
 					/*InHasInputAssembler=*/ true
 				)
@@ -70,67 +42,58 @@ namespace Eternal
 				}
 			);
 
-			GlobalResources& InGlobalResources = InRenderer.GetGlobalResources();
 			_ObjectRenderPass = CreateRenderPass(
 				InContext,
-				RenderPassCreateInformation(
-					InContext.GetMainViewport(),
-					{
-						RenderTargetInformation(BlendStateAdditive, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferLuminance().GetRenderTargetDepthStencilView()),
-						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferAlbedo().GetRenderTargetDepthStencilView()),
-						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferNormals().GetRenderTargetDepthStencilView()),
-						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferRoughnessMetallicSpecular().GetRenderTargetDepthStencilView())
-					},
-					InGlobalResources.GetGBufferDepthStencil().GetRenderTargetDepthStencilView(), RenderTargetOperator::Clear_Store
-				)
+				InObjectPassCreateInformation.RenderPassInformation
 			);
+
+			char ShaderName[256];
 
 			if (UseMeshPipeline)
 			{
-				ShaderCreateInformation OpaqueMSCreateInformation(ShaderType::MS, "ObjectMS", "object.ms.hlsl", Defines);
+				sprintf_s(ShaderName, "%s%s", _GetPassName().c_str(), "MS");
+
+				ShaderCreateInformation OpaqueMSCreateInformation(ShaderType::MS, ShaderName, "object.ms.hlsl", InObjectPassCreateInformation.Defines);
 				Shader* OpaqueMS = InContext.GetShader(OpaqueMSCreateInformation);
 				
 				MeshPipelineCreateInformation OpaquePipelineCreateInformation(
 					*_RootSignature,
 					_ObjectRenderPass,
-					OpaqueMS, OpaquePS,
+					OpaqueMS, InObjectPassCreateInformation.ObjectPS,
 					DepthStencilTestWriteNone
 				);
 				_Pipeline = CreatePipeline(InContext, OpaquePipelineCreateInformation);
 			}
 			else
 			{
-				ShaderCreateInformation OpaqueVSCreateInformation(ShaderType::VS, "ObjectVS", "object.vs.hlsl", Defines);
+				sprintf_s(ShaderName, "%s%s", _GetPassName().c_str(), "VS");
+
+				ShaderCreateInformation OpaqueVSCreateInformation(ShaderType::VS, ShaderName, "object.vs.hlsl", InObjectPassCreateInformation.Defines);
 				Shader* OpaqueVS = InContext.GetShader(OpaqueVSCreateInformation);
 
 				GraphicsPipelineCreateInformation OpaquePipelineCreateInformation(
 					*_RootSignature,
 					_ObjectInputLayout,
 					_ObjectRenderPass,
-					OpaqueVS, OpaquePS,
+					OpaqueVS, InObjectPassCreateInformation.ObjectPS,
 					DepthStencilTestWriteNone
 				);
 				_Pipeline = CreatePipeline(InContext, OpaquePipelineCreateInformation);
 			}
 		}
 
-		ObjectPass::~ObjectPass()
-		{
-			DestroyRenderPass(_ObjectRenderPass);
-			DestroyInputLayout(_ObjectInputLayout);
-			DestroyDescriptorTable(_ObjectDescriptorTable);
-		}
-
 		template<
 			typename TransitionFunctor,
-			typename PerPassFunctor
+			typename PerPassFunctor,
+			typename PerDrawFunctor
 		>
 		void ObjectPass::_RenderInternal(
 			_In_ GraphicsContext& InContext,
 			_In_ System& InSystem,
 			_In_ Renderer& InRenderer,
 			_In_ TransitionFunctor InTransitionFunction,
-			_In_ PerPassFunctor InPerPassFunction
+			_In_ PerPassFunctor InPerPassFunction,
+			_In_ PerDrawFunctor InPerDrawFunction
 		)
 		{
 			ETERNAL_PROFILER(BASIC)();
@@ -169,7 +132,7 @@ namespace Eternal
 					{
 						GPUMesh::PerDrawInformation& DrawInformation = CurrentGPUMesh.PerDrawInformations[DrawIndex];
 
-						DrawInformation.PerDrawMaterial->CommitMaterial(*_ObjectDescriptorTable);
+						InPerDrawFunction(DrawInformation.PerDrawMaterial);
 
 						_ObjectDescriptorTable->SetDescriptor(0, DrawInformation.PerDrawConstantBufferMSVS);
 						ObjectCommandList->SetGraphicsDescriptorTable(InContext, *_ObjectDescriptorTable);
@@ -191,12 +154,13 @@ namespace Eternal
 			ObjectCommandList->EndRenderPass();
 		}
 
-		template void ObjectPass::_RenderInternal<TransitionFunctorType, PerPassFunctorType>(
+		template void ObjectPass::_RenderInternal<TransitionFunctorType, PerPassFunctorType, PerDrawFunctorType>(
 			_In_ GraphicsContext& InContext,
 			_In_ System& InSystem,
 			_In_ Renderer& InRenderer,
 			_In_ TransitionFunctorType InTransitionFunction,
-			_In_ PerPassFunctorType InPerPassFunction
+			_In_ PerPassFunctorType InPerPassFunction,
+			_In_ PerDrawFunctorType InPerDrawFunction
 		);
 	}
 }

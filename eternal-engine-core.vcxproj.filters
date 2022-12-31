@@ -174,6 +174,12 @@
     <ClInclude Include="include\GraphicsEngine\RenderPasses\ObjectPass.hpp">
       <Filter>GraphicsEngine\RenderPasses</Filter>
     </ClInclude>
+    <ClInclude Include="include\GraphicsEngine\RenderPasses\DepthOnlyPass.hpp">
+      <Filter>GraphicsEngine\RenderPasses</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsEngine\RenderPasses\ShadowMapPass.hpp">
+      <Filter>GraphicsEngine\RenderPasses</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Game.cpp">
@@ -289,6 +295,12 @@
       <Filter>GraphicsEngine\RenderPasses</Filter>
     </ClCompile>
     <ClCompile Include="src\GraphicsEngine\RenderPasses\ObjectPass.cpp">
+      <Filter>GraphicsEngine\RenderPasses</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\RenderPasses\DepthOnlyPass.cpp">
+      <Filter>GraphicsEngine\RenderPasses</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\RenderPasses\ShadowMapPass.cpp">
       <Filter>GraphicsEngine\RenderPasses</Filter>
     </ClCompile>
   </ItemGroup>
