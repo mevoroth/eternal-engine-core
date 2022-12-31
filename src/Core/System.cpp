@@ -163,8 +163,8 @@ namespace Eternal
 				CurrentGameFrame.Lights.Commit(OldestFrame.Lights);
 
 				// Camera
-				CurrentGameFrame.View = OldestFrame.PendingView ? OldestFrame.PendingView : OldestFrame.View;
-				OldestFrame.PendingView = nullptr;
+				CurrentGameFrame.ViewCamera = OldestFrame.PendingViewCamera ? OldestFrame.PendingViewCamera : OldestFrame.ViewCamera;
+				OldestFrame.PendingViewCamera = nullptr;
 			}
 		}
 

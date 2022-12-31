@@ -95,12 +95,14 @@ namespace Eternal
 								GameObject* LightObject = new GameObject();
 								LightComponent* NewLightComponent = LightData.Load<LightComponent>(LightItem);
 								LightObject->AddComponent<LightComponent>(NewLightComponent);
-								LightObject->AddComponent<TransformComponent>(TransformData.Load<TransformComponent>(TransformItem),
+								LightObject->AddComponent<TransformComponent>(
+									TransformData.Load<TransformComponent>(TransformItem),
 									[NewLightComponent](_Inout_ TransformComponent* InOutComponent)
 									{
 										InOutComponent->SetHasBehavior();
 										InOutComponent->OnTransformChanged().Receivers.push_back(&NewLightComponent->OnTransformChangedReceiver());
-									});
+									}
+								);
 								OutLevel->AddGameObject(LightObject);
 							}
 						);

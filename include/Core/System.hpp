@@ -129,8 +129,8 @@ namespace Eternal
 			vector<GraphicsCommand*> GraphicsCommands;
 			PayloadQueueType DelayedDestroyedRequests;
 			
-			Camera* View = nullptr;
-			Camera* PendingView = nullptr;
+			Camera* ViewCamera = nullptr;
+			Camera* PendingViewCamera = nullptr;
 		};
 
 		struct SystemCreateInformation

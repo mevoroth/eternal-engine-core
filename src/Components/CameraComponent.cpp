@@ -25,7 +25,7 @@ namespace Eternal
 		void CameraComponent::Begin()
 		{
 			System& SystemEngine = GetWorld()->GetGame().GetSystem();
-			SystemEngine.GetGameFrame().PendingView = _Camera;
+			SystemEngine.GetGameFrame().PendingViewCamera = _Camera;
 		}
 	}
 }
