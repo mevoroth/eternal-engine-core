@@ -45,7 +45,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(VCInstallDir)PlatformSDK\include;$(ProjectDir);$(SolutionDir)eternal-engine-utils\include;$(SolutionDir)eternal-engine-components\include;$(ProjectDir)include;$(SolutionDir)eternal-engine-extern\imgui;$(SolutionDir)eternal-engine-graphics\include;$(SolutionDir)eternal-engine-extern\rapidjson\include;$(SolutionDir)eternal-engine-shaders;$(SolutionDir)eternal-engine-extern\renderdoc;$(SolutionDir)eternal-engine-extern\optick\src;D:\Code\VulkanSDK\1.3.231.1\Include;D:\Software\FBXSDK\2020.2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(SolutionDir)\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
