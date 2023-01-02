@@ -10,7 +10,9 @@ namespace Eternal
 			: DepthOnlyPass(
 				InContext,
 				InRenderer,
-				InRenderer.GetGlobalResources().GetShadowMap().GetRenderTargetDepthStencilView()
+				InRenderer.GetGlobalResources().GetShadowMapViewport(),
+				InRenderer.GetGlobalResources().GetShadowMap().GetRenderTargetDepthStencilView(),
+				InRenderer.GetGlobalResources().GetShadowMapViewConstantBufferView()
 			)
 		{
 		}

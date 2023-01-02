@@ -6,8 +6,10 @@ namespace Eternal
 	{
 		const string DepthOnlyPass::DepthOnlyPassName = "DepthOnlyPass";
 
-		DepthOnlyPass::DepthOnlyPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer, _In_ View* InDepthStencilView)
-			: _DepthStencilView(InDepthStencilView)
+		DepthOnlyPass::DepthOnlyPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer, _In_ const Viewport& InDepthOnlyViewport, _In_ View* InDepthStencilView, _In_ View* InDepthOnlyViewConstantBufferView)
+			: _DepthOnlyViewport(InDepthOnlyViewport)
+			, _DepthStencilView(InDepthStencilView)
+			, _DepthOnlyViewConstantBufferView(InDepthOnlyViewConstantBufferView)
 		{
 			vector<string> Defines;
 
@@ -30,7 +32,7 @@ namespace Eternal
 				Defines,
 				UseMeshPipeline ? ParametersMSPS : ParametersVSPS,
 				RenderPassCreateInformation(
-					InContext.GetMainViewport(),
+					InDepthOnlyViewport,
 					_DepthStencilView, RenderTargetOperator::Clear_Store
 				)
 			};
@@ -53,7 +55,7 @@ namespace Eternal
 			PerPassFunctorType PerPassFunctionDepthOnly(
 				[this](_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer) -> void
 				{
-					_ObjectDescriptorTable->SetDescriptor(1, InRenderer.GetGlobalResources().GetViewConstantBufferView());
+					_ObjectDescriptorTable->SetDescriptor(1, _DepthOnlyViewConstantBufferView);
 				}
 			);
 

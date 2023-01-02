@@ -14,11 +14,13 @@ namespace Eternal
 			virtual void Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer) override final;
 
 		protected:
-			DepthOnlyPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer, _In_ View* InDepthStencilView);
+			DepthOnlyPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer, _In_ const Viewport& InDepthOnlyViewport, _In_ View* InDepthStencilView, _In_ View* InDepthOnlyViewConstantBufferView);
 
 			virtual const string& _GetPassName() const override;
 
-			View* _DepthStencilView = nullptr;
+			const Viewport&	_DepthOnlyViewport;
+			View*			_DepthStencilView					= nullptr;
+			View*			_DepthOnlyViewConstantBufferView	= nullptr;
 		};
 	}
 }
