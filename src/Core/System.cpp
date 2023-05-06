@@ -44,6 +44,7 @@ namespace Eternal
 				FilePath::Register(InSystemCreateInformation.ShaderIncludePath[IncludeIndex],	FileType::FILE_TYPE_SHADERS);
 			FilePath::Register(InSystemCreateInformation.LevelPath,								FileType::FILE_TYPE_LEVELS);
 			FilePath::Register(InSystemCreateInformation.FBXPath,								FileType::FILE_TYPE_MESHES);
+			FilePath::Register(InSystemCreateInformation.FBXCachePath,							FileType::FILE_TYPE_CACHED_MESHES);
 			FilePath::Register(InSystemCreateInformation.TexturePath,							FileType::FILE_TYPE_TEXTURES);
 
 			_Timer				= CreateTimer(TimeType::TIME_TYPE_WIN);
@@ -137,9 +138,12 @@ namespace Eternal
 			ETERNAL_PROFILER(BASIC)();
 			SystemFrame& CurrentGameFrame = GetGameFrame();
 
-			while (CurrentGameFrame.SystemState->Load() != SystemCanBeWritten)
 			{
-				Sleep(10);
+				ETERNAL_PROFILER(BASIC)("WaitForSystemCanBeWritten");
+				while (CurrentGameFrame.SystemState->Load() != SystemCanBeWritten)
+				{
+					Sleep(10);
+				}
 			}
 			GetParallelSystem().StartFrame();
 			GetImgui().Begin(CurrentGameFrame.ImguiFrameContext);
@@ -159,8 +163,8 @@ namespace Eternal
 			{
 				SystemFrame& OldestFrame = GetOldestGameFrame();
 
-				CurrentGameFrame.MeshCollections.Commit(OldestFrame.MeshCollections);
-				CurrentGameFrame.Lights.Commit(OldestFrame.Lights);
+				CurrentGameFrame.MeshCollections.CommitObjects(OldestFrame.MeshCollections);
+				CurrentGameFrame.Lights.CommitObjects(OldestFrame.Lights);
 
 				// Camera
 				CurrentGameFrame.ViewCamera = OldestFrame.PendingViewCamera ? OldestFrame.PendingViewCamera : OldestFrame.ViewCamera;

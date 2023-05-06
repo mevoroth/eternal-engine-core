@@ -2,7 +2,7 @@
 
 #include "Core/Component.hpp"
 #include "Transform/Transform.hpp"
-#include "Event/EventSender.h"
+#include "Event/EventSender.hpp"
 
 namespace Eternal
 {

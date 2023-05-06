@@ -19,7 +19,7 @@ namespace Eternal
 			: Component(InWorld)
 			, _OnTransformChangedReceiver(this)
 		{
-			_ComponentState.ComponentHasBehavior = true;
+			SetHasBehavior();
 		}
 
 		void CameraComponent::Begin()

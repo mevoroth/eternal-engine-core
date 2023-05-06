@@ -2,6 +2,8 @@
 #include "Core/World.hpp"
 #include "Core/Game.hpp"
 #include "Core/System.hpp"
+#include "Core/GameObject.hpp"
+#include "Components/TransformComponent.hpp"
 
 namespace Eternal
 {
@@ -13,7 +15,8 @@ namespace Eternal
 		{
 			_MeshCollection = InMeshCollection;
 			System& EngineSystem = GetWorld()->GetGame().GetSystem();
-			EngineSystem.GetGameFrame().MeshCollections.Add(InMeshCollection);
+			TransformComponent* Transform = GetParent()->GetComponent<TransformComponent>();
+			EngineSystem.GetGameFrame().MeshCollections.AddObject(InMeshCollection, Transform);
 		}
 	}
 }

@@ -8,6 +8,7 @@
 #include "Input/Input.hpp"
 #include "Types/Types.hpp"
 #include "Math/Math.hpp"
+#include "Memory/StackMemory.hpp"
 
 namespace Eternal
 {
@@ -339,18 +340,20 @@ namespace Eternal
 				std::string UploadTextureName = "ImguiFontTextureUploadBuffer";
 				const uint32_t UploadBufferPixels = _ImguiFontMetaData.Width * _ImguiFontMetaData.Height;
 				const uint32_t UploadBufferSize = UploadBufferPixels * _ImguiFontMetaData.BytesPerPixel;
-				BufferResourceCreateInformation UploadBufferTextureInformation(
-					InContext.GetDevice(),
-					UploadTextureName,
-					BufferCreateInformation(
-						Format::FORMAT_RGBA8888_UNORM,
-						BufferResourceUsage::BUFFER_RESOURCE_USAGE_COPY_READ,
-						_ImguiFontMetaData.BytesPerPixel,
-						UploadBufferPixels
-					),
-					ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
+				
+				Resource* ImguiFontUploadTexture = CreateBuffer(
+					BufferResourceCreateInformation(
+						InContext.GetDevice(),
+						UploadTextureName,
+						BufferCreateInformation(
+							Format::FORMAT_RGBA8888_UNORM,
+							BufferResourceUsage::BUFFER_RESOURCE_USAGE_COPY_READ,
+							_ImguiFontMetaData.BytesPerPixel,
+							UploadBufferPixels
+						),
+						ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
+					)
 				);
-				Resource* ImguiFontUploadTexture = CreateBuffer(UploadBufferTextureInformation);
 
 				//////////////////////////////////////////////////////////////////////////
 				// Map
@@ -484,16 +487,17 @@ namespace Eternal
 			}
 		}
 
-		void Imgui::_ImGui_SetupRenderState(_In_ const ImDrawData& InDrawData, _In_ ImguiRenderContext& InImguiContext, _In_ GraphicsContext& InContext, _In_ CommandList* InImguiCommandList)
+		void Imgui::_ImGui_SetupRenderState(_In_ const ImDrawData& InDrawData, _In_ ImguiRenderContext& InImguiContext, _In_ GraphicsContext& InContext, _In_ CommandList* InImguiCommandList, _Inout_ StackAllocation<View>& InOutProjectionConstantsViews)
 		{
 			Viewport* ImguiViewport = CreateInvertedViewport(
 				InContext,
 				static_cast<int32_t>(InDrawData.DisplaySize.x),
-				static_cast<int32_t>(InDrawData.DisplaySize.y)
+				static_cast<int32_t>(InDrawData.DisplaySize.y),
+				0, 0,
+				alloca(GetViewportSize(InContext))
 			);
 			InImguiCommandList->SetViewport(*ImguiViewport);
-			delete ImguiViewport;
-			ImguiViewport = nullptr;
+			DestroyInPlaceViewport(ImguiViewport);
 
 			float Left		= InDrawData.DisplayPos.x;
 			float Right		= InDrawData.DisplayPos.x + InDrawData.DisplaySize.x;
@@ -516,15 +520,18 @@ namespace Eternal
 			ViewMetaData ProjectionConstantsMetaData;
 			ProjectionConstantsMetaData.ConstantBufferView.BufferElementOffset	= InImguiContext.ImguiProjectionCount;
 			ProjectionConstantsMetaData.ConstantBufferView.BufferSize			= sizeof(ImguiProjectionConstants);
-			ConstantBufferViewCreateInformation ProjectionConstantsBufferViewCreateInformation(
-				InContext,
-				&(*_ImguiConstantBuffer),
-				ProjectionConstantsMetaData
+
+			View* ProjectionConstantsView = CreateConstantBufferView(
+				ConstantBufferViewCreateInformation(
+					InContext,
+					&(*_ImguiConstantBuffer),
+					ProjectionConstantsMetaData
+				),
+				InOutProjectionConstantsViews.SubAllocate()
 			);
-			View* ProjectionConstantsView = CreateConstantBufferView(ProjectionConstantsBufferViewCreateInformation);
-			if (_PreviousDrawCount > 0)
+			 //if (_PreviousDrawCount > 0)
 				_ImguiDescriptorTable->SetDescriptor(0, ProjectionConstantsView);
-			InContext.DelayedDelete(ProjectionConstantsView);
+			//InContext.DelayedDelete(ProjectionConstantsView);
 			
 			++InImguiContext.ImguiProjectionCount;
 
@@ -537,77 +544,80 @@ namespace Eternal
 		{
 			int ViewportWidth = (int)(InDrawData.DisplaySize.x * InDrawData.FramebufferScale.x);
 			int ViewportHeight = (int)(InDrawData.DisplaySize.y * InDrawData.FramebufferScale.y);
-			if (ViewportWidth <= 0 || ViewportHeight <= 0)
+			if (ViewportWidth <= 0 || ViewportHeight <= 0 || InDrawData.CmdListsCount <= 0)
 				return;
 
 			if (_PreviousDrawCount > 0)
 				_ImguiDescriptorTable->SetDescriptor(2, _ImguiBilinearSampler);
 
-			_ImGui_SetupRenderState(InDrawData, InImguiContext, InContext, InImguiCommandList);
-
-			_PreviousDrawCount = 0;
-
-			int GlobalVertexOffset = 0;
-			int GlobalIndexOffset = 0;
-			ImVec2 ClipOffset = InDrawData.DisplayPos;
-			ImVec2 ClipScale = InDrawData.FramebufferScale;
-
-			for (int DrawListIndex = 0; DrawListIndex < InDrawData.CmdListsCount; ++DrawListIndex)
 			{
-				const ImDrawList* ImguiDrawList = InDrawData.CmdLists[DrawListIndex];
-				for (int CommandIndex = 0; CommandIndex < ImguiDrawList->CmdBuffer.Size; ++CommandIndex)
+				StackAllocation<View> ProjectionConstantsViews(alloca(GetViewSize(InContext) * (InDrawData.CmdListsCount + 1)), GetViewSize(InContext), InDrawData.CmdListsCount + 1);
+				_ImGui_SetupRenderState(InDrawData, InImguiContext, InContext, InImguiCommandList, ProjectionConstantsViews);
+
+				_PreviousDrawCount = 0;
+
+				int GlobalVertexOffset = 0;
+				int GlobalIndexOffset = 0;
+				ImVec2 ClipOffset = InDrawData.DisplayPos;
+				ImVec2 ClipScale = InDrawData.FramebufferScale;
+
+				for (int DrawListIndex = 0; DrawListIndex < InDrawData.CmdListsCount; ++DrawListIndex)
 				{
-					const ImDrawCmd* ImguiCommand = &ImguiDrawList->CmdBuffer[CommandIndex];
-					if (ImguiCommand->UserCallback != NULL)
+					const ImDrawList* ImguiDrawList = InDrawData.CmdLists[DrawListIndex];
+					for (int CommandIndex = 0; CommandIndex < ImguiDrawList->CmdBuffer.Size; ++CommandIndex)
 					{
-						// User callback, registered via ImDrawList::AddCallback()
-						// (ImDrawCallback_ResetRenderState is a special callback value used by the user to request the renderer to reset render state.)
-						if (ImguiCommand->UserCallback == ImDrawCallback_ResetRenderState)
-							_ImGui_SetupRenderState(InDrawData, InImguiContext, InContext, InImguiCommandList);
-						else
-							ImguiCommand->UserCallback(ImguiDrawList, ImguiCommand);
-					}
-					else
-					{
-						float Left		= (ImguiCommand->ClipRect.x - ClipOffset.x) * ClipScale.x;
-						float Top		= (ImguiCommand->ClipRect.y - ClipOffset.y) * ClipScale.y;
-						float Right		= (ImguiCommand->ClipRect.z - ClipOffset.x) * ClipScale.x;
-						float Bottom	= (ImguiCommand->ClipRect.w - ClipOffset.y) * ClipScale.y;
-
-						// Apply Scissor, Bind texture, Draw
-
-						if (static_cast<int>(Left) < ViewportWidth &&
-							static_cast<int>(Top) < ViewportHeight &&
-							Right >= 0.0f &&
-							Left >= 0.0f)
+						const ImDrawCmd* ImguiCommand = &ImguiDrawList->CmdBuffer[CommandIndex];
+						if (ImguiCommand->UserCallback != NULL)
 						{
-							Left	= Max<float>(0.0f, Left);
-							Top		= Max<float>(0.0f, Top);
+							// User callback, registered via ImDrawList::AddCallback()
+							// (ImDrawCallback_ResetRenderState is a special callback value used by the user to request the renderer to reset render state.)
+							if (ImguiCommand->UserCallback == ImDrawCallback_ResetRenderState)
+								_ImGui_SetupRenderState(InDrawData, InImguiContext, InContext, InImguiCommandList, ProjectionConstantsViews);
+							else
+								ImguiCommand->UserCallback(ImguiDrawList, ImguiCommand);
+						}
+						else
+						{
+							float Left = (ImguiCommand->ClipRect.x - ClipOffset.x) * ClipScale.x;
+							float Top = (ImguiCommand->ClipRect.y - ClipOffset.y) * ClipScale.y;
+							float Right = (ImguiCommand->ClipRect.z - ClipOffset.x) * ClipScale.x;
+							float Bottom = (ImguiCommand->ClipRect.w - ClipOffset.y) * ClipScale.y;
 
-							ScissorRectangle ImguiRectangle =
+							// Apply Scissor, Bind texture, Draw
+
+							if (static_cast<int>(Left) < ViewportWidth &&
+								static_cast<int>(Top) < ViewportHeight &&
+								Right >= 0.0f &&
+								Left >= 0.0f)
 							{
-								static_cast<int32_t>(Left),
-								static_cast<int32_t>(Top),
-								static_cast<int32_t>(Right),
-								static_cast<int32_t>(Bottom)
-							};
+								Left = Max<float>(0.0f, Left);
+								Top = Max<float>(0.0f, Top);
 
-							View* ImguiTexture = static_cast<View*>(ImguiCommand->GetTexID());
-							_ImguiDescriptorTable->SetDescriptor(1, ImguiTexture);
-							InImguiCommandList->SetScissorRectangle(ImguiRectangle);
-							InImguiCommandList->SetGraphicsDescriptorTable(InContext, *_ImguiDescriptorTable);
-							InImguiCommandList->DrawIndexedInstanced(
-								ImguiCommand->ElemCount,
-								1,
-								ImguiCommand->IdxOffset + GlobalIndexOffset,
-								ImguiCommand->VtxOffset + GlobalVertexOffset
-							);
-							++_PreviousDrawCount;
+								ScissorRectangle ImguiRectangle =
+								{
+									static_cast<int32_t>(Left),
+									static_cast<int32_t>(Top),
+									static_cast<int32_t>(Right),
+									static_cast<int32_t>(Bottom)
+								};
+
+								View* ImguiTexture = static_cast<View*>(ImguiCommand->GetTexID());
+								_ImguiDescriptorTable->SetDescriptor(1, ImguiTexture);
+								InImguiCommandList->SetScissorRectangle(ImguiRectangle);
+								InImguiCommandList->SetGraphicsDescriptorTable(InContext, *_ImguiDescriptorTable);
+								InImguiCommandList->DrawIndexedInstanced(
+									ImguiCommand->ElemCount,
+									1,
+									ImguiCommand->IdxOffset + GlobalIndexOffset,
+									ImguiCommand->VtxOffset + GlobalVertexOffset
+								);
+								++_PreviousDrawCount;
+							}
 						}
 					}
+					GlobalIndexOffset += ImguiDrawList->IdxBuffer.Size;
+					GlobalVertexOffset += ImguiDrawList->VtxBuffer.Size;
 				}
-				GlobalIndexOffset += ImguiDrawList->IdxBuffer.Size;
-				GlobalVertexOffset += ImguiDrawList->VtxBuffer.Size;
 			}
 		}
 	}

@@ -10,6 +10,12 @@ struct ImDrawList;
 
 namespace Eternal
 {
+	namespace Memory
+	{
+		template<typename AllocationType>
+		class StackAllocation;
+	}
+
 	namespace GraphicsEngine
 	{
 		class Renderer;
@@ -20,6 +26,7 @@ namespace Eternal
 		using namespace Eternal::Graphics;
 		using namespace Eternal::GraphicsEngine;
 		using namespace Eternal::InputSystem;
+		using namespace Eternal::Memory;
 
 		struct ImguiRenderContext;
 
@@ -65,7 +72,7 @@ namespace Eternal
 
 			//void _ImGui_GetDrawData();
 			void _ImGui_FillBuffers(_In_ const ImDrawData& InDrawData, _In_ ImguiRenderContext& InImguiContext);
-			void _ImGui_SetupRenderState(_In_ const ImDrawData& InDrawData, _In_ ImguiRenderContext& InImguiContext, _In_ GraphicsContext& InContext, _In_ CommandList* InImguiCommandList);
+			void _ImGui_SetupRenderState(_In_ const ImDrawData& InDrawData, _In_ ImguiRenderContext& InImguiContext, _In_ GraphicsContext& InContext, _In_ CommandList* InImguiCommandList, _Inout_ StackAllocation<View>& InOutProjectionConstantsViews);
 			void _ImGui_Render(_In_ const ImDrawData& InDrawData, _In_ ImguiRenderContext& InImguiContext, _In_ GraphicsContext& InContext, _In_ CommandList* InImguiCommandList);
 
 			struct ImguiFontMetaData

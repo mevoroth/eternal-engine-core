@@ -1,4 +1,7 @@
 #include "GraphicsEngine/RenderPasses/ShadowMapPass.hpp"
+#include "Core/System.hpp"
+#include "Light/Light.hpp"
+#include "GraphicData/ViewGraphicData.hpp"
 
 namespace Eternal
 {
@@ -15,6 +18,22 @@ namespace Eternal
 				InRenderer.GetGlobalResources().GetShadowMapViewConstantBufferView()
 			)
 		{
+		}
+
+		void ShadowMapPass::_BeginRender(_In_ System& InSystem, _In_ Renderer& InRenderer)
+		{
+			GlobalResources& InGlobalResources = InRenderer.GetGlobalResources();
+
+			const vector<ObjectsList<Light>::InstancedObjects>& Lights = InSystem.GetRenderFrame().Lights;
+			if (Lights.size() > 0 && Lights[0].Object->GetShadow().ShadowCamera)
+			{
+				UploadViewCameraToBuffer(
+					InRenderer.GetGlobalResources().GetShadowMapViewConstantBuffer(),
+					Lights[0].Object->GetShadow().ShadowCamera,
+					static_cast<float>(InGlobalResources.GetShadowMapViewport().GetWidth()),
+					static_cast<float>(InGlobalResources.GetShadowMapViewport().GetHeight())
+				);
+			}
 		}
 
 		const string& ShadowMapPass::_GetPassName() const

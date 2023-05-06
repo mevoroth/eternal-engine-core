@@ -53,19 +53,19 @@ namespace Eternal
 				const uint32_t UploadBufferAlignedSizeBytes = Footprint.TotalBytes;
 				const uint32_t UploadBufferAlignedSize = UploadBufferAlignedSizeBytes / InTextureData.Stride;
 				
-				BufferResourceCreateInformation UploadBufferTextureInformation(
-					InContext.GetDevice(),
-					UploadBufferName,
-					BufferCreateInformation(
-						InTextureData.TextureFormat,
-						BufferResourceUsage::BUFFER_RESOURCE_USAGE_COPY_READ,
-						InTextureData.Stride,
-						UploadBufferAlignedSize
-					),
-					ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
+				Resource* UploadTexture = CreateBuffer(
+					BufferResourceCreateInformation(
+						InContext.GetDevice(),
+						UploadBufferName,
+						BufferCreateInformation(
+							InTextureData.TextureFormat,
+							BufferResourceUsage::BUFFER_RESOURCE_USAGE_COPY_READ,
+							InTextureData.Stride,
+							UploadBufferAlignedSize
+						),
+						ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
+					)
 				);
-
-				Resource* UploadTexture = CreateBuffer(UploadBufferTextureInformation);
 
 				//////////////////////////////////////////////////////////////////////////
 				// Map

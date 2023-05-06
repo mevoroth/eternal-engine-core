@@ -25,22 +25,24 @@ namespace Eternal
 				uint32_t VertexStride = CurrentMesh->GetVertexStride();
 				uint32_t VertexBufferSize = CurrentMesh->GetVertexStride() * VerticesCount;
 
-				BufferResourceCreateInformation MeshVerticesResourceCreateInformation(
-					InContext.GetDevice(),
-					CurrentMesh->GetName(),
-					//VertexBufferCreateInformation(
-					//	VertexStride,
-					//	VerticesCount
-					//),
-					BufferCreateInformation(
-						Format::FORMAT_UNKNOWN,
-						BufferResourceUsage::BUFFER_RESOURCE_USAGE_VERTEX_BUFFER | BufferResourceUsage::BUFFER_RESOURCE_USAGE_STRUCTURED_BUFFER,
-						VertexStride,
-						VerticesCount
-					),
-					ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
+;
+				Resource* MeshVertexBuffer = CreateBuffer(
+					BufferResourceCreateInformation(
+						InContext.GetDevice(),
+						CurrentMesh->GetName(),
+						//VertexBufferCreateInformation(
+						//	VertexStride,
+						//	VerticesCount
+						//),
+						BufferCreateInformation(
+							Format::FORMAT_UNKNOWN,
+							BufferResourceUsage::BUFFER_RESOURCE_USAGE_VERTEX_BUFFER | BufferResourceUsage::BUFFER_RESOURCE_USAGE_STRUCTURED_BUFFER,
+							VertexStride,
+							VerticesCount
+						),
+						ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
+					)
 				);
-				Resource* MeshVertexBuffer = CreateBuffer(MeshVerticesResourceCreateInformation);
 				ViewMetaData MeshVertexStructuredBufferViewMetaData;
 				MeshVertexStructuredBufferViewMetaData.ShaderResourceViewBuffer.FirstElement		= 0;
 				MeshVertexStructuredBufferViewMetaData.ShaderResourceViewBuffer.NumElements			= VerticesCount;
@@ -75,22 +77,23 @@ namespace Eternal
 				uint32_t IndexStride = CurrentMesh->GetIndexStride();
 				uint32_t IndexBufferSize = IndexStride * IndicesCount;
 
-				BufferResourceCreateInformation MeshIndicesResourceCreateInformation(
-					InContext.GetDevice(),
-					CurrentMesh->GetName(),
-					//IndexBufferCreateInformation(
-					//	IndexStride,
-					//	IndicesCount
-					//),
-					BufferCreateInformation(
-						CurrentMesh->GetIndexStride() == sizeof(uint16_t) ? Format::FORMAT_R16_UINT : Format::FORMAT_R32_UINT,
-						BufferResourceUsage::BUFFER_RESOURCE_USAGE_INDEX_BUFFER | BufferResourceUsage::BUFFER_RESOURCE_USAGE_STRUCTURED_BUFFER,
-						IndexStride,
-						IndicesCount
-					),
-					ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
+				Resource* MeshIndexBuffer = CreateBuffer(
+					BufferResourceCreateInformation(
+						InContext.GetDevice(),
+						CurrentMesh->GetName(),
+						//IndexBufferCreateInformation(
+						//	IndexStride,
+						//	IndicesCount
+						//),
+						BufferCreateInformation(
+							CurrentMesh->GetIndexStride() == sizeof(uint16_t) ? Format::FORMAT_R16_UINT : Format::FORMAT_R32_UINT,
+							BufferResourceUsage::BUFFER_RESOURCE_USAGE_INDEX_BUFFER | BufferResourceUsage::BUFFER_RESOURCE_USAGE_STRUCTURED_BUFFER,
+							IndexStride,
+							IndicesCount
+						),
+						ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
+					)
 				);
-				Resource* MeshIndexBuffer = CreateBuffer(MeshIndicesResourceCreateInformation);
 				ViewMetaData MeshIndexStructuredBufferViewMetaData;
 				MeshIndexStructuredBufferViewMetaData.ShaderResourceViewBuffer.FirstElement			= 0;
 				MeshIndexStructuredBufferViewMetaData.ShaderResourceViewBuffer.NumElements			= IndicesCount / 3;
@@ -116,18 +119,19 @@ namespace Eternal
 				uint32_t ConstantBufferStride = CurrentMesh->GetConstantBufferStride();
 				uint32_t ConstantBufferCount = CurrentMesh->GetConstantBufferCount();
 
-				BufferResourceCreateInformation MeshConstantBufferResourceCreateInformation(
-					InContext.GetDevice(),
-					CurrentMesh->GetName(),
-					BufferCreateInformation(
-						Format::FORMAT_UNKNOWN,
-						BufferResourceUsage::BUFFER_RESOURCE_USAGE_CONSTANT_BUFFER,
-						CurrentMesh->GetConstantBufferStride(),
-						ConstantBufferCount
-					),
-					ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
+				Resource* MeshConstantBuffer = CreateBuffer(
+					BufferResourceCreateInformation(
+						InContext.GetDevice(),
+						CurrentMesh->GetName(),
+						BufferCreateInformation(
+							Format::FORMAT_UNKNOWN,
+							BufferResourceUsage::BUFFER_RESOURCE_USAGE_CONSTANT_BUFFER,
+							CurrentMesh->GetConstantBufferStride(),
+							ConstantBufferCount
+						),
+						ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
+					)
 				);
-				Resource* MeshConstantBuffer = CreateBuffer(MeshConstantBufferResourceCreateInformation);
 				// Upload
 				{
 					uint32_t ActualConstantBufferStride	= MeshConstantBuffer->GetBufferStride();

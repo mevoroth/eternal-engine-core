@@ -17,12 +17,16 @@ namespace Eternal
 			{
 				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VS),
 				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VS)
 			};
 
 			vector<RootSignatureParameter> ParametersMSPS =
 			{
 				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS),
 				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS),
+				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS),
 				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS),
 				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MS)
 			};
@@ -55,7 +59,7 @@ namespace Eternal
 			PerPassFunctorType PerPassFunctionDepthOnly(
 				[this](_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer) -> void
 				{
-					_ObjectDescriptorTable->SetDescriptor(1, _DepthOnlyViewConstantBufferView);
+					_ObjectDescriptorTable->SetDescriptor(2, _DepthOnlyViewConstantBufferView);
 				}
 			);
 
@@ -63,6 +67,7 @@ namespace Eternal
 				[](_In_ Material* InPerDrawMaterial) {}
 			);
 
+			_BeginRender(InSystem, InRenderer);
 			_RenderInternal<TransitionFunctorType, PerPassFunctorType, PerDrawFunctorType>(
 				InContext,
 				InSystem,

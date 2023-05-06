@@ -126,7 +126,7 @@ namespace Eternal
 			//GraphicsCommandListScope DirectLightingCommandList = InContext.CreateNewGraphicsCommandList(*_DirectLightingRenderPass, "DirectLighting");
 			CommandListScope DirectLightingCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "DirectLighting");
 
-			const vector<Light*>& Lights = InSystem.GetRenderFrame().Lights;
+			const vector<ObjectsList<Light>::InstancedObjects>& Lights = InSystem.GetRenderFrame().Lights;
 			{
 				MapRange LightsBufferMapRange(sizeof(LightInformation) * 1024);
 				MapScope<LightInformation> LightsBufferMapScope(*_DirectLightingLightsBuffer, LightsBufferMapRange);
@@ -135,9 +135,9 @@ namespace Eternal
 				{
 					LightsBufferMapScope.GetDataPointer()[LightIndex] =
 					{
-						Vector4(Lights[LightIndex]->GetPosition(), 1.0f),
-						Lights[LightIndex]->GetColor() * Lights[LightIndex]->GetIntensity(), 0.0f,
-						Lights[LightIndex]->GetDirection(), 0.0f
+						Vector4(Lights[LightIndex].Object->GetPosition(), 1.0f),
+						Lights[LightIndex].Object->GetColor() * Lights[LightIndex].Object->GetIntensity(), static_cast<uint32_t>(Lights[LightIndex].Object->GetLightType()),
+						Lights[LightIndex].Object->GetDirection(), 0.0f
 					};
 				}
 			}

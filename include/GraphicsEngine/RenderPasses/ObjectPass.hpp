@@ -53,9 +53,13 @@ namespace Eternal
 				_In_ PerDrawFunctor InPerDrawFunction
 			);
 
-			InputLayout*		_ObjectInputLayout		= nullptr;
-			RenderPass*			_ObjectRenderPass		= nullptr;
-			DescriptorTable*	_ObjectDescriptorTable	= nullptr;
+			InputLayout*				_ObjectInputLayout					= nullptr;
+			RenderPass*					_ObjectRenderPass					= nullptr;
+			DescriptorTable*			_ObjectDescriptorTable				= nullptr;
+			MultiBuffered<Resource>*	_ObjectPerInstanceBuffer			= nullptr;
+			MultiBuffered<View>*		_ObjectPerInstanceBufferView		= nullptr;
+			MultiBuffered<Resource>*	_ObjectPerDrawInstanceBuffer		= nullptr;
+			MultiBuffered<View>*		_ObjectPerDrawInstanceBufferView	= nullptr;
 		};
 	}
 }

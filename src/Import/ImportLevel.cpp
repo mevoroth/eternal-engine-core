@@ -28,7 +28,7 @@ namespace Eternal
 				string LevelContent;
 
 				File* LevelFile = CreateFileHandle(FullPath);
-				LevelFile->Open(File::READ);
+				LevelFile->Open(File::OpenMode::READ);
 				LevelContent.resize(LevelFile->GetFileSize());
 				LevelFile->Read(const_cast<uint8_t*>(reinterpret_cast<const uint8_t*>(LevelContent.data())), LevelContent.size());
 				LevelFile->Close();

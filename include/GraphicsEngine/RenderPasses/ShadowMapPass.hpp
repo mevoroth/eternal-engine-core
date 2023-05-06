@@ -15,6 +15,9 @@ namespace Eternal
 
 		protected:
 			virtual const string& _GetPassName() const override final;
+
+		private:
+			virtual void _BeginRender(_In_ System& InSystem, _In_ Renderer& InRenderer) override final;
 		};
 	}
 }

@@ -85,33 +85,73 @@ namespace Eternal
 
 		class Game;
 		struct SystemFrame;
+		class TransformComponent;
 
 		static constexpr int SystemCanBeRendered = 1;
 		static constexpr int SystemCanBeWritten = 0;
 
 		template<typename ObjectType>
-		struct ObjectList
+		struct ObjectsList
 		{
-			void Add(_In_ ObjectType* InObject)
+			struct InstancedObjects
 			{
-				Objects.push_back(InObject);
-				PendingObjects.push_back(InObject);
+				ObjectType* Object = nullptr;
+				vector<TransformComponent*> Instances;
+			};
+
+			void AddObject(_In_ ObjectType* InObject, _In_ TransformComponent* InTransformComponent)
+			{
+				InstancedObjects* CurrentInstancedObjects = FindOrCreate(InObject, Objects);
+				InstancedObjects* CurrentPendingInstancedObjects = FindOrCreate(InObject, PendingObjects);
+
+				CurrentInstancedObjects->Instances.push_back(InTransformComponent);
+				CurrentPendingInstancedObjects->Instances.push_back(InTransformComponent);
 			}
 
-			void Commit(_Inout_ ObjectList<ObjectType>& InOutOldestFrameObjectList)
+			void CommitObjects(_Inout_ ObjectsList<ObjectType>& InOutOldestFrameObjectList)
 			{
-				Objects.insert(
-					Objects.end(),
-					InOutOldestFrameObjectList.PendingObjects.begin(),
-					InOutOldestFrameObjectList.PendingObjects.end()
-				);
-				InOutOldestFrameObjectList.PendingObjects.clear();
+				for (uint32_t PendingObjectIndex = 0; PendingObjectIndex < InOutOldestFrameObjectList.PendingObjects.size(); ++PendingObjectIndex)
+				{
+					if (InOutOldestFrameObjectList.PendingObjects[PendingObjectIndex].Instances.size() > 0)
+					{
+						InstancedObjects& CurrentPendingInstancedObjects = InOutOldestFrameObjectList.PendingObjects[PendingObjectIndex];
+
+						InstancedObjects* CurrentInstancedObjects = FindOrCreate(InOutOldestFrameObjectList.PendingObjects[PendingObjectIndex].Object, Objects);
+						CurrentInstancedObjects->Instances.insert(
+							CurrentInstancedObjects->Instances.end(),
+							CurrentPendingInstancedObjects.Instances.begin(),
+							CurrentPendingInstancedObjects.Instances.end()
+						);
+						CurrentPendingInstancedObjects.Instances.clear();
+					}
+				}
 			}
 
-			operator const vector<ObjectType*>&() const { return Objects; }
+			operator const vector<InstancedObjects>&() const { return Objects; }
 
-			vector<ObjectType*> Objects;
-			vector<ObjectType*> PendingObjects;
+			vector<InstancedObjects> Objects;
+			vector<InstancedObjects> PendingObjects;
+
+		private:
+			InstancedObjects* FindOrCreate(_In_ ObjectType* InObject, _In_ vector<InstancedObjects>& InObjects)
+			{
+				InstancedObjects* CurrentInstancedObjects = nullptr;
+				for (uint32_t ObjectIndex = 0; ObjectIndex < InObjects.size(); ++ObjectIndex)
+				{
+					if (InObjects[ObjectIndex].Object == InObject)
+					{
+						CurrentInstancedObjects = &InObjects[ObjectIndex];
+						break;
+					}
+				}
+				if (!CurrentInstancedObjects)
+				{
+					InObjects.push_back({});
+					CurrentInstancedObjects = &InObjects.back();
+					CurrentInstancedObjects->Object = InObject;
+				}
+				return CurrentInstancedObjects;
+			}
 		};
 
 		struct SystemFrame
@@ -124,8 +164,8 @@ namespace Eternal
 
 			AtomicS32* SystemState = nullptr;
 			ImguiContext ImguiFrameContext;
-			ObjectList<MeshCollection> MeshCollections;
-			ObjectList<Light> Lights;
+			ObjectsList<MeshCollection> MeshCollections;
+			ObjectsList<Light> Lights;
 			vector<GraphicsCommand*> GraphicsCommands;
 			PayloadQueueType DelayedDestroyedRequests;
 			
@@ -146,6 +186,7 @@ namespace Eternal
 
 			vector<const char*> ShaderIncludePath;
 			const char* FBXPath						= nullptr;
+			const char* FBXCachePath				= nullptr;
 			const char* TexturePath					= nullptr;
 			const char* LevelPath					= nullptr;
 		};

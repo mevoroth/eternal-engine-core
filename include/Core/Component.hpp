@@ -40,6 +40,7 @@ namespace Eternal
 
 			void SetHasBehavior() { _ComponentState.ComponentHasBehavior = true; }
 			void SetUpdatesEveryFrame() { _ComponentState.ComponentUpdatesEveryFrame = true; }
+			void SetIsDirty() { _ComponentState.ComponentIsDirty = true; }
 
 			template<typename ComponentType>
 			void OnAddComponent();

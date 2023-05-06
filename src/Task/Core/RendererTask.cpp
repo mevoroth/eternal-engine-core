@@ -23,6 +23,7 @@ namespace Eternal
 
 		void RendererTask::_WaitForData()
 		{
+			ETERNAL_PROFILER(BASIC)("WaitForSystemCanBeRenderered");
 			while (GetSystem().GetRenderFrame().SystemState->Load() != SystemCanBeRendered)
 			{
 				Sleep(1);

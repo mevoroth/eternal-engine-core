@@ -21,6 +21,9 @@ namespace Eternal
 			const Viewport&	_DepthOnlyViewport;
 			View*			_DepthStencilView					= nullptr;
 			View*			_DepthOnlyViewConstantBufferView	= nullptr;
+
+		private:
+			virtual void _BeginRender(_In_ System& InSystem, _In_ Renderer& InRenderer) = 0;
 		};
 	}
 }

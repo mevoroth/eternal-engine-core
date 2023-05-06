@@ -100,6 +100,7 @@ namespace Eternal
 									[NewLightComponent](_Inout_ TransformComponent* InOutComponent)
 									{
 										InOutComponent->SetHasBehavior();
+										InOutComponent->SetUpdatesEveryFrame();
 										InOutComponent->OnTransformChanged().Receivers.push_back(&NewLightComponent->OnTransformChangedReceiver());
 									}
 								);
