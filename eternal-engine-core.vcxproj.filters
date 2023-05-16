@@ -49,6 +49,9 @@
     <Filter Include="GameObjects">
       <UniqueIdentifier>{fc589e1f-563c-4e66-a62a-6c63c909e37c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="GraphicsEngine\RenderPasses\Debug">
+      <UniqueIdentifier>{85bf1a34-23d3-403d-871e-a46d7d2fa9db}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Core\Game.hpp">
@@ -180,6 +183,9 @@
     <ClInclude Include="include\GraphicsEngine\RenderPasses\ShadowMapPass.hpp">
       <Filter>GraphicsEngine\RenderPasses</Filter>
     </ClInclude>
+    <ClInclude Include="include\GraphicsEngine\RenderPasses\Debug\DebugObjectBoundingBoxPass.hpp">
+      <Filter>GraphicsEngine\RenderPasses\Debug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Core\Game.cpp">
@@ -302,6 +308,9 @@
     </ClCompile>
     <ClCompile Include="src\GraphicsEngine\RenderPasses\ShadowMapPass.cpp">
       <Filter>GraphicsEngine\RenderPasses</Filter>
+    </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\RenderPasses\Debug\DebugObjectBoundingBoxPass.cpp">
+      <Filter>GraphicsEngine\RenderPasses\Debug</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -17,6 +17,9 @@
 #include "Resources/Payload.hpp"
 #include "Optick/Optick.hpp"
 #include "GraphicData/Texture.hpp"
+#include "Mesh/Mesh.hpp"
+#include "Camera/Camera.hpp"
+#include "Components/TransformComponent.hpp"
 
 namespace Eternal
 {
@@ -65,13 +68,9 @@ namespace Eternal
 			for (uint32_t FrameIndex = 0; FrameIndex < GraphicsContext::FrameBufferingCount; ++FrameIndex)
 				_Frames[FrameIndex].ImguiFrameContext = _Imgui->CreateContext(*_GraphicsContext);
 
-			TaskCreateInformation RendererCreateInformation(*this, "RendererTask");
-			_RendererTask		= new RendererTask(RendererCreateInformation);
 			TaskCreateInformation RendererCreateInformation("RendererTask");
 			_RendererTask		= new RendererTask(RendererCreateInformation, *this);
 
-			TaskCreateInformation StreamingCreateInformation(*this, "StreamingTask");
-			_StreamingTask		= new StreamingTask(StreamingCreateInformation);
 			TaskCreateInformation StreamingCreateInformation("StreamingTask");
 			_StreamingTask		= new StreamingTask(StreamingCreateInformation, *this);
 
@@ -188,6 +187,56 @@ namespace Eternal
 		{
 			SystemFrame& CurrentRenderFrame = GetRenderFrame();
 			GraphicsContext& GfxContext = GetGraphicsContext();
+			
+			//GetParallelSystem().ParallelFor("Culling", 2, [](_In_ uint32_t InIndex) {
+			//});
+			
+			if (CurrentRenderFrame.ViewCamera)
+			{
+				const vector<ObjectsList<MeshCollection>::InstancedObjects>& MeshCollections = CurrentRenderFrame.MeshCollections;
+
+				Frustum CameraFrustum;
+				CurrentRenderFrame.ViewCamera->ComputeFrustum(CameraFrustum);
+
+				uint32_t BoundingBoxesCount = 0;
+				for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
+				{
+					vector<Mesh*>& Meshes = MeshCollections[CollectionIndex].Object->Meshes;
+
+					uint32_t SubMeshCount = 0;
+					for (uint32_t MeshIndex = 0; MeshIndex < Meshes.size(); ++MeshIndex)
+						SubMeshCount += static_cast<uint32_t>(Meshes[MeshIndex]->GetGPUMesh().BoundingBoxes.size());
+
+					BoundingBoxesCount += SubMeshCount * static_cast<uint32_t>(MeshCollections[CollectionIndex].Instances.size());
+				}
+
+				CurrentRenderFrame.MeshCollectionsVisibility.Resize(BoundingBoxesCount);
+
+				uint32_t VisibilityIndex = 0;
+				for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
+				{
+					vector<Mesh*>& Meshes = MeshCollections[CollectionIndex].Object->Meshes;
+
+					for (uint32_t InstanceIndex = 0; InstanceIndex < MeshCollections[CollectionIndex].Instances.size(); ++InstanceIndex)
+					{
+						Matrix4x4 LocalToWorld = MeshCollections[CollectionIndex].Instances[InstanceIndex]->GetTransform().GetLocalToWorld();
+
+						for (uint32_t MeshIndex = 0; MeshIndex < Meshes.size(); ++MeshIndex)
+						{
+							vector<AxisAlignedBoundingBox>& CurrentBoundingBoxes = Meshes[MeshIndex]->GetGPUMesh().BoundingBoxes;
+
+							for (uint32_t BoundingBoxIndex = 0; BoundingBoxIndex < CurrentBoundingBoxes.size(); ++BoundingBoxIndex)
+							{
+								bool IsIntersecting = CameraFrustum.Intersect(CurrentBoundingBoxes[BoundingBoxIndex].TransformBy(LocalToWorld));
+								if (IsIntersecting)
+									CurrentRenderFrame.MeshCollectionsVisibility.Set(VisibilityIndex);
+								++VisibilityIndex;
+							}
+						}
+					}
+				}
+			}
+
 			GfxContext.RegisterGraphicsCommands(CurrentRenderFrame.GraphicsCommands.size() ? &CurrentRenderFrame.GraphicsCommands : nullptr);
 			GfxContext.BeginFrame();
 
@@ -200,50 +249,103 @@ namespace Eternal
 		}
 		void System::UpdateDebug()
 		{
+			ImGui::Begin("Eternal Debug");
 			{
 				const TextureCacheStorage& Textures = GetTextureFactory().GetTextures();
 
-				ImGui::Begin("Texture Cache");
-				if (ImGui::BeginTable("Textures", 3, ImGuiTableFlags_Resizable | ImGuiTableFlags_Borders))
+				if (ImGui::TreeNode("Textures Cache"))
 				{
-					for (auto TexturesIterator = Textures.cbegin(); TexturesIterator != Textures.cend(); ++TexturesIterator)
+					if (ImGui::BeginTable("Textures", 3, ImGuiTableFlags_Resizable | ImGuiTableFlags_Borders))
 					{
-						ImGui::TableNextRow();
+						for (auto TexturesIterator = Textures.cbegin(); TexturesIterator != Textures.cend(); ++TexturesIterator)
 						{
-							ImGui::TableNextColumn();
-							ImGui::Text(TexturesIterator->first.c_str());
-						}
-						{
-							ImGui::TableNextColumn();
-							if (TexturesIterator->second.CachedTexture)
+							ImGui::TableNextRow();
 							{
-								const Resource& CurrentTexture = TexturesIterator->second.CachedTexture->GetTexture();
-								ImGui::Text(
-									"%dx%dx%d [%d]",
-									CurrentTexture.GetWidth(),
-									CurrentTexture.GetHeight(),
-									CurrentTexture.GetDepth(),
-									static_cast<int>(CurrentTexture.GetFormat())
-								);
+								ImGui::TableNextColumn();
+								ImGui::Text(TexturesIterator->first.c_str());
 							}
-							else
-								ImGui::Text("UNLOADED");
-						}
-						{
-							ImGui::TableNextColumn();
-							if (TexturesIterator->second.CachedTexture && TexturesIterator->second.CachedTexture->GetTexture().GetResourceDimension() == ResourceDimension::RESOURCE_DIMENSION_TEXTURE_2D)
 							{
-								const View* CurrentTexture = TexturesIterator->second.CachedTexture->GetShaderResourceView();
-								ImGui::Image(static_cast<ImTextureID>(const_cast<View*>(CurrentTexture)), ImVec2(32.0f, 32.0f));
+								ImGui::TableNextColumn();
+								if (TexturesIterator->second.CachedTexture)
+								{
+									const Resource& CurrentTexture = TexturesIterator->second.CachedTexture->GetTexture();
+									ImGui::Text(
+										"%dx%dx%d [%d]",
+										CurrentTexture.GetWidth(),
+										CurrentTexture.GetHeight(),
+										CurrentTexture.GetDepth(),
+										static_cast<int>(CurrentTexture.GetFormat())
+									);
+								}
+								else
+									ImGui::Text("UNLOADED");
 							}
-							else
-								ImGui::Text("X");
+							{
+								ImGui::TableNextColumn();
+								if (TexturesIterator->second.CachedTexture && TexturesIterator->second.CachedTexture->GetTexture().GetResourceDimension() == ResourceDimension::RESOURCE_DIMENSION_TEXTURE_2D)
+								{
+									const View* CurrentTexture = TexturesIterator->second.CachedTexture->GetShaderResourceView();
+									ImGui::Image(static_cast<ImTextureID>(const_cast<View*>(CurrentTexture)), ImVec2(32.0f, 32.0f));
+								}
+								else
+									ImGui::Text("X");
+							}
+						}
+						ImGui::EndTable();
+					}
+					ImGui::TreePop();
+				}
+			}
+			{
+				if (ImGui::TreeNode("Visibility"))
+				{
+					SystemFrame& CurrentGameFrame = GetGameFrame();
+					GraphicsContext& GfxContext = GetGraphicsContext();
+
+					if (CurrentGameFrame.ViewCamera && CurrentGameFrame.MeshCollectionsVisibility.GetSize() > 0)
+					{
+						CurrentGameFrame.MeshCollectionsBoundingBoxVisibility = GetRenderFrame().MeshCollectionsBoundingBoxVisibility;
+						if (CurrentGameFrame.MeshCollectionsBoundingBoxVisibility.GetBitCount() != CurrentGameFrame.MeshCollectionsVisibility.GetBitCount())
+							CurrentGameFrame.MeshCollectionsBoundingBoxVisibility.Resize(CurrentGameFrame.MeshCollectionsVisibility.GetBitCount());
+
+						const vector<ObjectsList<MeshCollection>::InstancedObjects>& MeshCollections = CurrentGameFrame.MeshCollections;
+
+						uint32_t VisibilityIndex = 0;
+						for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
+						{
+							vector<Mesh*>& Meshes = MeshCollections[CollectionIndex].Object->Meshes;
+
+							for (uint32_t InstanceIndex = 0; InstanceIndex < MeshCollections[CollectionIndex].Instances.size(); ++InstanceIndex)
+							{
+								Matrix4x4 LocalToWorld = MeshCollections[CollectionIndex].Instances[InstanceIndex]->GetTransform().GetLocalToWorld();
+
+								for (uint32_t MeshIndex = 0; MeshIndex < Meshes.size(); ++MeshIndex)
+								{
+									vector<AxisAlignedBoundingBox>& CurrentBoundingBoxes = Meshes[MeshIndex]->GetGPUMesh().BoundingBoxes;
+
+									for (uint32_t BoundingBoxIndex = 0; BoundingBoxIndex < CurrentBoundingBoxes.size(); ++BoundingBoxIndex)
+									{
+										bool IsIntersecting = CurrentGameFrame.MeshCollectionsVisibility.IsSet(VisibilityIndex);
+										bool ShowBoundingBox = CurrentGameFrame.MeshCollectionsBoundingBoxVisibility.IsSet(VisibilityIndex);
+										char MeshName[255];
+										sprintf_s(MeshName, "[%c] %s %d", IsIntersecting ? 'O' : 'X', Meshes[MeshIndex]->GetName().c_str(), BoundingBoxIndex);
+										if (ImGui::Checkbox(MeshName, &ShowBoundingBox))
+										{
+											if (ShowBoundingBox)
+												CurrentGameFrame.MeshCollectionsBoundingBoxVisibility.Set(VisibilityIndex);
+											else
+												CurrentGameFrame.MeshCollectionsBoundingBoxVisibility.Unset(VisibilityIndex);
+										}
+										++VisibilityIndex;
+									}
+								}
+							}
 						}
 					}
-					ImGui::EndTable();
+					ImGui::TreePop();
 				}
-				ImGui::End();
 			}
+			ImGui::End();
 		}
 
 		void System::RenderDebug()

@@ -55,7 +55,7 @@ namespace Eternal
 			virtual void* InternalLoad(_In_ const GameDataSource& InNode) const = 0;
 		};
 
-		using GameObjectFunctor = std::function<void (_In_ const GameDataSource& InNode)>;
-		extern void IterateGameDataCollection(_In_ const GameDataSource& InSource, _In_ GameObjectFunctor Functor);
+		using GameObjectFunction = std::function<void (_In_ const GameDataSource& InNode)>;
+		extern void IterateGameDataCollection(_In_ const GameDataSource& InSource, _In_ GameObjectFunction Functor);
 	}
 }

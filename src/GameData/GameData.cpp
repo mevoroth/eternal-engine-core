@@ -4,7 +4,7 @@ namespace Eternal
 {
 	namespace GameDataSystem
 	{
-		void IterateGameDataCollection(_In_ const GameDataSource& InSource, _In_ GameObjectFunctor Functor)
+		void IterateGameDataCollection(_In_ const GameDataSource& InSource, _In_ GameObjectFunction Functor)
 		{
 			uint32_t GameObjectCount = 0;
 			InSource.Get(GameObjectCount);

@@ -73,7 +73,7 @@ namespace Eternal
 
 		void OpaquePass::Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer)
 		{
-			TransitionFunctorType TransitionFunctionOpaque(
+			TransitionFunctionType TransitionFunctorOpaque(
 				[](_In_ CommandList* InObjectCommandList, _In_ Renderer& InRenderer) -> void
 				{
 					ResourceTransition Transitions[] =
@@ -87,7 +87,7 @@ namespace Eternal
 				}
 			);
 
-			PerPassFunctorType PerPassFunctionOpaque(
+			PerPassFunctionType PerPassFunctorOpaque(
 				[this](_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer) -> void
 				{
 					_ObjectDescriptorTable->SetDescriptor(2, InRenderer.GetGlobalResources().GetViewConstantBufferView());
@@ -95,20 +95,29 @@ namespace Eternal
 				}
 			);
 
-			PerDrawFunctorType PerDrawFunctionOpaque(
+			PerDrawFunctionType PerDrawFunctorOpaque(
 				[this](_In_ Material* InPerDrawMaterial)
 				{
 					InPerDrawMaterial->CommitMaterial(*_ObjectDescriptorTable);
 				}
 			);
 
-			_RenderInternal<TransitionFunctorType, PerPassFunctorType, PerDrawFunctorType>(
+			IsVisibleFunctionType IsVisibleFunctorOpaque(
+				[&InSystem](_In_ uint32_t InKey) -> bool
+				{
+					DynamicBitField<>& MeshCollectionsVisibility = InSystem.GetRenderFrame().MeshCollectionsVisibility;
+					return MeshCollectionsVisibility.IsSet(InKey);
+				}
+			);
+
+			_RenderInternal<TransitionFunctionType, PerPassFunctionType, PerDrawFunctionType>(
 				InContext,
 				InSystem,
 				InRenderer,
-				TransitionFunctionOpaque,
-				PerPassFunctionOpaque,
-				PerDrawFunctionOpaque
+				TransitionFunctorOpaque,
+				PerPassFunctorOpaque,
+				PerDrawFunctorOpaque,
+				IsVisibleFunctorOpaque
 			);
 		}
 

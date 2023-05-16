@@ -14,9 +14,10 @@ namespace Eternal
 	{
 		using namespace Eternal::Components;
 
-		using TransitionFunctorType	= std::function<void(_In_ CommandList* InObjectCommandList, _In_ Renderer& InRenderer)>;
-		using PerPassFunctorType	= std::function<void(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)>;
-		using PerDrawFunctorType	= std::function<void(_In_ Material* InPerDrawMaterial)>;
+		using TransitionFunctionType	= std::function<void(_In_ CommandList* InObjectCommandList, _In_ Renderer& InRenderer)>;
+		using PerPassFunctionType		= std::function<void(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)>;
+		using PerDrawFunctionType		= std::function<void(_In_ Material* InPerDrawMaterial)>;
+		using IsVisibleFunctionType		= std::function<bool(_In_ uint32_t InKey)>;
 
 		static constexpr bool UseMeshPipeline = false;
 
@@ -40,17 +41,19 @@ namespace Eternal
 			
 			void _InitializeObjectPass(_In_ GraphicsContext& InContext, _In_ const ObjectPassCreateInformation& InObjectPassCreateInformation);
 			template<
-				typename TransitionFunctor,
-				typename PerPassFunctor,
-				typename PerDrawFunctor
+				typename TransitionFunction,
+				typename PerPassFunction,
+				typename PerDrawFunction,
+				typename IsVisibleFunction
 			>
 			void _RenderInternal(
 				_In_ GraphicsContext& InContext,
 				_In_ System& InSystem,
 				_In_ Renderer& InRenderer,
-				_In_ TransitionFunctor InTransitionFunction,
-				_In_ PerPassFunctor InPerPassFunction,
-				_In_ PerDrawFunctor InPerDrawFunction
+				_In_ TransitionFunction InTransitionFunctor,
+				_In_ PerPassFunction InPerPassFunctor,
+				_In_ PerDrawFunction InPerDrawFunctor,
+				_In_ IsVisibleFunction InIsVisibleFunctor
 			);
 
 			InputLayout*				_ObjectInputLayout					= nullptr;

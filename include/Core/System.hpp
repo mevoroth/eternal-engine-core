@@ -5,6 +5,7 @@
 #include "Graphics/GraphicsContext.hpp"
 #include "Resources/TextureFactory.hpp"
 #include "Resources/Streaming.hpp"
+#include "Bit/BitField.hpp"
 #include "Imgui/Imgui.hpp"
 #include <array>
 
@@ -168,7 +169,9 @@ namespace Eternal
 			ObjectsList<Light> Lights;
 			vector<GraphicsCommand*> GraphicsCommands;
 			PayloadQueueType DelayedDestroyedRequests;
-			
+			DynamicBitField<> MeshCollectionsVisibility;
+			DynamicBitField<> MeshCollectionsBoundingBoxVisibility;
+
 			Camera* ViewCamera = nullptr;
 			Camera* PendingViewCamera = nullptr;
 		};

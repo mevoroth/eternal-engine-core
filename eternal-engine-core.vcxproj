@@ -126,6 +126,7 @@
     <ClInclude Include="include\GraphicsCommand\GraphicsCommandUploadTexture.hpp" />
     <ClInclude Include="include\GraphicsEngine\Renderer.hpp" />
     <ClInclude Include="include\GraphicsEngine\Pass.hpp" />
+    <ClInclude Include="include\GraphicsEngine\RenderPasses\Debug\DebugObjectBoundingBoxPass.hpp" />
     <ClInclude Include="include\GraphicsEngine\RenderPasses\DepthOnlyPass.hpp" />
     <ClInclude Include="include\GraphicsEngine\RenderPasses\DirectLightingPass.hpp" />
     <ClInclude Include="include\GraphicsEngine\RenderPasses\ObjectPass.hpp" />
@@ -170,6 +171,7 @@
     <ClCompile Include="src\GraphicsCommand\GraphicsCommandUploadTexture.cpp" />
     <ClCompile Include="src\GraphicsEngine\Pass.cpp" />
     <ClCompile Include="src\GraphicsEngine\Renderer.cpp" />
+    <ClCompile Include="src\GraphicsEngine\RenderPasses\Debug\DebugObjectBoundingBoxPass.cpp" />
     <ClCompile Include="src\GraphicsEngine\RenderPasses\DepthOnlyPass.cpp" />
     <ClCompile Include="src\GraphicsEngine\RenderPasses\DirectLightingPass.cpp" />
     <ClCompile Include="src\GraphicsEngine\RenderPasses\ObjectPass.cpp" />

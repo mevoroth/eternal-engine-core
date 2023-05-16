@@ -45,7 +45,7 @@ namespace Eternal
 
 		void DepthOnlyPass::Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer)
 		{
-			TransitionFunctorType TransitionFunctionDepthOnly(
+			TransitionFunctionType TransitionFunctorDepthOnly(
 				[this](_In_ CommandList* InObjectCommandList, _In_ Renderer& InRenderer) -> void
 				{
 					ResourceTransition Transitions[] =
@@ -56,25 +56,30 @@ namespace Eternal
 				}
 			);
 
-			PerPassFunctorType PerPassFunctionDepthOnly(
+			PerPassFunctionType PerPassFunctorDepthOnly(
 				[this](_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer) -> void
 				{
 					_ObjectDescriptorTable->SetDescriptor(2, _DepthOnlyViewConstantBufferView);
 				}
 			);
 
-			PerDrawFunctorType PerDrawFunctionDepthOnly(
+			PerDrawFunctionType PerDrawFunctorDepthOnly(
 				[](_In_ Material* InPerDrawMaterial) {}
 			);
 
+			IsVisibleFunctionType IsVisibleFunctorDepthonly(
+				[](_In_ uint32_t InKey) -> bool { return false; }
+			);
+
 			_BeginRender(InSystem, InRenderer);
-			_RenderInternal<TransitionFunctorType, PerPassFunctorType, PerDrawFunctorType>(
+			_RenderInternal<TransitionFunctionType, PerPassFunctionType, PerDrawFunctionType, IsVisibleFunctionType>(
 				InContext,
 				InSystem,
 				InRenderer,
-				TransitionFunctionDepthOnly,
-				PerPassFunctionDepthOnly,
-				PerDrawFunctionDepthOnly
+				TransitionFunctorDepthOnly,
+				PerPassFunctorDepthOnly,
+				PerDrawFunctorDepthOnly,
+				IsVisibleFunctorDepthonly
 			);
 		}
 

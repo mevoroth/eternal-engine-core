@@ -130,33 +130,36 @@ namespace Eternal
 		}
 
 		template<
-			typename TransitionFunctor,
-			typename PerPassFunctor,
-			typename PerDrawFunctor
+			typename TransitionFunction,
+			typename PerPassFunction,
+			typename PerDrawFunction,
+			typename IsVisibleFunction
 		>
 		void ObjectPass::_RenderInternal(
 			_In_ GraphicsContext& InContext,
 			_In_ System& InSystem,
 			_In_ Renderer& InRenderer,
-			_In_ TransitionFunctor InTransitionFunction,
-			_In_ PerPassFunctor InPerPassFunction,
-			_In_ PerDrawFunctor InPerDrawFunction
+			_In_ TransitionFunction InTransitionFunctor,
+			_In_ PerPassFunction InPerPassFunctor,
+			_In_ PerDrawFunction InPerDrawFunctor,
+			_In_ IsVisibleFunction InIsVisibleFunctor
 		)
 		{
 			ETERNAL_PROFILER(BASIC)();
 
 			const vector<ObjectsList<MeshCollection>::InstancedObjects>& MeshCollections = InSystem.GetRenderFrame().MeshCollections;
+			
 			if (MeshCollections.size() == 0)
 				return;
 
 			CommandListScope ObjectCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, _GetPassName());
 
-			InTransitionFunction(ObjectCommandList, InRenderer);
+			InTransitionFunctor(ObjectCommandList, InRenderer);
 
 			ObjectCommandList->BeginRenderPass(*_ObjectRenderPass);
 			ObjectCommandList->SetGraphicsPipeline(*_Pipeline);
 
-			InPerPassFunction(InContext, InRenderer);
+			InPerPassFunctor(InContext, InRenderer);
 
 			MapRange PerInstanceBufferMapRange(sizeof(PerInstanceInformation) * 4096);
 			MapScope<PerInstanceInformation> PerInstanceBufferMapScope(*_ObjectPerInstanceBuffer, PerInstanceBufferMapRange);
@@ -171,66 +174,76 @@ namespace Eternal
 			View* ObjectPerInstanceBufferView = *_ObjectPerInstanceBufferView;
 			_ObjectDescriptorTable->SetDescriptor(3, ObjectPerInstanceBufferView);
 
+			uint32_t VisibilityKey = 0;
+
 			for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
 			{
 				vector<Mesh*>& Meshes = MeshCollections[CollectionIndex].Object->Meshes;
-					
+				
 				PerDrawInstanceBufferMapScope[CollectionIndex].InstanceStart		= DrawInstanceCount;
 
 				uint32_t InstancesCount = static_cast<uint32_t>(MeshCollections[CollectionIndex].Instances.size());
-				for (uint32_t InstanceIndex = 0; InstanceIndex < MeshCollections[CollectionIndex].Instances.size(); ++InstanceIndex)
-					PerInstanceBufferMapScope[DrawInstanceCount + InstanceIndex].InstanceWorldToWorld	= MeshCollections[CollectionIndex].Instances[InstanceIndex]->GetTransform().GetViewToWorld();
-				DrawInstanceCount += InstancesCount;
+				//for (uint32_t InstanceIndex = 0; InstanceIndex < MeshCollections[CollectionIndex].Instances.size(); ++InstanceIndex)
+				//	PerInstanceBufferMapScope[DrawInstanceCount + InstanceIndex].InstanceWorldToWorld	= MeshCollections[CollectionIndex].Instances[InstanceIndex]->GetTransform().GetLocalToWorld();
+				//DrawInstanceCount += InstancesCount;
 
-				ViewMetaData ObjectPerDrawInstanceConstantsMetaData;
-				ObjectPerDrawInstanceConstantsMetaData.ConstantBufferView.BufferElementOffset	= CollectionIndex;
-				ObjectPerDrawInstanceConstantsMetaData.ConstantBufferView.BufferSize			= sizeof(PerDrawInstanceConstants);
-
-				View* ObjectPerDrawInstanceBufferView = CreateConstantBufferView(
-					ConstantBufferViewCreateInformation(
-						InContext,
-						&(*_ObjectPerDrawInstanceBuffer),
-						ObjectPerDrawInstanceConstantsMetaData
-					),
-					ObjectPerDrawInstanceBufferViews.SubAllocate()
-				);
-				_ObjectDescriptorTable->SetDescriptor(1, ObjectPerDrawInstanceBufferView);
-
-				for (uint32_t MeshIndex = 0; MeshIndex < Meshes.size(); ++MeshIndex)
+				for (uint32_t InstanceIndex = 0; InstanceIndex < InstancesCount; ++InstanceIndex)
 				{
-					GPUMesh& CurrentGPUMesh = Meshes[MeshIndex]->GetGPUMesh();
-					const Resource* MeshVertexBuffer = CurrentGPUMesh.MeshVertexBuffer;
-					if (UseMeshPipeline)
-					{
-						_ObjectDescriptorTable->SetDescriptor(7, CurrentGPUMesh.MeshVertexStructuredBufferView);
-						_ObjectDescriptorTable->SetDescriptor(8, CurrentGPUMesh.MeshIndexStructuredBufferView);
-					}
-					else
-					{
-						ObjectCommandList->SetIndexBuffer(*CurrentGPUMesh.MeshIndexBuffer);
-						ObjectCommandList->SetVertexBuffers(&MeshVertexBuffer);
-					}
+					PerInstanceBufferMapScope[DrawInstanceCount + InstanceIndex].InstanceWorldToWorld = MeshCollections[CollectionIndex].Instances[InstanceIndex]->GetTransform().GetLocalToWorld();
 
-					for (uint32_t DrawIndex = 0; DrawIndex < CurrentGPUMesh.PerDrawInformations.size(); ++DrawIndex)
+					ViewMetaData ObjectPerDrawInstanceConstantsMetaData;
+					ObjectPerDrawInstanceConstantsMetaData.ConstantBufferView.BufferElementOffset	= CollectionIndex;
+					ObjectPerDrawInstanceConstantsMetaData.ConstantBufferView.BufferSize			= sizeof(PerDrawInstanceConstants);
+
+					View* ObjectPerDrawInstanceBufferView = CreateConstantBufferView(
+						ConstantBufferViewCreateInformation(
+							InContext,
+							&(*_ObjectPerDrawInstanceBuffer),
+							ObjectPerDrawInstanceConstantsMetaData
+						),
+						ObjectPerDrawInstanceBufferViews.SubAllocate()
+					);
+					_ObjectDescriptorTable->SetDescriptor(1, ObjectPerDrawInstanceBufferView);
+
+					for (uint32_t MeshIndex = 0; MeshIndex < Meshes.size(); ++MeshIndex)
 					{
-						GPUMesh::PerDrawInformation& DrawInformation = CurrentGPUMesh.PerDrawInformations[DrawIndex];
-
-						InPerDrawFunction(DrawInformation.PerDrawMaterial);
-
-						_ObjectDescriptorTable->SetDescriptor(0, DrawInformation.PerDrawConstantBufferMSVS);
-						ObjectCommandList->SetGraphicsDescriptorTable(InContext, *_ObjectDescriptorTable);
+						GPUMesh& CurrentGPUMesh = Meshes[MeshIndex]->GetGPUMesh();
+						const Resource* MeshVertexBuffer = CurrentGPUMesh.MeshVertexBuffer;
 						if (UseMeshPipeline)
 						{
-							ObjectCommandList->DispatchMesh();
+							_ObjectDescriptorTable->SetDescriptor(7, CurrentGPUMesh.MeshVertexStructuredBufferView);
+							_ObjectDescriptorTable->SetDescriptor(8, CurrentGPUMesh.MeshIndexStructuredBufferView);
 						}
 						else
 						{
-							ObjectCommandList->DrawIndexedInstanced(
-								DrawInformation.IndicesCount,
-								InstancesCount,
-								DrawInformation.IndicesOffset,
-								DrawInformation.VerticesOffset
-							);
+							ObjectCommandList->SetIndexBuffer(*CurrentGPUMesh.MeshIndexBuffer);
+							ObjectCommandList->SetVertexBuffers(&MeshVertexBuffer);
+						}
+
+						for (uint32_t DrawIndex = 0; DrawIndex < CurrentGPUMesh.PerDrawInformations.size(); ++DrawIndex)
+						{
+							GPUMesh::PerDrawInformation& DrawInformation = CurrentGPUMesh.PerDrawInformations[DrawIndex];
+
+							if (!InIsVisibleFunctor(VisibilityKey++))
+								continue;
+
+							InPerDrawFunctor(DrawInformation.PerDrawMaterial);
+
+							_ObjectDescriptorTable->SetDescriptor(0, DrawInformation.PerDrawConstantBufferMSVS);
+							ObjectCommandList->SetGraphicsDescriptorTable(InContext, *_ObjectDescriptorTable);
+							if (UseMeshPipeline)
+							{
+								ObjectCommandList->DispatchMesh();
+							}
+							else
+							{
+								ObjectCommandList->DrawIndexedInstanced(
+									DrawInformation.IndicesCount,
+									1,
+									DrawInformation.IndicesOffset,
+									DrawInformation.VerticesOffset
+								);
+							}
 						}
 					}
 				}
@@ -238,13 +251,14 @@ namespace Eternal
 			ObjectCommandList->EndRenderPass();
 		}
 
-		template void ObjectPass::_RenderInternal<TransitionFunctorType, PerPassFunctorType, PerDrawFunctorType>(
+		template void ObjectPass::_RenderInternal<TransitionFunctionType, PerPassFunctionType, PerDrawFunctionType, IsVisibleFunctionType>(
 			_In_ GraphicsContext& InContext,
 			_In_ System& InSystem,
 			_In_ Renderer& InRenderer,
-			_In_ TransitionFunctorType InTransitionFunction,
-			_In_ PerPassFunctorType InPerPassFunction,
-			_In_ PerDrawFunctorType InPerDrawFunction
+			_In_ TransitionFunctionType InTransitionFunctor,
+			_In_ PerPassFunctionType InPerPassFunctor,
+			_In_ PerDrawFunctionType InPerDrawFunctor,
+			_In_ IsVisibleFunctionType InIsVisibleFunctor
 		);
 	}
 }
