@@ -29,7 +29,7 @@ namespace Eternal
 			Transform CameraTransform = Component->GetTransform();
 			CameraTransform.SetTranslation(Vector3::Zero);
 
-			Matrix4x4 ViewToWorld = CameraTransform.GetViewToWorld();
+			Matrix4x4 ViewToWorld = CameraTransform.GetLocalToWorld();
 			Vector4 Forward	= ViewToWorld * Vector4::ForwardPosition;
 			Vector4 Right	= ViewToWorld * Vector4::RightPosition;
 
