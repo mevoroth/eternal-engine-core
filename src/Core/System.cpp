@@ -67,9 +67,13 @@ namespace Eternal
 
 			TaskCreateInformation RendererCreateInformation(*this, "RendererTask");
 			_RendererTask		= new RendererTask(RendererCreateInformation);
+			TaskCreateInformation RendererCreateInformation("RendererTask");
+			_RendererTask		= new RendererTask(RendererCreateInformation, *this);
 
 			TaskCreateInformation StreamingCreateInformation(*this, "StreamingTask");
 			_StreamingTask		= new StreamingTask(StreamingCreateInformation);
+			TaskCreateInformation StreamingCreateInformation("StreamingTask");
+			_StreamingTask		= new StreamingTask(StreamingCreateInformation, *this);
 
 			ParallelSystemCreateInformation ParallelSystemInformation(
 				GraphicsContext::FrameBufferingCount,

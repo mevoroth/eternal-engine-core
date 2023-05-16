@@ -18,13 +18,15 @@ namespace Eternal
 		class StreamingTask final : public Task
 		{
 		public:
-			using Task::Task;
+			StreamingTask(_In_ const TaskCreateInformation& InTaskCreateInformation, _In_ System& InSystem);
 
 			virtual void DoExecute() override final;
 
 		private:
 
 			void _ProcessQueues(_In_ RequestQueueType& InStreamingRequests, _Inout_ PayloadQueueType& InOutStreamingPayloads);
+
+			System& _System;
 		};
 	}
 }

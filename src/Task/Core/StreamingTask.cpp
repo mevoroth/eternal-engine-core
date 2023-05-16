@@ -8,10 +8,16 @@ namespace Eternal
 {
 	namespace Tasks
 	{
+		StreamingTask::StreamingTask(_In_ const TaskCreateInformation& InTaskCreateInformation, _In_ System& InSystem)
+			: Task(InTaskCreateInformation)
+			, _System(InSystem)
+		{
+		}
+
 		void StreamingTask::DoExecute()
 		{
 			ETERNAL_PROFILER(BASIC)();
-			Streaming& StreamingSystem	= GetSystem().GetStreaming();
+			Streaming& StreamingSystem	= _System.GetStreaming();
 			RequestQueueType& StreamingRequests = StreamingSystem.GetPendingStreaming().PendingRequests;
 			PayloadQueueType& StreamingPayloads = StreamingSystem.GetPendingStreaming().LoadedRequests;
 
@@ -22,7 +28,7 @@ namespace Eternal
 
 		void StreamingTask::_ProcessQueues(_In_ RequestQueueType& InStreamingRequests, _Inout_ PayloadQueueType& InOutStreamingPayloads)
 		{
-			Streaming& StreamingSystem = GetSystem().GetStreaming();
+			Streaming& StreamingSystem = _System.GetStreaming();
 
 			for (uint32_t QueueType = 0; QueueType < InStreamingRequests.size(); ++QueueType)
 			{

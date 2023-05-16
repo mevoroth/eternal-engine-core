@@ -16,13 +16,15 @@ namespace Eternal
 		class RendererTask final : public Task
 		{
 		public:
-			using Task::Task;
+			RendererTask(_In_ const TaskCreateInformation& InTaskCreateInformation, _In_ System& InSystem);
 
 			virtual void DoExecute() override final;
 
 		private:
 			void _WaitForData();
 			void _AdvanceFrame();
+
+			System& _System;
 		};
 	}
 }
