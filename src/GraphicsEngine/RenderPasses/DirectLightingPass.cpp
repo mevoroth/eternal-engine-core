@@ -2,7 +2,6 @@
 #include "Light/Light.hpp"
 #include "Core/System.hpp"
 #include "Types/Types.hpp"
-#include "HLSLDirectLighting.hpp"
 
 namespace Eternal
 {
@@ -13,6 +12,8 @@ namespace Eternal
 		using namespace Eternal::HLSL;
 
 		DirectLightingPass::DirectLightingPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
+			: _DirectLightingConstantBuffer(InContext, "DirectLightingBuffer")
+			, _DirectLightingLightsBuffer(InContext, "DirectLightingLightsBuffer", 1024)
 		{
 			ShaderCreateInformation ScreenVSCreateInformation(ShaderType::VS, "ScreenVS", "screen.vs.hlsl");
 			Shader* ScreenVS = InContext.GetShader(ScreenVSCreateInformation);
@@ -57,62 +58,6 @@ namespace Eternal
 					DirectLightingPS
 				)
 			);
-
-			{
-				_DirectLightingConstantBuffer = CreateMultiBufferedBuffer(
-					InContext,
-					BufferResourceCreateInformation(
-						InContext.GetDevice(),
-						"DirectLightingBuffer",
-						BufferCreateInformation(
-							Format::FORMAT_UNKNOWN,
-							BufferResourceUsage::BUFFER_RESOURCE_USAGE_CONSTANT_BUFFER,
-							sizeof(DirectLightingConstants)
-						),
-						ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
-					)
-				);
-
-				ViewMetaData MetaData;
-				MetaData.ConstantBufferView.BufferSize = sizeof(DirectLightingConstants);
-				_DirectLightingConstantBufferView = CreateMultiBufferedConstantBufferView(
-					*_DirectLightingConstantBuffer,
-					ConstantBufferViewCreateInformation(
-						InContext,
-						*_DirectLightingConstantBuffer,
-						MetaData
-					)
-				);
-			}
-
-			{
-				_DirectLightingLightsBuffer = CreateMultiBufferedBuffer(
-					InContext,
-					BufferResourceCreateInformation(
-						InContext.GetDevice(),
-						"DirectLightingLightsBuffer",
-						BufferCreateInformation(
-							Format::FORMAT_UNKNOWN,
-							BufferResourceUsage::BUFFER_RESOURCE_USAGE_STRUCTURED_BUFFER,
-							sizeof(LightInformation),
-							1024
-						),
-						ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
-					)
-				);
-
-				ViewMetaData MetaData;
-				MetaData.ShaderResourceViewBuffer.NumElements			= 1024;
-				MetaData.ShaderResourceViewBuffer.StructureByteStride	= sizeof(LightInformation);
-				_DirectLightingLightsBufferView = CreateMultiBufferedShaderResourceView(
-					*_DirectLightingLightsBuffer,
-					ShaderResourceViewStructuredBufferCreateInformation(
-						InContext,
-						*_DirectLightingLightsBuffer,
-						MetaData
-					)
-				);
-			}
 		}
 
 		DirectLightingPass::~DirectLightingPass()
@@ -129,7 +74,7 @@ namespace Eternal
 			const vector<ObjectsList<Light>::InstancedObjects>& Lights = InSystem.GetRenderFrame().Lights;
 			{
 				MapRange LightsBufferMapRange(sizeof(LightInformation) * 1024);
-				MapScope<LightInformation> LightsBufferMapScope(*_DirectLightingLightsBuffer, LightsBufferMapRange);
+				MapScope<LightInformation> LightsBufferMapScope(*_DirectLightingLightsBuffer.ResourceBuffer, LightsBufferMapRange);
 
 				for (uint32_t LightIndex = 0; LightIndex < Lights.size(); ++LightIndex)
 				{
@@ -144,12 +89,12 @@ namespace Eternal
 
 			{
 				MapRange DirectLightingMapRange(sizeof(DirectLightingConstants));
-				MapScope<DirectLightingConstants> DirectLightingConstantsMapScope(*_DirectLightingConstantBuffer, DirectLightingMapRange);
+				MapScope<DirectLightingConstants> DirectLightingConstantsMapScope(*_DirectLightingConstantBuffer.ResourceBuffer, DirectLightingMapRange);
 				DirectLightingConstantsMapScope.GetDataPointer()->LightsCount = 1;// static_cast<uint32_t>(Lights.size());
 			}
 
-			View* DirectLightingConstantBufferView = *_DirectLightingConstantBufferView;
-			View* DirectLightingLightsBufferView = *_DirectLightingLightsBufferView;
+			View* DirectLightingConstantBufferView = *_DirectLightingConstantBuffer.ResourceView;
+			View* DirectLightingLightsBufferView = *_DirectLightingLightsBuffer.ResourceView;
 			_DirectLightingDescriptorTable->SetDescriptor(0, DirectLightingConstantBufferView);
 			_DirectLightingDescriptorTable->SetDescriptor(1, InRenderer.GetGlobalResources().GetViewConstantBufferView());
 			_DirectLightingDescriptorTable->SetDescriptor(2, InRenderer.GetGlobalResources().GetGBufferDepthStencil().GetShaderResourceView());

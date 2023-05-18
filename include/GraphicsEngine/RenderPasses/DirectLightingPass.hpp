@@ -2,6 +2,7 @@
 
 #include "GraphicsEngine/Pass.hpp"
 #include "Graphics/GraphicsInclude.hpp"
+#include "HLSLDirectLighting.hpp"
 
 namespace Eternal
 {
@@ -18,14 +19,10 @@ namespace Eternal
 
 		private:
 			
-			RenderPass*					_DirectLightingRenderPass			= nullptr;
-			DescriptorTable*			_DirectLightingDescriptorTable		= nullptr;
-
-			MultiBuffered<Resource>*	_DirectLightingConstantBuffer		= nullptr;
-			MultiBuffered<View>*		_DirectLightingConstantBufferView	= nullptr;
-			MultiBuffered<Resource>*	_DirectLightingLightsBuffer			= nullptr;
-			MultiBuffered<View>*		_DirectLightingLightsBufferView		= nullptr;
-
+			RenderPass*								_DirectLightingRenderPass			= nullptr;
+			DescriptorTable*						_DirectLightingDescriptorTable		= nullptr;
+			ConstantBuffer<DirectLightingConstants>	_DirectLightingConstantBuffer;
+			StructuredBuffer<LightInformation>		_DirectLightingLightsBuffer;
 		};
 	}
 }
