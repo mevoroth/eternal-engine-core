@@ -3,8 +3,6 @@
 #include "GraphicData/MeshVertexFormat.hpp"
 #include "Material/Material.hpp"
 #include "Mesh/Mesh.hpp"
-#include "ShadersReflection/HLSLPerDrawConstants.hpp"
-#include "ShadersReflection/HLSLPerInstanceInformation.hpp"
 #include "Memory/StackMemory.hpp"
 #include "Components/TransformComponent.hpp"
 
@@ -20,6 +18,11 @@ namespace Eternal
 			DestroyRenderPass(_ObjectRenderPass);
 			DestroyInputLayout(_ObjectInputLayout);
 			DestroyDescriptorTable(_ObjectDescriptorTable);
+		}
+
+		ObjectPass::ObjectPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
+			: _ObjectPerInstanceBuffer(InContext, "ObjectPerInstanceBuffer", 4096)
+		{
 		}
 
 		void ObjectPass::_InitializeObjectPass(_In_ GraphicsContext& InContext, _In_ const ObjectPassCreateInformation& InObjectPassCreateInformation)
@@ -50,33 +53,6 @@ namespace Eternal
 			_ObjectRenderPass = CreateRenderPass(
 				InContext,
 				InObjectPassCreateInformation.RenderPassInformation
-			);
-
-			_ObjectPerInstanceBuffer = CreateMultiBufferedBuffer(
-				InContext,
-				BufferResourceCreateInformation(
-					InContext.GetDevice(),
-					"ObjectPerInstanceBuffer",
-					BufferCreateInformation(
-						Format::FORMAT_UNKNOWN,
-						BufferResourceUsage::BUFFER_RESOURCE_USAGE_STRUCTURED_BUFFER,
-						sizeof(PerInstanceInformation),
-						4096
-					),
-					ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
-				)
-			);
-
-			ViewMetaData MetaData;
-			MetaData.ShaderResourceViewBuffer.NumElements = 4096;
-			MetaData.ShaderResourceViewBuffer.StructureByteStride = sizeof(PerInstanceInformation);
-			_ObjectPerInstanceBufferView = CreateMultiBufferedShaderResourceView(
-				*_ObjectPerInstanceBuffer,
-				ShaderResourceViewStructuredBufferCreateInformation(
-					InContext,
-					*_ObjectPerInstanceBuffer,
-					MetaData
-				)
 			);
 
 			_ObjectPerDrawInstanceBuffer = CreateMultiBufferedBuffer(
@@ -162,7 +138,7 @@ namespace Eternal
 			InPerPassFunctor(InContext, InRenderer);
 
 			MapRange PerInstanceBufferMapRange(sizeof(PerInstanceInformation) * 4096);
-			MapScope<PerInstanceInformation> PerInstanceBufferMapScope(*_ObjectPerInstanceBuffer, PerInstanceBufferMapRange);
+			MapScope<PerInstanceInformation> PerInstanceBufferMapScope(*_ObjectPerInstanceBuffer.ResourceBuffer, PerInstanceBufferMapRange);
 
 			MapRange PerDrawInstanceBufferMapRange(sizeof(PerDrawInstanceConstants) * 4096);
 			MapScope<PerDrawInstanceConstants> PerDrawInstanceBufferMapScope(*_ObjectPerDrawInstanceBuffer, PerDrawInstanceBufferMapRange);
@@ -171,7 +147,7 @@ namespace Eternal
 
 			uint32_t DrawInstanceCount	= 0;
 
-			View* ObjectPerInstanceBufferView = *_ObjectPerInstanceBufferView;
+			View* ObjectPerInstanceBufferView = *_ObjectPerInstanceBuffer.ResourceView;
 			_ObjectDescriptorTable->SetDescriptor(3, ObjectPerInstanceBufferView);
 
 			uint32_t VisibilityKey = 0;

@@ -7,7 +7,8 @@ namespace Eternal
 		const string DepthOnlyPass::DepthOnlyPassName = "DepthOnlyPass";
 
 		DepthOnlyPass::DepthOnlyPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer, _In_ const Viewport& InDepthOnlyViewport, _In_ View* InDepthStencilView, _In_ View* InDepthOnlyViewConstantBufferView)
-			: _DepthOnlyViewport(InDepthOnlyViewport)
+			: ObjectPass(InContext, InRenderer)
+			, _DepthOnlyViewport(InDepthOnlyViewport)
 			, _DepthStencilView(InDepthStencilView)
 			, _DepthOnlyViewConstantBufferView(InDepthOnlyViewConstantBufferView)
 		{

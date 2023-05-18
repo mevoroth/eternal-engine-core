@@ -1,6 +1,8 @@
 #pragma once
 
 #include "GraphicsEngine/Pass.hpp"
+#include "ShadersReflection/HLSLPerDrawConstants.hpp"
+#include "ShadersReflection/HLSLPerInstanceInformation.hpp"
 #include <functional>
 
 namespace Eternal
@@ -37,6 +39,8 @@ namespace Eternal
 
 		protected:
 
+			ObjectPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer);
+
 			virtual const string& _GetPassName() const = 0;
 			
 			void _InitializeObjectPass(_In_ GraphicsContext& InContext, _In_ const ObjectPassCreateInformation& InObjectPassCreateInformation);
@@ -56,13 +60,11 @@ namespace Eternal
 				_In_ IsVisibleFunction InIsVisibleFunctor
 			);
 
-			InputLayout*				_ObjectInputLayout					= nullptr;
-			RenderPass*					_ObjectRenderPass					= nullptr;
-			DescriptorTable*			_ObjectDescriptorTable				= nullptr;
-			MultiBuffered<Resource>*	_ObjectPerInstanceBuffer			= nullptr;
-			MultiBuffered<View>*		_ObjectPerInstanceBufferView		= nullptr;
-			MultiBuffered<Resource>*	_ObjectPerDrawInstanceBuffer		= nullptr;
-			MultiBuffered<View>*		_ObjectPerDrawInstanceBufferView	= nullptr;
+			InputLayout*								_ObjectInputLayout					= nullptr;
+			RenderPass*									_ObjectRenderPass					= nullptr;
+			DescriptorTable*							_ObjectDescriptorTable				= nullptr;
+			MultiBuffered<Resource>*					_ObjectPerDrawInstanceBuffer		= nullptr;
+			StructuredBuffer<PerInstanceInformation>	_ObjectPerInstanceBuffer;
 		};
 	}
 }

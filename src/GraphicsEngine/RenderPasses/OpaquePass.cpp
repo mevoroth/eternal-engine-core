@@ -13,6 +13,7 @@ namespace Eternal
 		const string OpaquePass::OpaquePassName = "OpaquePass";
 
 		OpaquePass::OpaquePass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
+			: ObjectPass(InContext, InRenderer)
 		{
 			GlobalResources& InGlobalResources = InRenderer.GetGlobalResources();
 
