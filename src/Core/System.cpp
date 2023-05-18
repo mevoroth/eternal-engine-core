@@ -16,7 +16,6 @@
 #include "Resources/LevelLoader.hpp"
 #include "Resources/Payload.hpp"
 #include "Optick/Optick.hpp"
-#include "GraphicData/Texture.hpp"
 #include "Mesh/Mesh.hpp"
 #include "Camera/Camera.hpp"
 #include "Components/TransformComponent.hpp"

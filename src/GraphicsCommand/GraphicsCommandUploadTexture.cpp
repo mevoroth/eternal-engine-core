@@ -2,7 +2,6 @@
 #include "Graphics/GraphicsInclude.hpp"
 #include "Resources/Payload.hpp"
 #include "Resources/TextureFactory.hpp"
-#include "GraphicData/Texture.hpp"
 #include "Material/Material.hpp"
 
 namespace Eternal

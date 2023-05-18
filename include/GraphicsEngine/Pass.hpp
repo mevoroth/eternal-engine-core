@@ -2,7 +2,6 @@
 
 #include "GraphicsEngine/Renderer.hpp"
 #include "GraphicData/GlobalResources.hpp"
-#include "GraphicData/RenderTargetTexture.hpp"
 #include "Graphics/GraphicsInclude.hpp"
 
 namespace Eternal

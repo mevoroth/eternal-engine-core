@@ -4,7 +4,6 @@
 #include "Graphics/GraphicsInclude.hpp"
 #include "GraphicsEngine/Renderer.hpp"
 #include "GraphicData/GlobalResources.hpp"
-#include "GraphicData/RenderTargetTexture.hpp"
 #include "Input/Input.hpp"
 #include "Types/Types.hpp"
 #include "Math/Math.hpp"
