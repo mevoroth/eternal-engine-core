@@ -1,5 +1,4 @@
 #include "GraphicsEngine/RenderPasses/VolumetricCloudsPass.hpp"
-#include "HLSLVolumetricClouds.hpp"
 #include "imgui.h"
 #include "Core/System.hpp"
 
@@ -16,14 +15,11 @@ namespace Eternal
 		static float VolumetricCloudsBottomLayerMeters	= 300.0f;
 		static float VolumetricCloudsTopLayerMeters		= 14000.0f;
 		static int VolumetricCloudsMaxSteps				= 64;
-		static float VolumetricCloudsPhaseG[]			= { 0.0f, 0.0f };
-		static float VolumetricCloudsBlend				= 0.5f;
 		static float VolumetricCloudsDensity			= 0.1f;
 		static float VolumetricCloudsNoiseScale			= 1.0f;
 
-		ETERNAL_STATIC_ASSERT(ETERNAL_ARRAYSIZE(VolumetricCloudsPhaseG) == VOLUMETRIC_PHASE_COUNT, "VolumeetricCloudsPhaseG not matching count");
-
 		VolumetricCloudsPass::VolumetricCloudsPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
+			: _VolumetricCloudsConstantBuffer(InContext, "VolumetricCloudsBuffer")
 		{
 			char ThreadGroupCountXString[4];
 			char ThreadGroupCountYString[4];
@@ -34,7 +30,7 @@ namespace Eternal
 			sprintf_s(ThreadGroupCountZString, "%d", ThreadGroupCountZ);
 
 			ShaderCreateInformation VolumetricCloudsCSCreateInformation(
-				ShaderType::CS, "VolumetricClouds", "volumetricclouds.cs.hlsl",
+				ShaderType::CS, "VolumetricClouds", "Volumetrics\\volumetricclouds.cs.hlsl",
 				{
 					"THREAD_GROUP_COUNT_X", ThreadGroupCountXString,
 					"THREAD_GROUP_COUNT_Y", ThreadGroupCountYString,
@@ -66,35 +62,6 @@ namespace Eternal
 					VolumetricCloudsCS
 				)
 			);
-
-
-			{
-				_VolumetricCloudsConstantBuffer = CreateMultiBufferedBuffer(
-					InContext,
-					BufferResourceCreateInformation(
-						InContext.GetDevice(),
-						"VolumetricCloudsBuffer",
-						BufferCreateInformation(
-							Format::FORMAT_UNKNOWN,
-							BufferResourceUsage::BUFFER_RESOURCE_USAGE_CONSTANT_BUFFER,
-							sizeof(VolumetricCloudsConstants)
-						),
-						ResourceMemoryType::RESOURCE_MEMORY_TYPE_GPU_UPLOAD
-					)
-				);
-
-				ViewMetaData MetaData;
-				MetaData.ConstantBufferView.BufferSize = sizeof(VolumetricCloudsConstants);
-				_VolumetricCloudsConstantBufferView = CreateMultiBufferedConstantBufferView(
-					*_VolumetricCloudsConstantBuffer,
-					ConstantBufferViewCreateInformation(
-						InContext,
-						*_VolumetricCloudsConstantBuffer,
-						MetaData
-					)
-				);
-			}
-
 		}
 
 		VolumetricCloudsPass::~VolumetricCloudsPass()
@@ -108,7 +75,7 @@ namespace Eternal
 
 			{
 				MapRange VolumetricCloudsMapRange(sizeof(VolumetricCloudsConstants));
-				MapScope<VolumetricCloudsConstants> VolumetricCloudsConstantsMapScope(*_VolumetricCloudsConstantBuffer, VolumetricCloudsMapRange);
+				MapScope<VolumetricCloudsConstants> VolumetricCloudsConstantsMapScope(*_VolumetricCloudsConstantBuffer.ResourceBuffer, VolumetricCloudsMapRange);
 				VolumetricCloudsConstantsMapScope->CloudsBottomLayerRadiusMeters		= VolumetricCloudsBottomLayerMeters;
 				VolumetricCloudsConstantsMapScope->CloudsTopLayerRadiusMeters			= VolumetricCloudsTopLayerMeters;
 				VolumetricCloudsConstantsMapScope->CloudsBottomLayerRadiusMetersSquared	= VolumetricCloudsBottomLayerMeters * VolumetricCloudsBottomLayerMeters;
@@ -116,18 +83,14 @@ namespace Eternal
 				VolumetricCloudsConstantsMapScope->CloudsMaxStepsRcp					= 1.0f / static_cast<float>(VolumetricCloudsMaxSteps);
 				VolumetricCloudsConstantsMapScope->CloudsMaxSteps						= VolumetricCloudsMaxSteps;
 
-				for (int PhaseGIndex = 0; PhaseGIndex < VOLUMETRIC_PHASE_COUNT; ++PhaseGIndex)
-					VolumetricCloudsConstantsMapScope->CloudsPhaseG[PhaseGIndex]		= 1.0f - VolumetricCloudsPhaseG[PhaseGIndex];
-				VolumetricCloudsConstantsMapScope->CloudsPhaseBlend						= VolumetricCloudsBlend;
 				VolumetricCloudsConstantsMapScope->CloudsDensity						= VolumetricCloudsDensity;
 				VolumetricCloudsConstantsMapScope->CloudsNoiseScale						= VolumetricCloudsNoiseScale;
 			}
 
-			View* VolumetricCloudsConstantBufferView = *_VolumetricCloudsConstantBufferView;
 			_VolumetricCloudsDescriptorTable->SetDescriptor(0, InRenderer.GetGlobalResources().GetViewConstantBufferView());
-			_VolumetricCloudsDescriptorTable->SetDescriptor(1, VolumetricCloudsConstantBufferView);
+			_VolumetricCloudsDescriptorTable->SetDescriptor(1, _VolumetricCloudsConstantBuffer.GetView());
 			_VolumetricCloudsDescriptorTable->SetDescriptor(2, InRenderer.GetGlobalResources().GetGBufferDepthStencil().GetShaderResourceView());
-			_VolumetricCloudsDescriptorTable->SetDescriptor(3, InSystem.GetTextureFactory().GetTextureCache("cloud_base").CachedTexture->GetShaderResourceView());
+			_VolumetricCloudsDescriptorTable->SetDescriptor(3, InSystem.GetTextureFactory().GetTextureCache("noise_curl_3d_xyzw").CachedTexture->GetShaderResourceView());
 			_VolumetricCloudsDescriptorTable->SetDescriptor(4, InContext.GetBilinearWrapSampler());
 			_VolumetricCloudsDescriptorTable->SetDescriptor(5, InRenderer.GetGlobalResources().GetGBufferLuminance().GetUnorderedAccessView());
 
@@ -152,19 +115,14 @@ namespace Eternal
 
 		void VolumetricCloudsPass::RenderDebug()
 		{
-			ImGui::Begin("Volumetric Clouds");
-			ImGui::SliderFloat("Clouds bottom layer (m)", &VolumetricCloudsBottomLayerMeters, 0.0f, 10000.0f);
-			ImGui::SliderFloat("Clouds top layer (m)", &VolumetricCloudsTopLayerMeters, 10000.0f, 20000.0f);
-			for (int PhaseGIndex = 0; PhaseGIndex < VOLUMETRIC_PHASE_COUNT; ++PhaseGIndex)
+			if (ImGui::TreeNode("Volumetric Clouds"))
 			{
-				char PhaseLabel[32];
-				sprintf_s(PhaseLabel, "Clouds Phase G %d", PhaseGIndex);
-				ImGui::SliderFloat(PhaseLabel, &VolumetricCloudsPhaseG[PhaseGIndex], -1.0f, 1.0f);
+				ImGui::SliderFloat("Clouds bottom layer (m)", &VolumetricCloudsBottomLayerMeters, 0.0f, 10000.0f);
+				ImGui::SliderFloat("Clouds top layer (m)", &VolumetricCloudsTopLayerMeters, 10000.0f, 20000.0f);
+				ImGui::SliderFloat("Clouds Density", &VolumetricCloudsDensity, 0.0f, 0.1f);
+				ImGui::SliderFloat("Clouds Noise scale", &VolumetricCloudsNoiseScale, 0.0f, 10.0f);
+				ImGui::TreePop();
 			}
-			ImGui::SliderFloat("Clouds Phase Blend", &VolumetricCloudsBlend, 0.0f, 1.0f);
-			ImGui::SliderFloat("Clouds Density", &VolumetricCloudsDensity, 0.0f, 0.1f);
-			ImGui::SliderFloat("Clouds Noise scale", &VolumetricCloudsNoiseScale, 0.0f, 10.0f);
-			ImGui::End();
 		}
 	}
 }

@@ -1,11 +1,14 @@
 #pragma once
 
 #include "GraphicsEngine/Pass.hpp"
+#include "HLSLVolumetricCloudsConstants.hpp"
 
 namespace Eternal
 {
 	namespace GraphicsEngine
 	{
+		using namespace Eternal::HLSL;
+
 		class VolumetricCloudsPass final : public Pass
 		{
 		public:
@@ -17,9 +20,8 @@ namespace Eternal
 
 		private:
 
-			DescriptorTable*			_VolumetricCloudsDescriptorTable	= nullptr;
-			MultiBuffered<Resource>*	_VolumetricCloudsConstantBuffer		= nullptr;
-			MultiBuffered<View>*		_VolumetricCloudsConstantBufferView	= nullptr;
+			DescriptorTable*							_VolumetricCloudsDescriptorTable	= nullptr;
+			ConstantBuffer<VolumetricCloudsConstants>	_VolumetricCloudsConstantBuffer;
 
 		};
 	}
