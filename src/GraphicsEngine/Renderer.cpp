@@ -1,11 +1,13 @@
 #include "GraphicsEngine/Renderer.hpp"
 #include "GraphicData/GlobalResources.hpp"
+#include "GraphicsEngine/RenderPasses/SkyPass.hpp"
 #include "GraphicsEngine/RenderPasses/ShadowMapPass.hpp"
 #include "GraphicsEngine/RenderPasses/OpaquePass.hpp"
 #include "GraphicsEngine/RenderPasses/DirectLightingPass.hpp"
 #include "GraphicsEngine/RenderPasses/VolumetricCloudsPass.hpp"
 #include "GraphicsEngine/RenderPasses/TonemappingPass.hpp"
 #include "GraphicsEngine/RenderPasses/PresentPass.hpp"
+#include "imgui.h"
 
 namespace Eternal
 {
@@ -22,6 +24,7 @@ namespace Eternal
 		Renderer::Renderer(_In_ GraphicsContext& InContext)
 			: _GlobalResources(new GlobalResources(InContext))
 			, _Passes({
+				new SkyPass(InContext, *this),
 				new ShadowMapPass(InContext, *this),
 				new OpaquePass(InContext, *this),
 				new DirectLightingPass(InContext, *this),
@@ -58,9 +61,11 @@ namespace Eternal
 
 		void Renderer::RenderDebug()
 		{
+			ImGui::Begin("Eternal Debug");
 			for (uint32_t PassIndex = 0; PassIndex < _Passes.size(); ++PassIndex)
 				_Passes[PassIndex]->RenderDebug();
 			_PresentPass->RenderDebug();
+			ImGui::End();
 		}
 	}
 }
