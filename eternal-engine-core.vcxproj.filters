@@ -185,6 +185,8 @@
     </ClInclude>
     <ClInclude Include="include\GraphicsEngine\RenderPasses\Debug\DebugObjectBoundingBoxPass.hpp">
       <Filter>GraphicsEngine\RenderPasses\Debug</Filter>
+    <ClInclude Include="include\GraphicsEngine\RenderPasses\SkyPass.hpp">
+      <Filter>GraphicsEngine\RenderPasses</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -311,6 +313,8 @@
     </ClCompile>
     <ClCompile Include="src\GraphicsEngine\RenderPasses\Debug\DebugObjectBoundingBoxPass.cpp">
       <Filter>GraphicsEngine\RenderPasses\Debug</Filter>
+    <ClCompile Include="src\GraphicsEngine\RenderPasses\SkyPass.cpp">
+      <Filter>GraphicsEngine\RenderPasses</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

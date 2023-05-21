@@ -133,6 +133,7 @@
     <ClInclude Include="include\GraphicsEngine\RenderPasses\OpaquePass.hpp" />
     <ClInclude Include="include\GraphicsEngine\RenderPasses\PresentPass.hpp" />
     <ClInclude Include="include\GraphicsEngine\RenderPasses\ShadowMapPass.hpp" />
+    <ClInclude Include="include\GraphicsEngine\RenderPasses\SkyPass.hpp" />
     <ClInclude Include="include\GraphicsEngine\RenderPasses\TonemappingPass.hpp" />
     <ClInclude Include="include\GraphicsEngine\RenderPasses\VolumetricCloudsPass.hpp" />
     <ClInclude Include="include\Imgui\Imgui.hpp" />
@@ -178,6 +179,7 @@
     <ClCompile Include="src\GraphicsEngine\RenderPasses\OpaquePass.cpp" />
     <ClCompile Include="src\GraphicsEngine\RenderPasses\PresentPass.cpp" />
     <ClCompile Include="src\GraphicsEngine\RenderPasses\ShadowMapPass.cpp" />
+    <ClCompile Include="src\GraphicsEngine\RenderPasses\SkyPass.cpp" />
     <ClCompile Include="src\GraphicsEngine\RenderPasses\TonemappingPass.cpp" />
     <ClCompile Include="src\GraphicsEngine\RenderPasses\VolumetricCloudsPass.cpp" />
     <ClCompile Include="src\Imgui\Imgui.cpp" />
