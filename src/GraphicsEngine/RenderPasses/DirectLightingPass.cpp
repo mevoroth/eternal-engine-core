@@ -93,15 +93,13 @@ namespace Eternal
 				DirectLightingConstantsMapScope.GetDataPointer()->LightsCount = 1;// static_cast<uint32_t>(Lights.size());
 			}
 
-			View* DirectLightingConstantBufferView = *_DirectLightingConstantBuffer.ResourceView;
-			View* DirectLightingLightsBufferView = *_DirectLightingLightsBuffer.ResourceView;
-			_DirectLightingDescriptorTable->SetDescriptor(0, DirectLightingConstantBufferView);
+			_DirectLightingDescriptorTable->SetDescriptor(0, _DirectLightingConstantBuffer.GetView());
 			_DirectLightingDescriptorTable->SetDescriptor(1, InRenderer.GetGlobalResources().GetViewConstantBufferView());
 			_DirectLightingDescriptorTable->SetDescriptor(2, InRenderer.GetGlobalResources().GetGBufferDepthStencil().GetShaderResourceView());
 			_DirectLightingDescriptorTable->SetDescriptor(3, InRenderer.GetGlobalResources().GetGBufferAlbedo().GetShaderResourceView());
 			_DirectLightingDescriptorTable->SetDescriptor(4, InRenderer.GetGlobalResources().GetGBufferNormals().GetShaderResourceView());
 			_DirectLightingDescriptorTable->SetDescriptor(5, InRenderer.GetGlobalResources().GetGBufferRoughnessMetallicSpecular().GetShaderResourceView());
-			_DirectLightingDescriptorTable->SetDescriptor(6, DirectLightingLightsBufferView);
+			_DirectLightingDescriptorTable->SetDescriptor(6, _DirectLightingLightsBuffer.GetView());
 			_DirectLightingDescriptorTable->SetDescriptor(7, InContext.GetPointClampSampler());
 
 			{

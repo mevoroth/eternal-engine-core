@@ -147,8 +147,7 @@ namespace Eternal
 
 			uint32_t DrawInstanceCount	= 0;
 
-			View* ObjectPerInstanceBufferView = *_ObjectPerInstanceBuffer.ResourceView;
-			_ObjectDescriptorTable->SetDescriptor(3, ObjectPerInstanceBufferView);
+			_ObjectDescriptorTable->SetDescriptor(3, _ObjectPerInstanceBuffer.GetView());
 
 			uint32_t VisibilityKey = 0;
 
