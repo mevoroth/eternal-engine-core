@@ -110,6 +110,7 @@ namespace Eternal
 					ImGui::SliderFloat(PhaseLabel, &AtmospherePhaseG[PhaseGIndex], -1.0f, 1.0f);
 				}
 				ImGui::SliderFloat("Atmosphere Phase Blend", &AtmospherePhaseBlend, 0.0f, 1.0f);
+				ImGui::TreePop();
 			}
 		}
 	}
