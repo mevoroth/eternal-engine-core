@@ -48,6 +48,7 @@ namespace Eternal
 	{
 		class RendererTask;
 		class StreamingTask;
+		class AutoRecompileShaderTask;
 	}
 
 	namespace Parallel
@@ -268,25 +269,26 @@ namespace Eternal
 			SystemCreateInformation										_SystemCreateInformation;
 			WindowsProcess												_WindowProcess;
 			TextureFactory												_TextureFactory;
-			ParallelSystem*												_ParallelSystem		= nullptr;
-			GraphicsContext*											_GraphicsContext	= nullptr;
-			Imgui*														_Imgui				= nullptr;
-			Timer*														_Timer				= nullptr;
-			Log*														_Logs				= nullptr;
-			Input*														_Input				= nullptr;
-			Streaming*													_Streaming			= nullptr;
-			Renderer*													_Renderer			= nullptr;
+			ParallelSystem*												_ParallelSystem				= nullptr;
+			GraphicsContext*											_GraphicsContext			= nullptr;
+			Imgui*														_Imgui						= nullptr;
+			Timer*														_Timer						= nullptr;
+			Log*														_Logs						= nullptr;
+			Input*														_Input						= nullptr;
+			Streaming*													_Streaming					= nullptr;
+			Renderer*													_Renderer					= nullptr;
 
 			//////////////////////////////////////////////////////////////////////////
 			// Tasks
-			RendererTask*												_RendererTask		= nullptr;
-			StreamingTask*												_StreamingTask		= nullptr;
+			RendererTask*												_RendererTask				= nullptr;
+			StreamingTask*												_StreamingTask				= nullptr;
+			AutoRecompileShaderTask*									_AutoRecompileShaderTask	= nullptr;
 
 			//////////////////////////////////////////////////////////////////////////
 			// System state
 			array<SystemFrame, GraphicsContext::FrameBufferingCount>	_Frames;
-			AtomicS32*													_RenderIndex		= nullptr;
-			AtomicS32*													_GameIndex			= nullptr;
+			AtomicS32*													_RenderIndex				= nullptr;
+			AtomicS32*													_GameIndex					= nullptr;
 		};
 	}
 }

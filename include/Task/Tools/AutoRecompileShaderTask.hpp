@@ -1,29 +1,28 @@
-#ifndef _AUTO_RECOMPILE_SHADER_TASK_HPP_
-#define _AUTO_RECOMPILE_SHADER_TASK_HPP_
+#pragma once
 
 #include "Parallel/Task.hpp"
+#include <vector>
 
 namespace Eternal
 {
-	namespace Task
+	namespace Tasks
 	{
+		using namespace std;
 		using namespace Eternal::Parallel;
 
-		class AutoRecompileShaderTask : public Task
+		struct AutoRecompileShaderPrivateData;
+
+		class AutoRecompileShaderTask final : public Task
 		{
 		public:
-			using Task::Task;
-			//AutoRecompileShaderTask();
+			AutoRecompileShaderTask(_In_ const TaskCreateInformation& InTaskCreateInformation);
 			~AutoRecompileShaderTask();
 
-			virtual void DoExecute() override;
+			virtual void DoExecute() override final;
 
 		private:
-			void** _FilesWatchHandles = nullptr;
-			void** _DirectoryHandles = nullptr;
-			int _FilesWatchHandlesCount = 0;
+
+			AutoRecompileShaderPrivateData* _AutoRecompileShaderData = nullptr;
 		};
 	}
 }
-
-#endif

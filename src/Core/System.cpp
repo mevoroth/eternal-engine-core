@@ -9,6 +9,7 @@
 #include "Input/InputFactory.hpp"
 #include "Task/Core/RendererTask.hpp"
 #include "Task/Core/StreamingTask.hpp"
+#include "Task/Tools/AutoRecompileShaderTask.hpp"
 #include "Parallel/AtomicS32.hpp"
 #include "Parallel/AtomicS32Factory.hpp"
 #include "Parallel/Sleep.hpp"
@@ -49,35 +50,38 @@ namespace Eternal
 			FilePath::Register(InSystemCreateInformation.FBXCachePath,							FileType::FILE_TYPE_CACHED_MESHES);
 			FilePath::Register(InSystemCreateInformation.TexturePath,							FileType::FILE_TYPE_TEXTURES);
 
-			_Timer				= CreateTimer(TimeType::TIME_TYPE_WIN);
-			_Logs				= CreateMultiChannelLog({ LogType::LOG_TYPE_CONSOLE/*, LogType::LOG_TYPE_FILE*/ });
-			_Input				= CreateMultiInput({ InputType::INPUT_TYPE_WIN, InputType::INPUT_TYPE_XINPUT });
+			_Timer						= CreateTimer(TimeType::TIME_TYPE_WIN);
+			_Logs						= CreateMultiChannelLog({ LogType::LOG_TYPE_CONSOLE/*, LogType::LOG_TYPE_FILE*/ });
+			_Input						= CreateMultiInput({ InputType::INPUT_TYPE_WIN, InputType::INPUT_TYPE_XINPUT });
 
 			WindowsProcess::SetInputHandler(_Input);
 			WindowsProcess::SetIsRunning(&InSystemCreateInformation.GameContext->_Running);
 			
-			_GraphicsContext	= CreateGraphicsContext(InSystemCreateInformation.ContextInformation);
+			_GraphicsContext			= CreateGraphicsContext(InSystemCreateInformation.ContextInformation);
 
-			_Streaming			= new Streaming(_TextureFactory);
+			_Streaming					= new Streaming(_TextureFactory);
 			_Streaming->RegisterLoader(AssetType::ASSET_TYPE_LEVEL, new LevelLoader());
 
-			_Renderer			= new Renderer(*_GraphicsContext);
-			_Imgui				= new Imgui(*_GraphicsContext, *_Renderer, _Input);
+			_Renderer					= new Renderer(*_GraphicsContext);
+			_Imgui						= new Imgui(*_GraphicsContext, *_Renderer, _Input);
 
 			for (uint32_t FrameIndex = 0; FrameIndex < GraphicsContext::FrameBufferingCount; ++FrameIndex)
 				_Frames[FrameIndex].ImguiFrameContext = _Imgui->CreateContext(*_GraphicsContext);
 
 			TaskCreateInformation RendererCreateInformation("RendererTask");
-			_RendererTask		= new RendererTask(RendererCreateInformation, *this);
+			_RendererTask				= new RendererTask(RendererCreateInformation, *this);
 
 			TaskCreateInformation StreamingCreateInformation("StreamingTask");
-			_StreamingTask		= new StreamingTask(StreamingCreateInformation, *this);
+			_StreamingTask				= new StreamingTask(StreamingCreateInformation, *this);
+
+			TaskCreateInformation AutoRecompileShaderTaskCreateInformation("AutoRecompileShaderTask");
+			_AutoRecompileShaderTask	= new AutoRecompileShaderTask(AutoRecompileShaderTaskCreateInformation);
 
 			ParallelSystemCreateInformation ParallelSystemInformation(
 				GraphicsContext::FrameBufferingCount,
-				{ _RendererTask, _StreamingTask }
+				{ _RendererTask, _StreamingTask, _AutoRecompileShaderTask }
 			);
-			_ParallelSystem		= new ParallelSystem(ParallelSystemInformation);
+			_ParallelSystem				= new ParallelSystem(ParallelSystemInformation);
 
 			Optick::OptickStart(*_GraphicsContext);
 
@@ -94,6 +98,7 @@ namespace Eternal
 
 			Destroy(_StreamingTask);
 			Destroy(_RendererTask);
+			Destroy(_AutoRecompileShaderTask);
 
 			for (uint32_t FrameIndex = 0; FrameIndex < GraphicsContext::FrameBufferingCount; ++FrameIndex)
 				_Imgui->DestroyContext(_Frames[FrameIndex].ImguiFrameContext);
