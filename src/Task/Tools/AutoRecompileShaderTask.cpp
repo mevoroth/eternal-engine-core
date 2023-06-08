@@ -22,17 +22,20 @@ namespace Eternal
 
 		struct AutoRecompileShaderPrivateData
 		{
+			static constexpr uint32_t InvalidWaitObject = ~0u;
+
 			AutoRecompileShaderState		AutoRecompileState;
 			vector<HANDLE>					DirectoryHandles;
 			vector<OVERLAPPED>				DirectoryOverlappeds;
 			vector<array<uint8_t, 1024>>	AutoRecompileChangeBuffers;
+			uint32_t						WaitObjectIndex = InvalidWaitObject;
 		};
 
 		AutoRecompileShaderTask::AutoRecompileShaderTask(_In_ const TaskCreateInformation& InTaskCreateInformation)
 			: Task(InTaskCreateInformation)
 			, _AutoRecompileShaderData(new AutoRecompileShaderPrivateData())
 		{
-			const vector<string>& FolderPaths = FilePath::GetFolderPaths(FileType::FILE_TYPE_SHADERS);
+			const vector<string>& FolderPaths							= FilePath::GetFolderPaths(FileType::FILE_TYPE_SHADERS);
 			vector<HANDLE>& DirectoryHandles							= _AutoRecompileShaderData->DirectoryHandles;
 			vector<OVERLAPPED>& DirectoryOverlappeds					= _AutoRecompileShaderData->DirectoryOverlappeds;
 			vector<array<uint8_t, 1024>>& AutoRecompileChangeBuffers	= _AutoRecompileShaderData->AutoRecompileChangeBuffers;
@@ -73,7 +76,7 @@ namespace Eternal
 			{
 				for (uint32_t DirectoryIndex = 0; DirectoryIndex < _AutoRecompileShaderData->DirectoryHandles.size(); ++DirectoryIndex)
 				{
-					BOOL ReadDirectorySuccess = ReadDirectoryChangesW(
+					BOOL ReadDirectorySuccess = ReadDirectoryChangesA(
 						_AutoRecompileShaderData->DirectoryHandles[DirectoryIndex],
 						_AutoRecompileShaderData->AutoRecompileChangeBuffers[DirectoryIndex].data(), 1024,
 						TRUE,
@@ -94,9 +97,7 @@ namespace Eternal
 				HANDLE* Handles = reinterpret_cast<HANDLE*>(alloca(sizeof(HANDLE) * _AutoRecompileShaderData->DirectoryOverlappeds.size()));
 
 				for (uint32_t DirectoryIndex = 0; DirectoryIndex < _AutoRecompileShaderData->DirectoryOverlappeds.size(); ++DirectoryIndex)
-				{
 					Handles[DirectoryIndex] = _AutoRecompileShaderData->DirectoryOverlappeds[DirectoryIndex].hEvent;
-				}
 
 				DWORD WaitResult = WaitForMultipleObjects(
 					_AutoRecompileShaderData->DirectoryOverlappeds.size(),
@@ -105,64 +106,80 @@ namespace Eternal
 					0
 				);
 
-				if (WaitResult == WAIT_OBJECT_0)
-					_AutoRecompileShaderData->AutoRecompileState = AutoRecompileShaderState::AUTO_RECOMPILE_SHADER_POLL;
+				for (uint32_t DirectoryIndex = 0; DirectoryIndex < _AutoRecompileShaderData->DirectoryOverlappeds.size(); ++DirectoryIndex)
+				{
+					if (WaitResult == (WAIT_OBJECT_0 + DirectoryIndex))
+					{
+						_AutoRecompileShaderData->WaitObjectIndex		= DirectoryIndex;
+						_AutoRecompileShaderData->AutoRecompileState	= AutoRecompileShaderState::AUTO_RECOMPILE_SHADER_POLL;
+						break;
+					}
+				}
 			} break;
 
 			case AutoRecompileShaderState::AUTO_RECOMPILE_SHADER_POLL:
 			{
-				for (uint32_t DirectoryIndex = 0; DirectoryIndex < _AutoRecompileShaderData->DirectoryOverlappeds.size(); ++DirectoryIndex)
+				DWORD BytesTransferred;
+				BOOL OverlappedResult = GetOverlappedResult(
+					_AutoRecompileShaderData->DirectoryHandles[_AutoRecompileShaderData->WaitObjectIndex],
+					&_AutoRecompileShaderData->DirectoryOverlappeds[_AutoRecompileShaderData->WaitObjectIndex],
+					&BytesTransferred,
+					FALSE
+				);
+
+				ETERNAL_ASSERT(OverlappedResult == TRUE);
+
+				char DebugFileName[1024] = {};
+
+				FILE_NOTIFY_INFORMATION* FileNotifyInformation = reinterpret_cast<FILE_NOTIFY_INFORMATION*>(_AutoRecompileShaderData->AutoRecompileChangeBuffers[_AutoRecompileShaderData->WaitObjectIndex].data());
+				for (;;)
 				{
-					DWORD BytesTransferred;
-					BOOL OverlappedResult = GetOverlappedResult(
-						_AutoRecompileShaderData->DirectoryHandles[DirectoryIndex],
-						&_AutoRecompileShaderData->DirectoryOverlappeds[DirectoryIndex],
-						&BytesTransferred,
-						FALSE
-					);
-
-					ETERNAL_ASSERT(OverlappedResult == TRUE);
-
-					char DebugFileName[1024] = {};
-
-					FILE_NOTIFY_INFORMATION* FileNotifyInformation = reinterpret_cast<FILE_NOTIFY_INFORMATION*>(_AutoRecompileShaderData->AutoRecompileChangeBuffers[DirectoryIndex].data());
-					for (;;)
+					DWORD FileNameLength = FileNotifyInformation->FileNameLength / sizeof(wchar_t);
+					wchar_t* FileName = reinterpret_cast<wchar_t*>(alloca((FileNameLength + 1) * sizeof(wchar_t)));
+					memcpy(FileName, FileNotifyInformation->FileName, FileNameLength * sizeof(wchar_t));
+					FileName[FileNameLength] = 0;
+					switch (FileNotifyInformation->Action)
 					{
-						DWORD FileNameLength = FileNotifyInformation->FileNameLength / sizeof(wchar_t);
-						switch (FileNotifyInformation->Action)
-						{
-						case FILE_ACTION_ADDED:
-							sprintf_s(DebugFileName, "Added: %ls\n", FileNotifyInformation->FileName);
-							break;
+					//case FILE_ACTION_ADDED:
+					//	sprintf_s(DebugFileName, "Added: %ls\n", FileName);
+					//	break;
 
-						case FILE_ACTION_REMOVED:
-							sprintf_s(DebugFileName, "Removed: %ls\n", FileNotifyInformation->FileName);
-							break;
+					//case FILE_ACTION_REMOVED:
+					//	sprintf_s(DebugFileName, "Removed: %ls\n", FileName);
+					//	break;
 
-						case FILE_ACTION_MODIFIED:
-							sprintf_s(DebugFileName, "Modified: %ls\n", FileNotifyInformation->FileName);
-							break;
+					//case FILE_ACTION_MODIFIED:
+					//	sprintf_s(DebugFileName, "Modified: %ls\n", FileName);
+					//	break;
 
-						case FILE_ACTION_RENAMED_OLD_NAME:
-							sprintf_s(DebugFileName, "Renamed from: %ls\n", FileNotifyInformation->FileName);
-							break;
+					//case FILE_ACTION_RENAMED_OLD_NAME:
+					//	sprintf_s(DebugFileName, "Renamed from: %ls\n", FileName);
+					//	break;
 
-						case FILE_ACTION_RENAMED_NEW_NAME:
-							sprintf_s(DebugFileName, "to: %ls\n", FileNotifyInformation->FileName);
-							break;
+					case FILE_ACTION_RENAMED_NEW_NAME:
+						sprintf_s(DebugFileName, "to: %ls\n", FileName);
+						break;
 
-						default:
-							ETERNAL_BREAK();
-							break;
-						}
-
-						OutputDebugString(DebugFileName);
-
-						if (FileNotifyInformation->NextEntryOffset)
-							*reinterpret_cast<uint8_t**>(&FileNotifyInformation) += FileNotifyInformation->NextEntryOffset;
-						else
-							break;
+					//default:
+					//	ETERNAL_BREAK();
+					//	break;
 					}
+
+					switch (FileNotifyInformation->Action)
+					{
+					//case FILE_ACTION_ADDED:
+					//case FILE_ACTION_REMOVED:
+					//case FILE_ACTION_MODIFIED:
+					//case FILE_ACTION_RENAMED_OLD_NAME:
+					case FILE_ACTION_RENAMED_NEW_NAME:
+						OutputDebugString(DebugFileName);
+						break;
+					}
+
+					if (FileNotifyInformation->NextEntryOffset)
+						*reinterpret_cast<uint8_t**>(&FileNotifyInformation) += FileNotifyInformation->NextEntryOffset;
+					else
+						break;
 				}
 				_AutoRecompileShaderData->AutoRecompileState = AutoRecompileShaderState::AUTO_RECOMPILE_SHADER_QUERY;
 			} break;
