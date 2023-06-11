@@ -76,7 +76,7 @@ namespace Eternal
 			{
 				for (uint32_t DirectoryIndex = 0; DirectoryIndex < _AutoRecompileShaderData->DirectoryHandles.size(); ++DirectoryIndex)
 				{
-					BOOL ReadDirectorySuccess = ReadDirectoryChangesA(
+					BOOL ReadDirectorySuccess = ReadDirectoryChangesW(
 						_AutoRecompileShaderData->DirectoryHandles[DirectoryIndex],
 						_AutoRecompileShaderData->AutoRecompileChangeBuffers[DirectoryIndex].data(), 1024,
 						TRUE,
