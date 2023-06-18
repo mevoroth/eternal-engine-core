@@ -1,11 +1,14 @@
 #include "Task/Tools/AutoRecompileShaderTask.hpp"
 
+#include "Graphics/GraphicsContext.hpp"
 #include "File/FilePath.hpp"
 #define VC_EXTRALEAN
 #define WIN32_EXTRA_LEAN
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <array>
+#include <locale>
+#include <codecvt>
 
 namespace Eternal
 {
@@ -31,9 +34,10 @@ namespace Eternal
 			uint32_t						WaitObjectIndex = InvalidWaitObject;
 		};
 
-		AutoRecompileShaderTask::AutoRecompileShaderTask(_In_ const TaskCreateInformation& InTaskCreateInformation)
+		AutoRecompileShaderTask::AutoRecompileShaderTask(_In_ const TaskCreateInformation& InTaskCreateInformation, _In_ GraphicsContext& InContext)
 			: Task(InTaskCreateInformation)
 			, _AutoRecompileShaderData(new AutoRecompileShaderPrivateData())
+			, _Context(InContext)
 		{
 			const vector<string>& FolderPaths							= FilePath::GetFolderPaths(FileType::FILE_TYPE_SHADERS);
 			vector<HANDLE>& DirectoryHandles							= _AutoRecompileShaderData->DirectoryHandles;
@@ -100,7 +104,7 @@ namespace Eternal
 					Handles[DirectoryIndex] = _AutoRecompileShaderData->DirectoryOverlappeds[DirectoryIndex].hEvent;
 
 				DWORD WaitResult = WaitForMultipleObjects(
-					_AutoRecompileShaderData->DirectoryOverlappeds.size(),
+					static_cast<DWORD>(_AutoRecompileShaderData->DirectoryOverlappeds.size()),
 					Handles,
 					FALSE,
 					0
@@ -138,42 +142,18 @@ namespace Eternal
 					wchar_t* FileName = reinterpret_cast<wchar_t*>(alloca((FileNameLength + 1) * sizeof(wchar_t)));
 					memcpy(FileName, FileNotifyInformation->FileName, FileNameLength * sizeof(wchar_t));
 					FileName[FileNameLength] = 0;
-					switch (FileNotifyInformation->Action)
+					wstring FileNameUTF8(FileName);
+					string FileNameString = std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t>().to_bytes(FileNameUTF8);
+
+					if (FileNotifyInformation->Action == FILE_ACTION_RENAMED_NEW_NAME)
 					{
-					//case FILE_ACTION_ADDED:
-					//	sprintf_s(DebugFileName, "Added: %ls\n", FileName);
-					//	break;
-
-					//case FILE_ACTION_REMOVED:
-					//	sprintf_s(DebugFileName, "Removed: %ls\n", FileName);
-					//	break;
-
-					//case FILE_ACTION_MODIFIED:
-					//	sprintf_s(DebugFileName, "Modified: %ls\n", FileName);
-					//	break;
-
-					//case FILE_ACTION_RENAMED_OLD_NAME:
-					//	sprintf_s(DebugFileName, "Renamed from: %ls\n", FileName);
-					//	break;
-
-					case FILE_ACTION_RENAMED_NEW_NAME:
-						sprintf_s(DebugFileName, "to: %ls\n", FileName);
-						break;
-
-					//default:
-					//	ETERNAL_BREAK();
-					//	break;
-					}
-
-					switch (FileNotifyInformation->Action)
-					{
-					//case FILE_ACTION_ADDED:
-					//case FILE_ACTION_REMOVED:
-					//case FILE_ACTION_MODIFIED:
-					//case FILE_ACTION_RENAMED_OLD_NAME:
-					case FILE_ACTION_RENAMED_NEW_NAME:
-						OutputDebugString(DebugFileName);
-						break;
+						string FullPathSource = FilePath::Find(FileNameString, FileType::FILE_TYPE_SHADERS);
+						if (FullPathSource.length() > 0)
+						{
+							ResolvedPipelineDependency PipelineDependencies = _Context.GetPipelineDependency().ResolveSource(FullPathSource);
+							if (PipelineDependencies.IsShaderSourceResolved())
+								_Context.RegisterPipelineRecompile(PipelineDependencies);
+						}
 					}
 
 					if (FileNotifyInformation->NextEntryOffset)

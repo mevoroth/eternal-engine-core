@@ -75,7 +75,7 @@ namespace Eternal
 			_StreamingTask				= new StreamingTask(StreamingCreateInformation, *this);
 
 			TaskCreateInformation AutoRecompileShaderTaskCreateInformation("AutoRecompileShaderTask");
-			_AutoRecompileShaderTask	= new AutoRecompileShaderTask(AutoRecompileShaderTaskCreateInformation);
+			_AutoRecompileShaderTask	= new AutoRecompileShaderTask(AutoRecompileShaderTaskCreateInformation, *_GraphicsContext);
 
 			ParallelSystemCreateInformation ParallelSystemInformation(
 				GraphicsContext::FrameBufferingCount,
