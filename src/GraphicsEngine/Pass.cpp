@@ -9,5 +9,10 @@ namespace Eternal
 			DestroyPipeline(_Pipeline);
 			DestroyRootSignature(_RootSignature);
 		}
+
+		bool Pass::CanRenderPass() const
+		{
+			return _Pipeline && _Pipeline->IsPipelineCompiled();
+		}
 	}
 }

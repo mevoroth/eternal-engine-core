@@ -50,7 +50,10 @@ namespace Eternal
 			if (_GlobalResources->BeginRender(InContext, InSystem))
 			{
 				for (uint32_t PassIndex = 0; PassIndex < _Passes.size(); ++PassIndex)
-					_Passes[PassIndex]->Render(InContext, InSystem, *this);
+				{
+					if (_Passes[PassIndex]->CanRenderPass())
+						_Passes[PassIndex]->Render(InContext, InSystem, *this);
+				}
 			}
 		}
 

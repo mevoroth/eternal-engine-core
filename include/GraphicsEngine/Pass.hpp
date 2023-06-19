@@ -37,6 +37,8 @@ namespace Eternal
 			virtual void Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer) = 0;
 			virtual void RenderDebug() {}
 
+			bool CanRenderPass() const;
+
 		protected:
 
 			RootSignature*	_RootSignature	= nullptr;
