@@ -42,12 +42,12 @@ namespace Eternal
 			float RYWithDeadZone = InputSystem.GetAxisWithDeadZone(Input::JOY0_RY);
 
 			Component->GetTransform().Translate(
-				RightVector * LXWithDeadZone +
-				ForwardVector * LYWithDeadZone
+				RightVector * LXWithDeadZone * 10.0f +
+				ForwardVector * LYWithDeadZone * 10.0f
 			);
 
 			Component->GetTransform().Rotate(
-				Vector3(0.0f, RXWithDeadZone * 0.1f, RYWithDeadZone * 0.1f)
+				Vector3(0.0f, RXWithDeadZone * 0.1f, 0.0f /*RYWithDeadZone * 0.1f*/)
 			);
 		}
 
