@@ -31,6 +31,11 @@ namespace Eternal
 		using namespace Eternal::Platform;
 		using namespace Eternal::Parallel;
 
+		namespace SystemPrivate
+		{
+			static bool ShowDebugVisibility = 0;
+		}
+
 		template<typename SystemType>
 		void Destroy(_Inout_ SystemType*& InOutSystem)
 		{
@@ -177,6 +182,29 @@ namespace Eternal
 				CurrentGameFrame.ViewCamera = OldestFrame.PendingViewCamera ? OldestFrame.PendingViewCamera : OldestFrame.ViewCamera;
 				OldestFrame.PendingViewCamera = nullptr;
 			}
+			{
+				SystemFrame& OldestFrame = GetOldestGameFrame();
+
+				const vector<ObjectsList<MeshCollection>::InstancedObjects>& MeshCollections = CurrentGameFrame.MeshCollections;
+
+				uint32_t BoundingBoxesCount = 0;
+				for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
+				{
+					vector<Mesh*>& Meshes = MeshCollections[CollectionIndex].Object->Meshes;
+
+					uint32_t SubMeshCount = 0;
+					for (uint32_t MeshIndex = 0; MeshIndex < Meshes.size(); ++MeshIndex)
+						SubMeshCount += static_cast<uint32_t>(Meshes[MeshIndex]->GetGPUMesh().BoundingBoxes.size());
+
+					BoundingBoxesCount += SubMeshCount * static_cast<uint32_t>(MeshCollections[CollectionIndex].Instances.size());
+				}
+
+				if (CurrentGameFrame.MeshCollectionsVisibility.GetBitCount() != BoundingBoxesCount)
+					CurrentGameFrame.MeshCollectionsVisibility.Resize(BoundingBoxesCount);
+
+				if (CurrentGameFrame.MeshCollectionsVisibility.GetBitCount() == OldestFrame.MeshCollectionsVisibility.GetBitCount())
+					CurrentGameFrame.MeshCollectionsVisibility = OldestFrame.MeshCollectionsVisibility;
+			}
 		}
 
 		void System::Update()
@@ -202,39 +230,30 @@ namespace Eternal
 				Frustum CameraFrustum;
 				CurrentRenderFrame.ViewCamera->ComputeFrustum(CameraFrustum);
 
-				uint32_t BoundingBoxesCount = 0;
-				for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
+				if (!SystemPrivate::ShowDebugVisibility)
 				{
-					vector<Mesh*>& Meshes = MeshCollections[CollectionIndex].Object->Meshes;
-
-					uint32_t SubMeshCount = 0;
-					for (uint32_t MeshIndex = 0; MeshIndex < Meshes.size(); ++MeshIndex)
-						SubMeshCount += static_cast<uint32_t>(Meshes[MeshIndex]->GetGPUMesh().BoundingBoxes.size());
-
-					BoundingBoxesCount += SubMeshCount * static_cast<uint32_t>(MeshCollections[CollectionIndex].Instances.size());
-				}
-
-				CurrentRenderFrame.MeshCollectionsVisibility.Resize(BoundingBoxesCount);
-
-				uint32_t VisibilityIndex = 0;
-				for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
-				{
-					vector<Mesh*>& Meshes = MeshCollections[CollectionIndex].Object->Meshes;
-
-					for (uint32_t InstanceIndex = 0; InstanceIndex < MeshCollections[CollectionIndex].Instances.size(); ++InstanceIndex)
+					uint32_t VisibilityIndex = 0;
+					for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
 					{
-						Matrix4x4 LocalToWorld = MeshCollections[CollectionIndex].Instances[InstanceIndex]->GetTransform().GetLocalToWorld();
+						vector<Mesh*>& Meshes = MeshCollections[CollectionIndex].Object->Meshes;
 
-						for (uint32_t MeshIndex = 0; MeshIndex < Meshes.size(); ++MeshIndex)
+						for (uint32_t InstanceIndex = 0; InstanceIndex < MeshCollections[CollectionIndex].Instances.size(); ++InstanceIndex)
 						{
-							vector<AxisAlignedBoundingBox>& CurrentBoundingBoxes = Meshes[MeshIndex]->GetGPUMesh().BoundingBoxes;
+							Matrix4x4 LocalToWorld = MeshCollections[CollectionIndex].Instances[InstanceIndex]->GetTransform().GetLocalToWorld();
 
-							for (uint32_t BoundingBoxIndex = 0; BoundingBoxIndex < CurrentBoundingBoxes.size(); ++BoundingBoxIndex)
+							for (uint32_t MeshIndex = 0; MeshIndex < Meshes.size(); ++MeshIndex)
 							{
-								bool IsIntersecting = CameraFrustum.Intersect(CurrentBoundingBoxes[BoundingBoxIndex].TransformBy(LocalToWorld));
-								if (IsIntersecting)
-									CurrentRenderFrame.MeshCollectionsVisibility.Set(VisibilityIndex);
-								++VisibilityIndex;
+								vector<AxisAlignedBoundingBox>& CurrentBoundingBoxes = Meshes[MeshIndex]->GetGPUMesh().BoundingBoxes;
+
+								for (uint32_t BoundingBoxIndex = 0; BoundingBoxIndex < CurrentBoundingBoxes.size(); ++BoundingBoxIndex)
+								{
+									bool IsIntersecting = CameraFrustum.Intersect(CurrentBoundingBoxes[BoundingBoxIndex].TransformBy(LocalToWorld));
+									if (IsIntersecting)
+										CurrentRenderFrame.MeshCollectionsVisibility.Set(VisibilityIndex);
+									else
+										CurrentRenderFrame.MeshCollectionsVisibility.Unset(VisibilityIndex);
+									++VisibilityIndex;
+								}
 							}
 						}
 					}
@@ -308,20 +327,17 @@ namespace Eternal
 
 					if (CurrentGameFrame.ViewCamera && CurrentGameFrame.MeshCollectionsVisibility.GetSize() > 0)
 					{
-						CurrentGameFrame.MeshCollectionsBoundingBoxVisibility = GetRenderFrame().MeshCollectionsBoundingBoxVisibility;
-						if (CurrentGameFrame.MeshCollectionsBoundingBoxVisibility.GetBitCount() != CurrentGameFrame.MeshCollectionsVisibility.GetBitCount())
-							CurrentGameFrame.MeshCollectionsBoundingBoxVisibility.Resize(CurrentGameFrame.MeshCollectionsVisibility.GetBitCount());
-
 						const vector<ObjectsList<MeshCollection>::InstancedObjects>& MeshCollections = CurrentGameFrame.MeshCollections;
 
 						uint32_t VisibilityIndex = 0;
 						for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
 						{
-							vector<Mesh*>& Meshes = MeshCollections[CollectionIndex].Object->Meshes;
+							const ObjectsList<MeshCollection>::InstancedObjects& CurrentInstancedObject = MeshCollections[CollectionIndex];
+							vector<Mesh*>& Meshes = CurrentInstancedObject.Object->Meshes;
 
-							for (uint32_t InstanceIndex = 0; InstanceIndex < MeshCollections[CollectionIndex].Instances.size(); ++InstanceIndex)
+							for (uint32_t InstanceIndex = 0; InstanceIndex < CurrentInstancedObject.Instances.size(); ++InstanceIndex)
 							{
-								Matrix4x4 LocalToWorld = MeshCollections[CollectionIndex].Instances[InstanceIndex]->GetTransform().GetLocalToWorld();
+								Matrix4x4 LocalToWorld = CurrentInstancedObject.Instances[InstanceIndex]->GetTransform().GetLocalToWorld();
 
 								for (uint32_t MeshIndex = 0; MeshIndex < Meshes.size(); ++MeshIndex)
 								{
@@ -330,15 +346,15 @@ namespace Eternal
 									for (uint32_t BoundingBoxIndex = 0; BoundingBoxIndex < CurrentBoundingBoxes.size(); ++BoundingBoxIndex)
 									{
 										bool IsIntersecting = CurrentGameFrame.MeshCollectionsVisibility.IsSet(VisibilityIndex);
-										bool ShowBoundingBox = CurrentGameFrame.MeshCollectionsBoundingBoxVisibility.IsSet(VisibilityIndex);
+										bool ShowBoundingBox = IsIntersecting;// CurrentGameFrame.MeshCollectionsBoundingBoxVisibility.IsSet(VisibilityIndex);
 										char MeshName[255];
 										sprintf_s(MeshName, "[%c] %s %d", IsIntersecting ? 'O' : 'X', Meshes[MeshIndex]->GetName().c_str(), BoundingBoxIndex);
 										if (ImGui::Checkbox(MeshName, &ShowBoundingBox))
 										{
 											if (ShowBoundingBox)
-												CurrentGameFrame.MeshCollectionsBoundingBoxVisibility.Set(VisibilityIndex);
+												CurrentGameFrame.MeshCollectionsVisibility.Set(VisibilityIndex);
 											else
-												CurrentGameFrame.MeshCollectionsBoundingBoxVisibility.Unset(VisibilityIndex);
+												CurrentGameFrame.MeshCollectionsVisibility.Unset(VisibilityIndex);
 										}
 										++VisibilityIndex;
 									}
@@ -354,7 +370,16 @@ namespace Eternal
 
 		void System::RenderDebug()
 		{
+			ImGui::Begin("Eternal Debug");
+			{
+				if (ImGui::TreeNode("System Debug"))
+				{
+					ImGui::Checkbox("Debug Visibility", &SystemPrivate::ShowDebugVisibility);
+					ImGui::TreePop();
+				}
+			}
 			GetRenderer().RenderDebug();
+			ImGui::End();
 		}
 
 		void System::EndFrame()
