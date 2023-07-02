@@ -7,6 +7,7 @@
 #include "GraphicsEngine/RenderPasses/VolumetricCloudsPass.hpp"
 #include "GraphicsEngine/RenderPasses/TonemappingPass.hpp"
 #include "GraphicsEngine/RenderPasses/PresentPass.hpp"
+#include "GraphicsEngine/RenderPasses/Debug/DebugObjectBoundingBoxPass.hpp"
 #include "imgui.h"
 
 namespace Eternal
@@ -28,6 +29,7 @@ namespace Eternal
 				new ShadowMapPass(InContext, *this),
 				new OpaquePass(InContext, *this),
 				new DirectLightingPass(InContext, *this),
+				new DebugObjectBoundingBoxPass(InContext, *this),
 				new VolumetricCloudsPass(InContext, *this),
 				new TonemappingPass(InContext, *this)
 			})
@@ -64,11 +66,9 @@ namespace Eternal
 
 		void Renderer::RenderDebug()
 		{
-			ImGui::Begin("Eternal Debug");
 			for (uint32_t PassIndex = 0; PassIndex < _Passes.size(); ++PassIndex)
 				_Passes[PassIndex]->RenderDebug();
 			_PresentPass->RenderDebug();
-			ImGui::End();
 		}
 	}
 }
