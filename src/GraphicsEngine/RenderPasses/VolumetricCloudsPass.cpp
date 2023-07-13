@@ -29,15 +29,15 @@ namespace Eternal
 			sprintf_s(ThreadGroupCountYString, "%d", ThreadGroupCountY);
 			sprintf_s(ThreadGroupCountZString, "%d", ThreadGroupCountZ);
 
-			ShaderCreateInformation VolumetricCloudsCSCreateInformation(
-				ShaderType::CS, "VolumetricClouds", "Volumetrics\\volumetricclouds.cs.hlsl",
+			ShaderCreateInformation VolumetricCloudsComputeCreateInformation(
+				ShaderType::SHADER_TYPE_COMPUTE, "VolumetricClouds", "Volumetrics\\volumetricclouds.compute.hlsl",
 				{
 					"THREAD_GROUP_COUNT_X", ThreadGroupCountXString,
 					"THREAD_GROUP_COUNT_Y", ThreadGroupCountYString,
 					"THREAD_GROUP_COUNT_Z", ThreadGroupCountZString
 				}
 			);
-			Shader* VolumetricCloudsCS = InContext.GetShader(VolumetricCloudsCSCreateInformation);
+			Shader* VolumetricCloudsCompute = InContext.GetShader(VolumetricCloudsComputeCreateInformation);
 
 			_RootSignature = CreateRootSignature(
 				InContext,
@@ -59,7 +59,7 @@ namespace Eternal
 				InContext,
 				ComputePipelineCreateInformation(
 					*_RootSignature,
-					VolumetricCloudsCS
+					VolumetricCloudsCompute
 				)
 			);
 		}

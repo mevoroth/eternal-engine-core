@@ -28,7 +28,7 @@ namespace Eternal
 			const vector<string>&					Defines;
 			const vector<RootSignatureParameter>&	RootSignatureParameters;
 			RenderPassCreateInformation				RenderPassInformation;
-			Shader*									ObjectPS = nullptr;
+			Shader*									ObjectPixel = nullptr;
 		};
 
 		class ObjectPass : public Pass

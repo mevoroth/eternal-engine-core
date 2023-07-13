@@ -6,10 +6,8 @@ namespace Eternal
 	{
 		PresentPass::PresentPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 		{
-			ShaderCreateInformation ScreenVSCreateInformation(ShaderType::VS, "ScreenVS", "screen.vs.hlsl");
-			Shader* ScreenVS = InContext.GetShader(ScreenVSCreateInformation);
-			ShaderCreateInformation SampleTexturePSCreateInformation(ShaderType::PS, "SampleTexturePS", "sampletexture.ps.hlsl");
-			Shader* SampleTexturePS = InContext.GetShader(SampleTexturePSCreateInformation);
+			Shader* ScreenVertex		= InContext.GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_VERTEX, "ScreenVertex", "screen.vertex.hlsl"));
+			Shader* SampleTexturePixel	= InContext.GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_PIXEL, "SampleTexturePixel", "sampletexture.pixel.hlsl"));
 
 			_RootSignature = CreateRootSignature(
 				InContext,
@@ -29,7 +27,7 @@ namespace Eternal
 					*_RootSignature,
 					InContext.GetEmptyInputLayout(),
 					InContext.GetBackBufferRenderPass(),
-					ScreenVS, SampleTexturePS
+					ScreenVertex, SampleTexturePixel
 				)
 			);
 		}

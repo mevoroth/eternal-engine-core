@@ -19,15 +19,15 @@ namespace Eternal
 			sprintf_s(ThreadGroupCountYString, "%d", ThreadGroupCountY);
 			sprintf_s(ThreadGroupCountZString, "%d", ThreadGroupCountZ);
 
-			ShaderCreateInformation TonemappingCSCreateInformation(
-				ShaderType::CS, "TonemappingCS", "tonemapping.cs.hlsl",
+			ShaderCreateInformation TonemappingComputeCreateInformation(
+				ShaderType::SHADER_TYPE_COMPUTE, "TonemappingCompute", "tonemapping.compute.hlsl",
 				{
 					"THREAD_GROUP_COUNT_X", ThreadGroupCountXString,
 					"THREAD_GROUP_COUNT_Y", ThreadGroupCountYString,
 					"THREAD_GROUP_COUNT_Z", ThreadGroupCountZString
 				}
 			);
-			Shader* TonemappingCS = InContext.GetShader(TonemappingCSCreateInformation);
+			Shader* TonemappingCompute = InContext.GetShader(TonemappingComputeCreateInformation);
 
 			_RootSignature = CreateRootSignature(
 				InContext,
@@ -45,7 +45,7 @@ namespace Eternal
 				InContext,
 				ComputePipelineCreateInformation(
 					*_RootSignature,
-					TonemappingCS
+					TonemappingCompute
 				)
 			);
 		}

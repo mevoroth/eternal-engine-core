@@ -25,7 +25,7 @@ namespace Eternal
 				"OBJECT_NEEDS_UV",			"1"
 			};
 
-			ShaderCreateInformation OpaquePSCreateInformation(ShaderType::PS, "OpaquePS", "opaque.ps.hlsl", Defines);
+			ShaderCreateInformation OpaquePSCreateInformation(ShaderType::SHADER_TYPE_PIXEL, "OpaquePS", "opaque.pixel.hlsl", Defines);
 
 			vector<RootSignatureParameter> ParametersVSPS =
 			{

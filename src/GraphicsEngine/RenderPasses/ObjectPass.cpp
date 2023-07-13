@@ -74,31 +74,29 @@ namespace Eternal
 
 			if (UseMeshPipeline)
 			{
-				sprintf_s(ShaderName, "%s%s", _GetPassName().c_str(), "MS");
+				sprintf_s(ShaderName, "%s%s", _GetPassName().c_str(), "Mesh");
 
-				ShaderCreateInformation OpaqueMSCreateInformation(ShaderType::MS, ShaderName, "object.ms.hlsl", InObjectPassCreateInformation.Defines);
-				Shader* OpaqueMS = InContext.GetShader(OpaqueMSCreateInformation);
+				Shader* OpaqueMesh = InContext.GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_MESH, ShaderName, "object.mesh.hlsl", InObjectPassCreateInformation.Defines));
 				
 				MeshPipelineCreateInformation OpaquePipelineCreateInformation(
 					*_RootSignature,
 					_ObjectRenderPass,
-					OpaqueMS, InObjectPassCreateInformation.ObjectPS,
+					OpaqueMesh, InObjectPassCreateInformation.ObjectPixel,
 					DepthStencilTestWriteNone
 				);
 				_Pipeline = CreatePipeline(InContext, OpaquePipelineCreateInformation);
 			}
 			else
 			{
-				sprintf_s(ShaderName, "%s%s", _GetPassName().c_str(), "VS");
+				sprintf_s(ShaderName, "%s%s", _GetPassName().c_str(), "Vertex");
 
-				ShaderCreateInformation OpaqueVSCreateInformation(ShaderType::VS, ShaderName, "object.vs.hlsl", InObjectPassCreateInformation.Defines);
-				Shader* OpaqueVS = InContext.GetShader(OpaqueVSCreateInformation);
+				Shader* OpaqueVertex = InContext.GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_VERTEX, ShaderName, "object.vertex.hlsl", InObjectPassCreateInformation.Defines));
 
 				GraphicsPipelineCreateInformation OpaquePipelineCreateInformation(
 					*_RootSignature,
 					_ObjectInputLayout,
 					_ObjectRenderPass,
-					OpaqueVS, InObjectPassCreateInformation.ObjectPS,
+					OpaqueVertex, InObjectPassCreateInformation.ObjectPixel,
 					DepthStencilTestWriteNone
 				);
 				_Pipeline = CreatePipeline(InContext, OpaquePipelineCreateInformation);

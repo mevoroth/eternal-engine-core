@@ -15,10 +15,8 @@ namespace Eternal
 			: _DirectLightingConstantBuffer(InContext, "DirectLightingBuffer")
 			, _DirectLightingLightsBuffer(InContext, "DirectLightingLightsBuffer", 1024)
 		{
-			ShaderCreateInformation ScreenVSCreateInformation(ShaderType::VS, "ScreenVS", "screen.vs.hlsl");
-			Shader* ScreenVS = InContext.GetShader(ScreenVSCreateInformation);
-			ShaderCreateInformation DirectLightingPSCreateInformation(ShaderType::PS, "DirectLightingPS", "directlighting.ps.hlsl");
-			Shader* DirectLightingPS = InContext.GetShader(DirectLightingPSCreateInformation);
+			Shader* ScreenVertex		= InContext.GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_VERTEX, "ScreenVertex", "screen.vertex.hlsl"));
+			Shader* DirectLightingPixel	= InContext.GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_PIXEL, "DirectLightingPixel", "directlighting.pixel.hlsl"));
 
 			_RootSignature = CreateRootSignature(
 				InContext,
@@ -54,8 +52,8 @@ namespace Eternal
 					*_RootSignature,
 					InContext.GetEmptyInputLayout(),
 					_DirectLightingRenderPass,
-					ScreenVS,
-					DirectLightingPS
+					ScreenVertex,
+					DirectLightingPixel
 				)
 			);
 		}

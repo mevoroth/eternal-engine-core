@@ -20,16 +20,16 @@ namespace Eternal
 				"USE_MULTIPLE_LAYER_RENDER_TARGETS",	"MULTIPLE_LAYER_RENDER_TARGETS_CUBEMAP"
 			};
 
-			Shader* CubeMapVS = InContext.GetShader(ShaderCreateInformation(
-				ShaderType::VS,
-				"CubeMapVS",
-				"screen.vs.hlsl",
+			Shader* CubeMapVertex = InContext.GetShader(ShaderCreateInformation(
+				ShaderType::SHADER_TYPE_VERTEX,
+				"CubeMapVertex",
+				"screen.vertex.hlsl",
 				Defines
 			));
-			Shader* AtmosphereCubeMapPS = InContext.GetShader(ShaderCreateInformation(
-				ShaderType::PS,
-				"AtmosphereCubeMapPS",
-				"Volumetrics\\atmosphere.ps.hlsl",
+			Shader* AtmosphereCubeMapPixel = InContext.GetShader(ShaderCreateInformation(
+				ShaderType::SHADER_TYPE_PIXEL,
+				"AtmosphereCubeMapPixel",
+				"Volumetrics\\atmosphere.pixel.hlsl",
 				Defines
 			));
 
@@ -61,8 +61,8 @@ namespace Eternal
 					*_RootSignature,
 					InContext.GetEmptyInputLayout(),
 					_SkyRenderPass,
-					CubeMapVS,
-					AtmosphereCubeMapPS
+					CubeMapVertex,
+					AtmosphereCubeMapPixel
 				)
 			);
 		}

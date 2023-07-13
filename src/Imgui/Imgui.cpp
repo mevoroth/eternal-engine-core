@@ -73,18 +73,16 @@ namespace Eternal
 
 			//////////////////////////////////////////////////////////////////////////
 			// Graphics resources
-			ShaderCreateInformation ImguiVSCreateInformation(
-				ShaderType::VS,
-				"ImguiVS",
-				"imgui\\imgui.vs.hlsl"
-			);
-			Shader* ImguiVS = InContext.GetShader(ImguiVSCreateInformation);
-			ShaderCreateInformation ImguiPSCreateInformation(
-				ShaderType::PS,
-				"ImguiPS",
-				"imgui\\imgui.ps.hlsl"
-			);
-			Shader* ImguiPS = InContext.GetShader(ImguiPSCreateInformation);
+			Shader* ImguiVertex = InContext.GetShader(ShaderCreateInformation(
+				ShaderType::SHADER_TYPE_VERTEX,
+				"ImguiVertex",
+				"imgui\\imgui.vertex.hlsl"
+			));
+			Shader* ImguiPixel = InContext.GetShader(ShaderCreateInformation(
+				ShaderType::SHADER_TYPE_PIXEL,
+				"ImguiPixel",
+				"imgui\\imgui.pixel.hlsl"
+			));
 			
 			_ImguiBlendState = new BlendState(
 				Blend::BLEND_SOURCE_ALPHA,
@@ -131,8 +129,8 @@ namespace Eternal
 				*_ImguiRootSignature,
 				_ImguiInputLayout,
 				_ImguiRenderPass,
-				ImguiVS,
-				ImguiPS,
+				ImguiVertex,
+				ImguiPixel,
 				DepthStencilNoneNone,
 				Rasterizer(FrontFace::FRONT_FACE_CLOCKWISE)
 			);
