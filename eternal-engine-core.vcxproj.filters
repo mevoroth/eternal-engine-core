@@ -130,6 +130,9 @@
     <ClCompile Include="src\Core\GameState.cpp">
       <Filter>Core</Filter>
     </ClCompile>
+    <ClCompile Include="src\GraphicsEngine\RenderPasses\Debug\DebugRayTracingPass.cpp">
+      <Filter>GraphicsEngine\RenderPasses\Debug</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CoreSettings.hpp" />
@@ -266,6 +269,9 @@
     </ClInclude>
     <ClInclude Include="include\Core\GameState.hpp">
       <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="include\GraphicsEngine\RenderPasses\Debug\DebugRayTracingPass.hpp">
+      <Filter>GraphicsEngine\RenderPasses\Debug</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
