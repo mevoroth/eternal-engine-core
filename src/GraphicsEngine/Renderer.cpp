@@ -8,6 +8,7 @@
 #include "GraphicsEngine/RenderPasses/TonemappingPass.hpp"
 #include "GraphicsEngine/RenderPasses/PresentPass.hpp"
 #include "GraphicsEngine/RenderPasses/Debug/DebugObjectBoundingBoxPass.hpp"
+#include "GraphicsEngine/RenderPasses/Debug/DebugRayTracingPass.hpp"
 #include "imgui.h"
 
 namespace Eternal
@@ -32,6 +33,7 @@ namespace Eternal
 				new DebugObjectBoundingBoxPass(InContext, *this),
 				new VolumetricCloudsPass(InContext, *this),
 				new TonemappingPass(InContext, *this)
+				, new DebugRayTracingPass(InContext, *this)
 			})
 			, _PresentPass(new PresentPass(InContext, *this))
 		{
