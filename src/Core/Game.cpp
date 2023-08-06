@@ -99,21 +99,23 @@ namespace Eternal
 
 		void Game::ProcessStreamingPayloads()
 		{
-			Streaming& StreamingSystem = GetSystem().GetStreaming();
-			TextureFactory& Factory = GetSystem().GetTextureFactory();
-			vector<GraphicsCommand*>& GraphicsCommands = GetSystem().GetGameFrame().GraphicsCommands;
+			System& GlobalSystem						= GetSystem();
+			Streaming& StreamingSystem					= GetSystem().GetStreaming();
+			TextureFactory& SystemTextureFactory		= GetSystem().GetTextureFactory();
+			vector<GraphicsCommand*>& GraphicsCommands	= GetSystem().GetGameFrame().GraphicsCommands;
 
-			StreamingSystem.ProcessGathered(
+			StreamingSystem.ProcessGathered_MainThread(
 				AssetType::ASSET_TYPE_LEVEL,
 				GetSystem().GetGameFrame().DelayedDestroyedRequests,
 				[this](_In_ Payload& InPayload)
 				{
 					LevelPayload& InLevelPayload = static_cast<LevelPayload&>(InPayload);
 					_World.AddLevel(InLevelPayload.LoadedLevel);
+					InLevelPayload.MarkProcessed();
 				}
 			);
 
-			StreamingSystem.ProcessGathered(
+			StreamingSystem.ProcessGathered_MainThread(
 				AssetType::ASSET_TYPE_MESH,
 				GetSystem().GetGameFrame().DelayedDestroyedRequests,
 				[this, &GraphicsCommands](_In_ Payload& InPayload)
@@ -129,14 +131,14 @@ namespace Eternal
 				}
 			);
 
-			StreamingSystem.ProcessGathered(
+			StreamingSystem.ProcessGathered_MainThread(
 				AssetType::ASSET_TYPE_TEXTURE,
 				GetSystem().GetGameFrame().DelayedDestroyedRequests,
-				[this, &GraphicsCommands, &Factory](_In_ Payload& InPayload)
+				[this, &GraphicsCommands, &SystemTextureFactory, &GlobalSystem](_In_ Payload& InPayload)
 				{
 					TexturePayload& InTexturePayload = static_cast<TexturePayload&>(InPayload);
 					GraphicsCommands.push_back(
-						new GraphicsCommandUploadTexture(InTexturePayload, Factory)
+						new GraphicsCommandUploadTexture(InTexturePayload, SystemTextureFactory, GlobalSystem)
 					);
 				}
 			);

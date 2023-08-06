@@ -1,5 +1,6 @@
 #include "GraphicsCommand/GraphicsCommandUploadTexture.hpp"
 #include "Graphics/GraphicsInclude.hpp"
+#include "Core/System.hpp"
 #include "Resources/Payload.hpp"
 #include "Resources/TextureFactory.hpp"
 #include "Material/Material.hpp"
@@ -8,26 +9,30 @@ namespace Eternal
 {
 	namespace GraphicsCommands
 	{
-		GraphicsCommandUploadTexture::GraphicsCommandUploadTexture(_In_ TexturePayload& InPayload, _In_ TextureFactory& InTextureFactory)
+		GraphicsCommandUploadTexture::GraphicsCommandUploadTexture(_In_ TexturePayload& InPayload, _In_ TextureFactory& InTextureFactory, _In_ System& InSystem)
 			: _Payload(InPayload)
 			, _Factory(InTextureFactory)
+			, _System(InSystem)
 		{
 		}
 
 		void GraphicsCommandUploadTexture::Execute(_In_ GraphicsContext& InContext)
 		{
-			const RawTextureData& InTextureData = _Payload.TextureData;
-			TextureCache& Cache = _Factory.GetTextureCache(_Payload.MaterialToUpdate.Key);
+			TextureCache& Cache							= _Factory.GetTextureCache(_Payload.Key);
+			MaterialUpdateBatch& CurrentMaterialBatch	= _System.GetMaterialUpdateBatcher().MaterialUpdates.find(_Payload.Key)->second;
+			const RawTextureData& InTextureData			= CurrentMaterialBatch.TextureData;
 
 			if (!Cache.CachedTexture)
 			{
+				ETERNAL_ASSERT(InTextureData.TextureData);
+
 				CommandListScope UploadTextureCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "GraphicsCommandUploadTexture");
 
 				//////////////////////////////////////////////////////////////////////////
 				// GPU Texture
 				TextureResourceCreateInformation GPUTextureCreateInformation(
 					InContext.GetDevice(),
-					_Payload.MaterialToUpdate.Key,
+					_Payload.Key,
 					TextureCreateInformation(
 						InTextureData.Dimension,
 						InTextureData.TextureFormat,
@@ -48,9 +53,9 @@ namespace Eternal
 				std::string UploadBufferName = "AnonymousTextureBuffer";
 				//const uint32_t UploadBufferSize = InTextureData.Width * InTextureData.Height * InTextureData.DepthOrArraySize;
 				//const uint32_t UploadBufferSizeBytes = UploadBufferSize * InTextureData.Stride;
-				TextureToBufferMemoryFootprint Footprint = Cache.CachedTexture->GetTexture().GetTextureToBufferMemoryFootprint(InContext.GetDevice());
-				const uint32_t UploadBufferAlignedSizeBytes = Footprint.TotalBytes;
-				const uint32_t UploadBufferAlignedSize = UploadBufferAlignedSizeBytes / InTextureData.Stride;
+				TextureToBufferMemoryFootprint Footprint	= Cache.CachedTexture->GetTexture().GetTextureToBufferMemoryFootprint(InContext.GetDevice());
+				const uint32_t UploadBufferAlignedSizeBytes	= Footprint.TotalBytes;
+				const uint32_t UploadBufferAlignedSize		= UploadBufferAlignedSizeBytes / InTextureData.Stride;
 				
 				Resource* UploadTexture = CreateBuffer(
 					BufferResourceCreateInformation(
@@ -114,8 +119,15 @@ namespace Eternal
 				);
 			}
 
-			if (_Payload.MaterialToUpdate.MaterialToUpdate)
-				_Payload.MaterialToUpdate.MaterialToUpdate->SetTexture(_Payload.MaterialToUpdate.Slot, Cache.CachedTexture);
+			for (uint32_t MaterialIndex = 0; MaterialIndex < CurrentMaterialBatch.Materials.size(); ++MaterialIndex)
+			{
+				if (CurrentMaterialBatch.Materials[MaterialIndex].MaterialToUpdate)
+					CurrentMaterialBatch.Materials[MaterialIndex].MaterialToUpdate->SetTexture(CurrentMaterialBatch.Materials[MaterialIndex].Slot, Cache.CachedTexture);
+			}
+			CurrentMaterialBatch.Materials.clear();
+			CurrentMaterialBatch.TextureData.ReleaseTextureData();
+
+			_Payload.MarkProcessed();
 		}
 	}
 }

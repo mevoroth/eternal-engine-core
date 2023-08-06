@@ -71,13 +71,13 @@ namespace Eternal
 			_Imgui						= new Imgui(*_GraphicsContext, *_Renderer, _Input);
 
 			for (uint32_t FrameIndex = 0; FrameIndex < GraphicsContext::FrameBufferingCount; ++FrameIndex)
-				_Frames[FrameIndex].ImguiFrameContext = _Imgui->CreateContext(*_GraphicsContext);
+				_Frames[FrameIndex].InitializeSystemFrame(*_GraphicsContext, _Imgui->CreateContext(*_GraphicsContext));
 
 			TaskCreateInformation RendererCreateInformation("RendererTask");
 			_RendererTask				= new RendererTask(RendererCreateInformation, *this);
 
 			TaskCreateInformation StreamingCreateInformation("StreamingTask");
-			_StreamingTask				= new StreamingTask(StreamingCreateInformation, *this);
+			_StreamingTask				= new StreamingTask(StreamingCreateInformation, *_Streaming);
 
 			TaskCreateInformation AutoRecompileShaderTaskCreateInformation("AutoRecompileShaderTask");
 			_AutoRecompileShaderTask	= new AutoRecompileShaderTask(AutoRecompileShaderTaskCreateInformation, *_GraphicsContext);
@@ -121,28 +121,41 @@ namespace Eternal
 
 		void System::_LoadBuiltin()
 		{
-			_Streaming->EnqueueRequest(
+			_Streaming->EnqueueRequest_MainThread(
 				new TextureRequest(
 					FilePath::Find("black.tga", FileType::FILE_TYPE_TEXTURES),
 					"black",
 					"black"
 				)
 			);
-			_Streaming->EnqueueRequest(
+			_Streaming->EnqueueRequest_MainThread(
 				new TextureRequest(
 					FilePath::Find("noise_curl_3d_xyzw.dds", FileType::FILE_TYPE_TEXTURES),
 					"noise_curl_3d_xyzw",
 					"noise_curl_3d_xyzw"
 				)
 			);
-			_Streaming->EnqueueRequest(
+			_Streaming->EnqueueRequest_MainThread(
 				new TextureRequest(
 					FilePath::Find("cloud_base.dds", FileType::FILE_TYPE_TEXTURES),
 					"cloud_base",
 					"cloud_base"
 				)
 			);
-			_Streaming->CommitRequests();
+			{
+				for (uint32_t TextureIndex = 0; TextureIndex < static_cast<uint32_t>(TextureType::TEXTURE_TYPE_COUNT); ++TextureIndex)
+				{
+					TextureRequest* DefaultMaterialTexture = new TextureRequest(
+						FilePath::Find("black.tga", FileType::FILE_TYPE_TEXTURES),
+						"black",
+						"black"
+					);
+					DefaultMaterialTexture->MaterialToUpdate.MaterialToUpdate	= Material::DefaultMaterial;
+					DefaultMaterialTexture->MaterialToUpdate.Slot				= static_cast<TextureType>(TextureIndex);
+					_Streaming->EnqueueRequest_MainThread(DefaultMaterialTexture);
+				}
+			}
+			_Streaming->CommitRequests_MainThread();
 		}
 
 		void System::StartFrame()
@@ -159,17 +172,34 @@ namespace Eternal
 			}
 			GetParallelSystem().StartFrame();
 			GetImgui().Begin(CurrentGameFrame.ImguiFrameContext);
-			GetStreaming().GatherPayloads();
+			GetStreaming().GatherPayloads_MainThread(CurrentGameFrame.MaterialUpdateBatches);
 			// Delayed payloads delete
 			{
-				for (uint32_t QueueType = 0; QueueType < CurrentGameFrame.DelayedDestroyedRequests.size(); ++QueueType)
+				MergeStreamingQueues(_DelayedDestroyedRequests, CurrentGameFrame.DelayedDestroyedRequests);
+
+				for (uint32_t QueueType = 0; QueueType < _DelayedDestroyedRequests.size(); ++QueueType)
 				{
-					for (uint32_t RequestIndex = 0; RequestIndex < CurrentGameFrame.DelayedDestroyedRequests[QueueType].size(); ++RequestIndex)
+					uint32_t RequestIndex = 0;
+					uint32_t RequestsCount = static_cast<uint32_t>(_DelayedDestroyedRequests[QueueType].size());
+
+					while (RequestIndex < RequestsCount)
 					{
-						delete CurrentGameFrame.DelayedDestroyedRequests[QueueType][RequestIndex];
-						CurrentGameFrame.DelayedDestroyedRequests[QueueType][RequestIndex] = nullptr;
+						if (_DelayedDestroyedRequests[QueueType][RequestIndex]->IsProcessed())
+						{
+							delete _DelayedDestroyedRequests[QueueType][RequestIndex];
+							_DelayedDestroyedRequests[QueueType][RequestIndex] = nullptr;
+
+							uint32_t LastRequestIndex = RequestsCount - 1;
+							std::swap(_DelayedDestroyedRequests[QueueType][RequestIndex], _DelayedDestroyedRequests[QueueType][LastRequestIndex]);
+							--RequestsCount;
+						}
+						else
+						{
+							++RequestIndex;
+						}
 					}
-					CurrentGameFrame.DelayedDestroyedRequests[QueueType].clear();
+					uint32_t DestroyedCount = static_cast<uint32_t>(_DelayedDestroyedRequests[QueueType].size()) - RequestsCount;
+					_DelayedDestroyedRequests[QueueType].erase(_DelayedDestroyedRequests[QueueType].end() - DestroyedCount, _DelayedDestroyedRequests[QueueType].end());
 				}
 			}
 			{
@@ -259,6 +289,37 @@ namespace Eternal
 					}
 				}
 			}
+			if (CurrentRenderFrame.MeshCollectionsVisibility.GetBitCount() > 0)
+			{
+				const vector<ObjectsList<MeshCollection>::InstancedObjects>& MeshCollections = CurrentRenderFrame.MeshCollections;
+
+				RebuildAccelerationStructureInput RebuildInput;
+				RebuildInput.Instances.reserve(CurrentRenderFrame.MeshCollectionsVisibility.GetBitCount());
+
+				for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
+				{
+					AccelerationStructure* CurrentAccelerationStructure = MeshCollections[CollectionIndex].Object->MeshCollectionAccelerationStructure;
+					for (uint32_t InstanceIndex = 0; InstanceIndex < MeshCollections[CollectionIndex].Instances.size(); ++InstanceIndex)
+					{
+						Matrix4x4 LocalToWorld = MeshCollections[CollectionIndex].Instances[InstanceIndex]->GetTransform().GetLocalToWorld();
+						Transpose(LocalToWorld);
+
+						RebuildInput.Instances.push_back({});
+						AccelerationStructureInstance& CurrentInstance			= RebuildInput.Instances.back();
+						CurrentInstance.BottomLevelAccelerationStructureBuffer	= CurrentAccelerationStructure;
+						CurrentInstance.InstanceToWorld							= Matrix3x4(&LocalToWorld.m[0][0]);
+					}
+				}
+
+				CurrentRenderFrame.MeshCollectionsAccelerationStructure->RebuildAccelerationStructure(GfxContext, RebuildInput);
+
+				CommandListScope BuildAccelerationStructureCommandlist = GfxContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "BuildTopLevelAccelerationStructure");
+				BuildAccelerationStructureCommandlist->BuildRaytracingAccelerationStructure(GfxContext, *CurrentRenderFrame.MeshCollectionsAccelerationStructure);
+				ResourceTransition TransitionTopLevelAccelerationStructure(CurrentRenderFrame.MeshCollectionsAccelerationStructure->GetAccelerationStructure(), TransitionState::TRANSITION_RAYTRACING_ACCELERATION_STRUCTURE);
+				BuildAccelerationStructureCommandlist->Transition(TransitionTopLevelAccelerationStructure);
+			}
+
+			MergeMaterialUpdateBatches(_MaterialUpdateBatcher, CurrentRenderFrame.MaterialUpdateBatches);
 
 			GfxContext.RegisterGraphicsCommands(CurrentRenderFrame.GraphicsCommands.size() ? &CurrentRenderFrame.GraphicsCommands : nullptr);
 			GfxContext.BeginFrame();
@@ -387,7 +448,7 @@ namespace Eternal
 			ETERNAL_PROFILER(BASIC)();
 			SystemFrame& CurrentGameFrame = GetGameFrame();
 
-			GetStreaming().CommitRequests();
+			GetStreaming().CommitRequests_MainThread();
 			GetImgui().End(CurrentGameFrame.ImguiFrameContext);
 			GetParallelSystem().EndFrame();
 			GetGameFrame().SystemState->Store(SystemCanBeRendered);
@@ -425,6 +486,9 @@ namespace Eternal
 			_GameIndex->Store((_GameIndex->Load() + 1) % _Frames.size());
 		}
 
+		//////////////////////////////////////////////////////////////////////////
+		// SystemFrame
+
 		SystemFrame::SystemFrame()
 			: SystemState(CreateAtomicS32())
 		{
@@ -433,7 +497,14 @@ namespace Eternal
 
 		SystemFrame::~SystemFrame()
 		{
+			DestroyAccelerationStructure(MeshCollectionsAccelerationStructure);
 			DestroyAtomicS32(SystemState);
+		}
+
+		void SystemFrame::InitializeSystemFrame(_In_ GraphicsContext& InContext, _In_ const ImguiContext& InImguiContext)
+		{
+			MeshCollectionsAccelerationStructure	= CreateTopLevelAccelerationStructure(InContext, TopLevelAccelerationStructureCreateInformation("MeshCollectionsAccelerationStructure"));
+			ImguiFrameContext						= InImguiContext;
 		}
 	}
 }

@@ -5,6 +5,7 @@
 #include "Graphics/GraphicsContext.hpp"
 #include "Resources/TextureFactory.hpp"
 #include "Resources/Streaming.hpp"
+#include "resources/Payload.hpp"
 #include "Bit/BitField.hpp"
 #include "Imgui/Imgui.hpp"
 #include <array>
@@ -15,6 +16,7 @@ namespace Eternal
 	{
 		struct GraphicsContextCreateInformation;
 		class GraphicsContext;
+		class AccelerationStructure;
 	}
 
 	namespace GraphicsEngine
@@ -158,23 +160,28 @@ namespace Eternal
 
 		struct SystemFrame
 		{
-			static constexpr uint32_t EstimatedGraphicsCommandsCount = 1024;
-			static constexpr uint32_t EstimatedMeshesCount = 4096;
+			static constexpr uint32_t EstimatedGraphicsCommandsCount	= 1024;
+			static constexpr uint32_t EstimatedMeshesCount				= 4096;
 
 			SystemFrame();
 			~SystemFrame();
 
-			AtomicS32* SystemState = nullptr;
+			void InitializeSystemFrame(_In_ GraphicsContext& InContext, _In_ const ImguiContext& InImguiContext);
+
 			ImguiContext ImguiFrameContext;
 			ObjectsList<MeshCollection> MeshCollections;
 			ObjectsList<Light> Lights;
 			vector<GraphicsCommand*> GraphicsCommands;
+			MaterialUpdateBatcher MaterialUpdateBatches;
 			PayloadQueueType DelayedDestroyedRequests;
 			DynamicBitField<> MeshCollectionsVisibility;
 			DynamicBitField<> MeshCollectionsBoundingBoxVisibility;
+			
+			AtomicS32* SystemState											= nullptr;
+			AccelerationStructure* MeshCollectionsAccelerationStructure		= nullptr;
 
-			Camera* ViewCamera = nullptr;
-			Camera* PendingViewCamera = nullptr;
+			Camera* ViewCamera												= nullptr;
+			Camera* PendingViewCamera										= nullptr;
 		};
 
 		struct SystemCreateInformation
@@ -249,6 +256,11 @@ namespace Eternal
 				return _TextureFactory;
 			}
 
+			inline MaterialUpdateBatcher& GetMaterialUpdateBatcher()
+			{
+				return _MaterialUpdateBatcher;
+			}
+
 			SystemFrame& GetGameFrame();
 			SystemFrame& GetOldestGameFrame();
 			SystemFrame& GetRenderFrame();
@@ -269,6 +281,7 @@ namespace Eternal
 			SystemCreateInformation										_SystemCreateInformation;
 			WindowsProcess												_WindowProcess;
 			TextureFactory												_TextureFactory;
+			MaterialUpdateBatcher										_MaterialUpdateBatcher;
 			ParallelSystem*												_ParallelSystem				= nullptr;
 			GraphicsContext*											_GraphicsContext			= nullptr;
 			Imgui*														_Imgui						= nullptr;
@@ -287,6 +300,7 @@ namespace Eternal
 			//////////////////////////////////////////////////////////////////////////
 			// System state
 			array<SystemFrame, GraphicsContext::FrameBufferingCount>	_Frames;
+			PayloadQueueType											_DelayedDestroyedRequests;
 			AtomicS32*													_RenderIndex				= nullptr;
 			AtomicS32*													_GameIndex					= nullptr;
 		};

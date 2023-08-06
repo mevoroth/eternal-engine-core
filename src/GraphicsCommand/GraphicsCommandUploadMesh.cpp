@@ -16,14 +16,17 @@ namespace Eternal
 
 		void GraphicsCommandUploadMesh::Execute(_In_ GraphicsContext& InContext)
 		{
+			vector<AccelerationStructureGeometry> Geometries;
+			Geometries.resize(_Payload.LoadedMesh->Meshes.size());
+
 			for (uint32_t MeshIndex = 0, MeshCount = static_cast<uint32_t>(_Payload.LoadedMesh->Meshes.size()); MeshIndex < MeshCount; ++MeshIndex)
 			{
 				Mesh* CurrentMesh = _Payload.LoadedMesh->Meshes[MeshIndex];
 
 				// Vertex buffer
-				uint32_t VerticesCount = CurrentMesh->GetVerticesCount();
-				uint32_t VertexStride = CurrentMesh->GetVertexStride();
-				uint32_t VertexBufferSize = CurrentMesh->GetVertexStride() * VerticesCount;
+				uint32_t VerticesCount		= CurrentMesh->GetVerticesCount();
+				uint32_t VertexStride		= CurrentMesh->GetVertexStride();
+				uint32_t VertexBufferSize	= CurrentMesh->GetVertexStride() * VerticesCount;
 
 ;
 				Resource* MeshVertexBuffer = CreateBuffer(
@@ -73,9 +76,9 @@ namespace Eternal
 				CurrentMesh->SetMeshVertexBuffer(MeshVertexBuffer);
 
 				// Index buffer
-				uint32_t IndicesCount = CurrentMesh->GetIndicesCount();
-				uint32_t IndexStride = CurrentMesh->GetIndexStride();
-				uint32_t IndexBufferSize = IndexStride * IndicesCount;
+				uint32_t IndicesCount		= CurrentMesh->GetIndicesCount();
+				uint32_t IndexStride		= CurrentMesh->GetIndexStride();
+				uint32_t IndexBufferSize	= IndexStride * IndicesCount;
 
 				Resource* MeshIndexBuffer = CreateBuffer(
 					BufferResourceCreateInformation(
@@ -161,7 +164,26 @@ namespace Eternal
 					View* PerDrawConstantBufferView = CreateConstantBufferView(PerDrawConstantBufferViewCreateInformation);
 					CurrentMesh->SetPerDrawConstantBufferViewMSVS(ConstantBufferViewIndex, PerDrawConstantBufferView);
 				}
+
+				Geometries[MeshIndex] = { MeshVertexBuffer, MeshIndexBuffer };
 			}
+
+			if (Geometries.size() > 0)
+			{
+				CommandListScope BuildBottomLevelAccelerationStructureCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "BuildBottomLevelAccelerationStructure");
+
+				_Payload.LoadedMesh->MeshCollectionAccelerationStructure = CreateBottomLevelAccelerationStructure(
+					InContext,
+					BottomLevelAccelerationStructureCreateInformation(
+						/*CurrentMesh->GetName()*/"BLAS",
+						Geometries
+					)
+				);
+
+				BuildBottomLevelAccelerationStructureCommandList->BuildRaytracingAccelerationStructure(InContext, *_Payload.LoadedMesh->MeshCollectionAccelerationStructure);
+			}
+
+			_Payload.MarkProcessed();
 		}
 	}
 }
