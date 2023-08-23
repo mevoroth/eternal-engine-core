@@ -17,7 +17,11 @@ namespace Eternal
 		void GraphicsCommandUploadMesh::Execute(_In_ GraphicsContext& InContext)
 		{
 			vector<AccelerationStructureGeometry> Geometries;
-			Geometries.resize(_Payload.LoadedMesh->Meshes.size());
+			uint32_t GeometryIndex = 0u;
+			uint32_t GeometriesCount = 0u;
+			for (uint32_t MeshIndex = 0, MeshCount = static_cast<uint32_t>(_Payload.LoadedMesh->Meshes.size()); MeshIndex < MeshCount; ++MeshIndex)
+				GeometriesCount += static_cast<uint32_t>(_Payload.LoadedMesh->Meshes[MeshIndex]->GetGPUMesh().PerDrawInformations.size());
+			Geometries.resize(GeometriesCount);
 
 			for (uint32_t MeshIndex = 0, MeshCount = static_cast<uint32_t>(_Payload.LoadedMesh->Meshes.size()); MeshIndex < MeshCount; ++MeshIndex)
 			{
@@ -165,7 +169,19 @@ namespace Eternal
 					CurrentMesh->SetPerDrawConstantBufferViewMSVS(ConstantBufferViewIndex, PerDrawConstantBufferView);
 				}
 
-				Geometries[MeshIndex] = { MeshVertexBuffer, MeshIndexBuffer };
+				for (uint32_t DrawIndex = 0; DrawIndex < CurrentMesh->GetGPUMesh().PerDrawInformations.size(); ++DrawIndex)
+				{
+					GPUMesh::PerDrawInformation& CurrentPerDrawInformation = CurrentMesh->GetGPUMesh().PerDrawInformations[DrawIndex];
+
+					AccelerationStructureGeometry& CurrentGeometry = Geometries[GeometryIndex++];
+					CurrentGeometry.VertexBuffer	= MeshVertexBuffer;
+					CurrentGeometry.IndexBuffer		= MeshIndexBuffer;
+					CurrentGeometry.TransformBuffer	= CurrentMesh->GetGPUMesh().MeshConstantBuffer;
+					CurrentGeometry.IndicesCount	= CurrentPerDrawInformation.IndicesCount;
+					CurrentGeometry.IndicesOffset	= CurrentPerDrawInformation.IndicesOffset;
+					CurrentGeometry.VerticesOffset	= CurrentPerDrawInformation.VerticesOffset;
+					CurrentGeometry.TransformsOffet	= DrawIndex;
+				}
 			}
 
 			if (Geometries.size() > 0)
@@ -181,6 +197,7 @@ namespace Eternal
 				);
 
 				BuildBottomLevelAccelerationStructureCommandList->BuildRaytracingAccelerationStructure(InContext, *_Payload.LoadedMesh->MeshCollectionAccelerationStructure);
+				BuildBottomLevelAccelerationStructureCommandList->TransitionUAV(_Payload.LoadedMesh->MeshCollectionAccelerationStructure->GetAccelerationStructure());
 			}
 
 			_Payload.MarkProcessed();

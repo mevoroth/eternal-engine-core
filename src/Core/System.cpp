@@ -21,6 +21,8 @@
 #include "Camera/Camera.hpp"
 #include "Components/TransformComponent.hpp"
 
+#include "Mesh/Mesh.hpp"
+
 namespace Eternal
 {
 	namespace Core
@@ -50,6 +52,7 @@ namespace Eternal
 		{
 			for (uint32_t IncludeIndex = 0; IncludeIndex < InSystemCreateInformation.ShaderIncludePath.size(); ++IncludeIndex)
 				FilePath::Register(InSystemCreateInformation.ShaderIncludePath[IncludeIndex],	FileType::FILE_TYPE_SHADERS);
+			FilePath::Register(InSystemCreateInformation.ShaderPDBPath,							FileType::FILE_TYPE_SHADERS_PDB);
 			FilePath::Register(InSystemCreateInformation.LevelPath,								FileType::FILE_TYPE_LEVELS);
 			FilePath::Register(InSystemCreateInformation.FBXPath,								FileType::FILE_TYPE_MESHES);
 			FilePath::Register(InSystemCreateInformation.FBXCachePath,							FileType::FILE_TYPE_CACHED_MESHES);
@@ -289,8 +292,14 @@ namespace Eternal
 					}
 				}
 			}
+			MergeMaterialUpdateBatches(_MaterialUpdateBatcher, CurrentRenderFrame.MaterialUpdateBatches);
+
+			GfxContext.RegisterGraphicsCommands(CurrentRenderFrame.GraphicsCommands.size() ? &CurrentRenderFrame.GraphicsCommands : nullptr);
+			GfxContext.BeginFrame();
+
 			if (CurrentRenderFrame.MeshCollectionsVisibility.GetBitCount() > 0)
 			{
+				CommandListScope BuildAccelerationStructureCommandlist = GfxContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "BuildTopLevelAccelerationStructure");
 				const vector<ObjectsList<MeshCollection>::InstancedObjects>& MeshCollections = CurrentRenderFrame.MeshCollections;
 
 				RebuildAccelerationStructureInput RebuildInput;
@@ -298,7 +307,45 @@ namespace Eternal
 
 				for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
 				{
-					AccelerationStructure* CurrentAccelerationStructure = MeshCollections[CollectionIndex].Object->MeshCollectionAccelerationStructure;
+					vector<AccelerationStructureGeometry> Geometries;
+					uint32_t GeometryIndex = 0u;
+					uint32_t GeometriesCount = 0u;
+					for (uint32_t MeshIndex = 0, MeshCount = static_cast<uint32_t>(MeshCollections[CollectionIndex].Object->Meshes.size()); MeshIndex < MeshCount; ++MeshIndex)
+						GeometriesCount += static_cast<uint32_t>(MeshCollections[CollectionIndex].Object->Meshes[MeshIndex]->GetGPUMesh().PerDrawInformations.size());
+					Geometries.resize(GeometriesCount);
+
+					AccelerationStructure*& CurrentAccelerationStructure = MeshCollections[CollectionIndex].Object->MeshCollectionAccelerationStructure;
+					for (uint32_t MeshIndex = 0; MeshIndex < MeshCollections[CollectionIndex].Object->Meshes.size(); ++MeshIndex)
+					{
+						GPUMesh& CurrentGPUMesh = MeshCollections[CollectionIndex].Object->Meshes[MeshIndex]->GetGPUMesh();
+
+						for (uint32_t DrawIndex = 0; DrawIndex < CurrentGPUMesh.PerDrawInformations.size(); ++DrawIndex)
+						{
+							GPUMesh::PerDrawInformation& CurrentPerDrawInformation = CurrentGPUMesh.PerDrawInformations[DrawIndex];
+
+							AccelerationStructureGeometry& CurrentGeometry = Geometries[GeometryIndex++];
+							CurrentGeometry.VertexBuffer	= CurrentGPUMesh.MeshVertexBuffer;
+							CurrentGeometry.IndexBuffer		= CurrentGPUMesh.MeshIndexBuffer;
+							CurrentGeometry.TransformBuffer	= CurrentGPUMesh.MeshConstantBuffer;
+							CurrentGeometry.IndicesCount	= CurrentPerDrawInformation.IndicesCount;
+							CurrentGeometry.IndicesOffset	= CurrentPerDrawInformation.IndicesOffset;
+							CurrentGeometry.VerticesOffset	= CurrentPerDrawInformation.VerticesOffset;
+							CurrentGeometry.TransformsOffet	= DrawIndex;
+						}
+					}
+
+					GfxContext.DelayedDelete(CurrentAccelerationStructure);
+					CurrentAccelerationStructure = CreateBottomLevelAccelerationStructure(
+						GfxContext,
+						BottomLevelAccelerationStructureCreateInformation(
+							/*CurrentMesh->GetName()*/"BLAS",
+							Geometries
+						)
+					);
+
+					BuildAccelerationStructureCommandlist->BuildRaytracingAccelerationStructure(GfxContext, *CurrentAccelerationStructure);
+					BuildAccelerationStructureCommandlist->TransitionUAV(CurrentAccelerationStructure->GetAccelerationStructure());
+
 					for (uint32_t InstanceIndex = 0; InstanceIndex < MeshCollections[CollectionIndex].Instances.size(); ++InstanceIndex)
 					{
 						Matrix4x4 LocalToWorld = MeshCollections[CollectionIndex].Instances[InstanceIndex]->GetTransform().GetLocalToWorld();
@@ -313,16 +360,10 @@ namespace Eternal
 
 				CurrentRenderFrame.MeshCollectionsAccelerationStructure->RebuildAccelerationStructure(GfxContext, RebuildInput);
 
-				CommandListScope BuildAccelerationStructureCommandlist = GfxContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "BuildTopLevelAccelerationStructure");
 				BuildAccelerationStructureCommandlist->BuildRaytracingAccelerationStructure(GfxContext, *CurrentRenderFrame.MeshCollectionsAccelerationStructure);
 				ResourceTransition TransitionTopLevelAccelerationStructure(CurrentRenderFrame.MeshCollectionsAccelerationStructure->GetAccelerationStructure(), TransitionState::TRANSITION_RAYTRACING_ACCELERATION_STRUCTURE);
 				BuildAccelerationStructureCommandlist->Transition(TransitionTopLevelAccelerationStructure);
 			}
-
-			MergeMaterialUpdateBatches(_MaterialUpdateBatcher, CurrentRenderFrame.MaterialUpdateBatches);
-
-			GfxContext.RegisterGraphicsCommands(CurrentRenderFrame.GraphicsCommands.size() ? &CurrentRenderFrame.GraphicsCommands : nullptr);
-			GfxContext.BeginFrame();
 
 			GetRenderer().Render(GfxContext, *this);
 			GetImgui().Render(GfxContext, GetRenderer(), CurrentRenderFrame.ImguiFrameContext);

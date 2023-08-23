@@ -31,7 +31,7 @@ namespace Eternal
 				new OpaquePass(InContext, *this),
 				new DirectLightingPass(InContext, *this),
 				new DebugObjectBoundingBoxPass(InContext, *this),
-				new VolumetricCloudsPass(InContext, *this),
+				//new VolumetricCloudsPass(InContext, *this),
 				new TonemappingPass(InContext, *this)
 				, new DebugRayTracingPass(InContext, *this)
 			})

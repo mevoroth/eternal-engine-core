@@ -52,10 +52,16 @@ namespace Eternal
 			CommandListScope DebugRayTracingCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "DebugRayTracingPass");
 
 			{
+				float AspectRatio = static_cast<float>(InContext.GetMainViewport().GetHeight()) / static_cast<float>(InContext.GetMainViewport().GetWidth());
+				float Border = 0.1f;
+
 				MapRange RayGenerationBufferMapRange(sizeof(RayGenerationConstants));
 				MapScope<RayGenerationConstants> RayGenerationBufferMapScope(*_DebugRayTracingRayGenerationConstantBuffer.ResourceBuffer, RayGenerationBufferMapRange);
-				RayGenerationBufferMapScope->Viewport	= { 0.0f, 0.0f, static_cast<float>(InContext.GetMainViewport().GetWidth()), static_cast<float>(InContext.GetMainViewport().GetHeight()) };
-				RayGenerationBufferMapScope->Stencil	= { 0.0f, 0.0f, static_cast<float>(InContext.GetMainViewport().GetWidth()), static_cast<float>(InContext.GetMainViewport().GetHeight()) };
+				RayGenerationBufferMapScope->Viewport	= { -1.0f, -1.0f, 1.0f, 1.0f };
+				RayGenerationBufferMapScope->Stencil	= {
+					-1.0f + Border / AspectRatio, -1.0f + Border,
+					 1.0f - Border / AspectRatio,  1.0f - Border
+				};
 			}
 
 			_DebugRayTracingDescriptorTable->SetDescriptor(0, CurrentRenderFrame.MeshCollectionsAccelerationStructure->GetView());
