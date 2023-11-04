@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GraphicsEngine/Pass.hpp"
-#include "HLSLVolumetricCloudsConstants.hpp"
+#include "ShadersReflection/HLSLVolumetricCloudsConstants.hpp"
 
 namespace Eternal
 {

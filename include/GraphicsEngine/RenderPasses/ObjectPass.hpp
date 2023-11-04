@@ -1,8 +1,8 @@
 #pragma once
 
 #include "GraphicsEngine/Pass.hpp"
-#include "HLSLPerDrawConstants.hpp"
-#include "HLSLPerInstanceInformation.hpp"
+#include "ShadersReflection/HLSLPerDrawConstants.hpp"
+#include "ShadersReflection/HLSLPerInstanceInformation.hpp"
 #include <functional>
 
 namespace Eternal

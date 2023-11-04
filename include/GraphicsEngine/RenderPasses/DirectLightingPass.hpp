@@ -2,7 +2,7 @@
 
 #include "GraphicsEngine/Pass.hpp"
 #include "Graphics/GraphicsInclude.hpp"
-#include "HLSLDirectLighting.hpp"
+#include "ShadersReflection/HLSLDirectLighting.hpp"
 
 namespace Eternal
 {

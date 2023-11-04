@@ -1,6 +1,9 @@
 #include "Optick/Optick.hpp"
 
 #define VK_USE_PLATFORM_WIN32_KHR
+#ifdef VKAPI_PTR
+#undef VKAPI_PTR
+#endif
 #include "optick.h"
 #include <vulkan/vulkan.h>
 
