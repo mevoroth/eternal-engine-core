@@ -24,7 +24,7 @@ namespace Eternal
 		{
 			Input& InputSystem = GetWorld()->GetGame().GetSystem().GetInput();
 
-			TransformComponent* Component = static_cast<TransformComponent*>(GetComponent<TransformComponent>());
+			TransformComponent* Component = GetComponent<TransformComponent>();
 
 			Transform CameraTransform = Component->GetTransform();
 			CameraTransform.SetTranslation(Vector3::Zero);
@@ -43,7 +43,8 @@ namespace Eternal
 
 			Component->GetTransform().Translate(
 				RightVector * LXWithDeadZone * 10.0f +
-				ForwardVector * LYWithDeadZone * 10.0f
+				ForwardVector * LYWithDeadZone * 10.0f +
+				Vector3::Up * RYWithDeadZone * 10.0f
 			);
 
 			Component->GetTransform().Rotate(
@@ -55,7 +56,7 @@ namespace Eternal
 		{
 			Input& InputSystem = GetWorld()->GetGame().GetSystem().GetInput();
 
-			TransformComponent* Component = static_cast<TransformComponent*>(GetComponent<TransformComponent>());
+			TransformComponent* Component = GetComponent<TransformComponent>();
 
 			ImGui::Begin("Camera");
 			ImGui::Text("Input X: [%.3f] / Input Y: [%.3f]", InputSystem.GetAxisWithDeadZone(Input::JOY0_LX), InputSystem.GetAxisWithDeadZone(Input::JOY0_LY));
