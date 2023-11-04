@@ -12,6 +12,8 @@ namespace Eternal
 		DebugRayTracingPass::DebugRayTracingPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 			: _DebugRayTracingRayGenerationConstantBuffer(InContext, "DebugRayTracingRayGenerationBuffer")
 		{
+			_IsPassEnabled = false;
+
 			Shader* DebugRayTracingRayGeneration	= InContext.GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_RAYTRACING_RAY_GENERATION, "DebugRayTracingRayGeneration", "RayTracing/Debug/debugraytracing.raygeneration.hlsl"));
 			Shader* DebugRayTracingClosestHit		= InContext.GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_RAYTRACING_CLOSEST_HIT, "DebugRayTracingClosestHit", "RayTracing/Debug/debugraytracing.closesthit.hlsl"));
 			Shader* DebugRayTracingMiss				= InContext.GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_RAYTRACING_MISS, "DebugRayTracingMiss", "RayTracing/Debug/debugraytracing.miss.hlsl"));
@@ -69,8 +71,8 @@ namespace Eternal
 			_DebugRayTracingDescriptorTable->SetDescriptor(2, _DebugRayTracingRayGenerationConstantBuffer.GetView());
 
 			DebugRayTracingCommandList->SetRayTracingPipeline(*_Pipeline);
-			DebugRayTracingCommandList->SetComputeDescriptorTable(InContext, *_DebugRayTracingDescriptorTable);
-			DebugRayTracingCommandList->DispatchRays(*_DebugRayTracingShaderTable);
+			DebugRayTracingCommandList->SetRayTracingDescriptorTable(InContext, *_DebugRayTracingDescriptorTable);
+			DebugRayTracingCommandList->DispatchRays(*_DebugRayTracingShaderTable, InContext.GetWindow().GetWidth(), InContext.GetWindow().GetHeight());
 		}
 	}
 }

@@ -13,6 +13,8 @@ namespace Eternal
 		DebugObjectBoundingBoxPass::DebugObjectBoundingBoxPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 			: _DebugObjectBoundingBoxPerInstanceBuffer(InContext, "DebugObjectBoundingBoxBoxPerInstanceBuffer", 4096)
 		{
+			_IsPassEnabled = false;
+
 			using namespace Eternal::HLSL;
 
 			GlobalResources& InGlobalResources = InRenderer.GetGlobalResources();
@@ -61,8 +63,6 @@ namespace Eternal
 
 		void DebugObjectBoundingBoxPass::Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer)
 		{
-			return;
-
 			SystemFrame& CurrentFrame = InSystem.GetRenderFrame();
 			const vector<ObjectsList<MeshCollection>::InstancedObjects>& MeshCollections = CurrentFrame.MeshCollections;
 

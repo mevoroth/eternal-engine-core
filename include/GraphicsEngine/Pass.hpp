@@ -43,6 +43,7 @@ namespace Eternal
 
 			RootSignature*	_RootSignature	= nullptr;
 			Pipeline*		_Pipeline		= nullptr;
+			bool			_IsPassEnabled	= true;
 
 		};
 	}

@@ -21,6 +21,8 @@ namespace Eternal
 		VolumetricCloudsPass::VolumetricCloudsPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 			: _VolumetricCloudsConstantBuffer(InContext, "VolumetricCloudsBuffer")
 		{
+			_IsPassEnabled = false;
+
 			char ThreadGroupCountXString[4];
 			char ThreadGroupCountYString[4];
 			char ThreadGroupCountZString[4];

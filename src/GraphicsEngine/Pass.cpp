@@ -12,7 +12,7 @@ namespace Eternal
 
 		bool Pass::CanRenderPass() const
 		{
-			return _Pipeline && _Pipeline->IsPipelineCompiled();
+			return _IsPassEnabled && _Pipeline && _Pipeline->IsPipelineCompiled();
 		}
 	}
 }
