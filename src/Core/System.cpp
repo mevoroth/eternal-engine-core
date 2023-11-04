@@ -299,7 +299,7 @@ namespace Eternal
 
 			if (CurrentRenderFrame.MeshCollectionsVisibility.GetBitCount() > 0)
 			{
-				CommandListScope BuildAccelerationStructureCommandlist = GfxContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "BuildTopLevelAccelerationStructure");
+				CommandListScope BuildAccelerationStructureCommandlist = GfxContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "BuildAccelerationStructure");
 				const vector<ObjectsList<MeshCollection>::InstancedObjects>& MeshCollections = CurrentRenderFrame.MeshCollections;
 
 				RebuildAccelerationStructureInput RebuildInput;
@@ -307,54 +307,59 @@ namespace Eternal
 
 				for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
 				{
-					vector<AccelerationStructureGeometry> Geometries;
-					uint32_t GeometryIndex = 0u;
-					uint32_t GeometriesCount = 0u;
-					for (uint32_t MeshIndex = 0, MeshCount = static_cast<uint32_t>(MeshCollections[CollectionIndex].Object->Meshes.size()); MeshIndex < MeshCount; ++MeshIndex)
-						GeometriesCount += static_cast<uint32_t>(MeshCollections[CollectionIndex].Object->Meshes[MeshIndex]->GetGPUMesh().PerDrawInformations.size());
-					Geometries.resize(GeometriesCount);
-
 					AccelerationStructure*& CurrentAccelerationStructure = MeshCollections[CollectionIndex].Object->MeshCollectionAccelerationStructure;
-					for (uint32_t MeshIndex = 0; MeshIndex < MeshCollections[CollectionIndex].Object->Meshes.size(); ++MeshIndex)
+
+					static constexpr bool ForceRebuildBLAS = false;
+					if (ForceRebuildBLAS)
 					{
-						GPUMesh& CurrentGPUMesh = MeshCollections[CollectionIndex].Object->Meshes[MeshIndex]->GetGPUMesh();
+						vector<AccelerationStructureGeometry> Geometries;
+						uint32_t GeometryIndex = 0u;
+						uint32_t GeometriesCount = 0u;
+						for (uint32_t MeshIndex = 0, MeshCount = static_cast<uint32_t>(MeshCollections[CollectionIndex].Object->Meshes.size()); MeshIndex < MeshCount; ++MeshIndex)
+							GeometriesCount += static_cast<uint32_t>(MeshCollections[CollectionIndex].Object->Meshes[MeshIndex]->GetGPUMesh().PerDrawInformations.size());
+						Geometries.resize(GeometriesCount);
 
-						for (uint32_t DrawIndex = 0; DrawIndex < CurrentGPUMesh.PerDrawInformations.size(); ++DrawIndex)
+						for (uint32_t MeshIndex = 0; MeshIndex < MeshCollections[CollectionIndex].Object->Meshes.size(); ++MeshIndex)
 						{
-							GPUMesh::PerDrawInformation& CurrentPerDrawInformation = CurrentGPUMesh.PerDrawInformations[DrawIndex];
+							GPUMesh& CurrentGPUMesh = MeshCollections[CollectionIndex].Object->Meshes[MeshIndex]->GetGPUMesh();
 
-							AccelerationStructureGeometry& CurrentGeometry = Geometries[GeometryIndex++];
-							CurrentGeometry.VertexBuffer	= CurrentGPUMesh.MeshVertexBuffer;
-							CurrentGeometry.IndexBuffer		= CurrentGPUMesh.MeshIndexBuffer;
-							CurrentGeometry.TransformBuffer	= CurrentGPUMesh.MeshConstantBuffer;
-							CurrentGeometry.IndicesCount	= CurrentPerDrawInformation.IndicesCount;
-							CurrentGeometry.IndicesOffset	= CurrentPerDrawInformation.IndicesOffset;
-							CurrentGeometry.VerticesOffset	= CurrentPerDrawInformation.VerticesOffset;
-							CurrentGeometry.TransformsOffet	= DrawIndex;
+							for (uint32_t DrawIndex = 0; DrawIndex < CurrentGPUMesh.PerDrawInformations.size(); ++DrawIndex)
+							{
+								GPUMesh::PerDrawInformation& CurrentPerDrawInformation = CurrentGPUMesh.PerDrawInformations[DrawIndex];
+
+								AccelerationStructureGeometry& CurrentGeometry = Geometries[GeometryIndex++];
+								CurrentGeometry.VertexBuffer	= CurrentGPUMesh.MeshVertexBuffer;
+								CurrentGeometry.IndexBuffer		= CurrentGPUMesh.MeshIndexBuffer;
+								CurrentGeometry.TransformBuffer	= CurrentGPUMesh.MeshConstantBuffer;
+								CurrentGeometry.IndicesCount	= CurrentPerDrawInformation.IndicesCount;
+								CurrentGeometry.IndicesOffset	= CurrentPerDrawInformation.IndicesOffset;
+								CurrentGeometry.VerticesOffset	= CurrentPerDrawInformation.VerticesOffset;
+								CurrentGeometry.TransformsOffet	= DrawIndex;
+							}
 						}
+
+						GfxContext.DelayedDelete(CurrentAccelerationStructure);
+						CurrentAccelerationStructure = CreateBottomLevelAccelerationStructure(
+							GfxContext,
+							BottomLevelAccelerationStructureCreateInformation(
+								/*CurrentMesh->GetName()*/"BLAS",
+								Geometries
+							)
+						);
+
+						BuildAccelerationStructureCommandlist->BuildRaytracingAccelerationStructure(GfxContext, *CurrentAccelerationStructure);
+						BuildAccelerationStructureCommandlist->TransitionUAV(CurrentAccelerationStructure->GetAccelerationStructure());
 					}
-
-					GfxContext.DelayedDelete(CurrentAccelerationStructure);
-					CurrentAccelerationStructure = CreateBottomLevelAccelerationStructure(
-						GfxContext,
-						BottomLevelAccelerationStructureCreateInformation(
-							/*CurrentMesh->GetName()*/"BLAS",
-							Geometries
-						)
-					);
-
-					BuildAccelerationStructureCommandlist->BuildRaytracingAccelerationStructure(GfxContext, *CurrentAccelerationStructure);
-					BuildAccelerationStructureCommandlist->TransitionUAV(CurrentAccelerationStructure->GetAccelerationStructure());
 
 					for (uint32_t InstanceIndex = 0; InstanceIndex < MeshCollections[CollectionIndex].Instances.size(); ++InstanceIndex)
 					{
-						Matrix4x4 LocalToWorld = MeshCollections[CollectionIndex].Instances[InstanceIndex]->GetTransform().GetLocalToWorld();
-						Transpose(LocalToWorld);
+						Matrix4x4 LocalToWorldTransposed = MeshCollections[CollectionIndex].Instances[InstanceIndex]->GetTransform().GetLocalToWorld();
+						Transpose(LocalToWorldTransposed);
 
 						RebuildInput.Instances.push_back({});
 						AccelerationStructureInstance& CurrentInstance			= RebuildInput.Instances.back();
 						CurrentInstance.BottomLevelAccelerationStructureBuffer	= CurrentAccelerationStructure;
-						CurrentInstance.InstanceToWorld							= Matrix3x4(&LocalToWorld.m[0][0]);
+						CurrentInstance.InstanceToWorld							= Matrix3x4(&LocalToWorldTransposed.m[0][0]);
 					}
 				}
 
