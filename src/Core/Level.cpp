@@ -28,6 +28,7 @@ namespace Eternal
 		{
 			InGameObject->SetParent(nullptr);
 			vector<GameObject*>::iterator GameObjectIterator = remove(_GameObjects.begin(), _GameObjects.end(), InGameObject);
+			(void)GameObjectIterator;
 		}
 
 		void Level::Update(_In_ const TimeSecondsT InDeltaSeconds)

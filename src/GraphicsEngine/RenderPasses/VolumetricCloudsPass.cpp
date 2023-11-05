@@ -92,7 +92,7 @@ namespace Eternal
 			_VolumetricCloudsDescriptorTable->SetDescriptor(0, InRenderer.GetGlobalResources().GetViewConstantBufferView());
 			_VolumetricCloudsDescriptorTable->SetDescriptor(1, _VolumetricCloudsConstantBuffer.GetView());
 			_VolumetricCloudsDescriptorTable->SetDescriptor(2, InRenderer.GetGlobalResources().GetGBufferDepthStencil().GetShaderResourceView());
-			_VolumetricCloudsDescriptorTable->SetDescriptor(3, InSystem.GetTextureFactory().GetTextureCache("noise_curl_3d_xyzw").CachedTexture ? InSystem.GetTextureFactory().GetTextureCache("noise_curl_3d_xyzw").CachedTexture->GetShaderResourceView() : nullptr);
+			_VolumetricCloudsDescriptorTable->SetDescriptor(3, InSystem.GetTextureFactory().GetTextureCache("noise_curl_3d_xyzw").CachedTexture->GetShaderResourceView());
 			_VolumetricCloudsDescriptorTable->SetDescriptor(4, InContext.GetBilinearWrapSampler());
 			_VolumetricCloudsDescriptorTable->SetDescriptor(5, InRenderer.GetGlobalResources().GetGBufferLuminance().GetUnorderedAccessView());
 
@@ -108,8 +108,8 @@ namespace Eternal
 				VolumetricCloudsCommandList->SetComputePipeline(*_Pipeline);
 				VolumetricCloudsCommandList->SetComputeDescriptorTable(InContext, *_VolumetricCloudsDescriptorTable);
 				VolumetricCloudsCommandList->Dispatch(
-					Math::DivideRoundUp(InContext.GetWindow().GetWidth(), ThreadGroupCountX),
-					Math::DivideRoundUp(InContext.GetWindow().GetHeight(), ThreadGroupCountY),
+					Math::DivideRoundUp(InContext.GetOutputDevice().GetWidth(), ThreadGroupCountX),
+					Math::DivideRoundUp(InContext.GetOutputDevice().GetHeight(), ThreadGroupCountY),
 					1
 				);
 			}

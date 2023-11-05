@@ -72,7 +72,7 @@ namespace Eternal
 
 			DebugRayTracingCommandList->SetRayTracingPipeline(*_Pipeline);
 			DebugRayTracingCommandList->SetRayTracingDescriptorTable(InContext, *_DebugRayTracingDescriptorTable);
-			DebugRayTracingCommandList->DispatchRays(*_DebugRayTracingShaderTable, InContext.GetWindow().GetWidth(), InContext.GetWindow().GetHeight());
+			DebugRayTracingCommandList->DispatchRays(*_DebugRayTracingShaderTable, InContext.GetOutputDevice().GetWidth(), InContext.GetOutputDevice().GetHeight());
 		}
 	}
 }

@@ -1,6 +1,6 @@
 #include "Imgui/Imgui.hpp"
 
-#include "Window/Window.hpp"
+#include "OutputDevice/OutputDevice.hpp"
 #include "Graphics/GraphicsInclude.hpp"
 #include "GraphicsEngine/Renderer.hpp"
 #include "GraphicData/GlobalResources.hpp"
@@ -241,8 +241,8 @@ namespace Eternal
 			ImGuiIO& IO = ImGui::GetIO();
 			IO.BackendPlatformName	= "PC";
 			IO.BackendRendererName	= "EternalGraphics";
-			IO.DisplaySize.x		= static_cast<float>(InContext.GetWindow().GetWidth());
-			IO.DisplaySize.y		= static_cast<float>(InContext.GetWindow().GetHeight());
+			IO.DisplaySize.x		= static_cast<float>(InContext.GetOutputDevice().GetWidth());
+			IO.DisplaySize.y		= static_cast<float>(InContext.GetOutputDevice().GetHeight());
 			IO.IniFilename			= "imgui.ini";
 
 			IO.BackendFlags			|= ImGuiBackendFlags_HasGamepad
@@ -253,7 +253,7 @@ namespace Eternal
 			IO.ConfigFlags			|= ImGuiConfigFlags_NavEnableKeyboard
 									| ImGuiConfigFlags_NavEnableGamepad;
 
-			IO.ImeWindowHandle		= InContext.GetWindow().GetWindowHandler();
+			//IO.ImeWindowHandle		= InContext.GetOutputDevice().GetWindowHandler();
 
 			_Map(Input::TAB,		ImGuiKey_Tab);
 			_Map(Input::LEFT,		ImGuiKey_LeftArrow);

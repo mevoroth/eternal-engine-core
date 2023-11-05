@@ -1,5 +1,6 @@
 #include "Optick/Optick.hpp"
 
+#if ETERNAL_PLATFORM_WINDOWS
 #define VK_USE_PLATFORM_WIN32_KHR
 #ifdef VKAPI_PTR
 #undef VKAPI_PTR
@@ -7,11 +8,12 @@
 #include "optick.h"
 #include <vulkan/vulkan.h>
 
-#include "Graphics/GraphicsInclude.hpp"
 #include "d3d12/D3D12Device.hpp"
 #include "d3d12/D3D12CommandQueue.hpp"
 #include "Vulkan/VulkanDevice.hpp"
 #include "Vulkan/VulkanCommandQueue.hpp"
+#endif
+#include "Graphics/GraphicsInclude.hpp"
 
 namespace Eternal
 {

@@ -21,6 +21,7 @@ namespace Eternal
 		{
 			InGameCreateInformation.SystemInformation.GameContext = this;
 			_System = new System(InGameCreateInformation.SystemInformation);
+			_System->InitializeSystem();
 		}
 
 		Game::~Game()
@@ -118,7 +119,7 @@ namespace Eternal
 			StreamingSystem.ProcessGathered_MainThread(
 				AssetType::ASSET_TYPE_MESH,
 				GetSystem().GetGameFrame().DelayedDestroyedRequests,
-				[this, &GraphicsCommands](_In_ Payload& InPayload)
+				[&GraphicsCommands](_In_ Payload& InPayload)
 				{
 					MeshPayload& InMeshPayload = static_cast<MeshPayload&>(InPayload);
 					GraphicsCommands.push_back(
@@ -134,7 +135,7 @@ namespace Eternal
 			StreamingSystem.ProcessGathered_MainThread(
 				AssetType::ASSET_TYPE_TEXTURE,
 				GetSystem().GetGameFrame().DelayedDestroyedRequests,
-				[this, &GraphicsCommands, &SystemTextureFactory, &GlobalSystem](_In_ Payload& InPayload)
+				[&GraphicsCommands, &SystemTextureFactory, &GlobalSystem](_In_ Payload& InPayload)
 				{
 					TexturePayload& InTexturePayload = static_cast<TexturePayload&>(InPayload);
 					GraphicsCommands.push_back(

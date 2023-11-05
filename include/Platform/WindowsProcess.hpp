@@ -1,5 +1,7 @@
 #pragma once
 
+#if ETERNAL_PLATFORM_WINDOWS
+
 #define WIN32_EXTRA_LEAN
 #define WIN32_LEAN_AND_MEAN
 #define VC_EXTRALEAN
@@ -32,3 +34,5 @@ namespace Eternal
 		};
 	}
 }
+
+#endif

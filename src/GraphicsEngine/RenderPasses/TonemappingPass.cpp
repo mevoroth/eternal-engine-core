@@ -69,8 +69,8 @@ namespace Eternal
 				TonemappingCommandList->SetComputePipeline(*_Pipeline);
 				TonemappingCommandList->SetComputeDescriptorTable(InContext, *_TonemappingDescriptorTable);
 				TonemappingCommandList->Dispatch(
-					Math::DivideRoundUp(InContext.GetWindow().GetWidth(), ThreadGroupCountX),
-					Math::DivideRoundUp(InContext.GetWindow().GetHeight(), ThreadGroupCountY),
+					Math::DivideRoundUp(InContext.GetOutputDevice().GetWidth(), ThreadGroupCountX),
+					Math::DivideRoundUp(InContext.GetOutputDevice().GetHeight(), ThreadGroupCountY),
 					1
 				);
 			}

@@ -4,6 +4,7 @@
 #include "GraphicsEngine/RenderPasses/ShadowMapPass.hpp"
 #include "GraphicsEngine/RenderPasses/OpaquePass.hpp"
 #include "GraphicsEngine/RenderPasses/DirectLightingPass.hpp"
+#include "GraphicsEngine/RenderPasses/RayTracedReflectionsPass.hpp"
 #include "GraphicsEngine/RenderPasses/VolumetricCloudsPass.hpp"
 #include "GraphicsEngine/RenderPasses/TonemappingPass.hpp"
 #include "GraphicsEngine/RenderPasses/PresentPass.hpp"
@@ -30,6 +31,7 @@ namespace Eternal
 				new ShadowMapPass(InContext, *this),
 				new OpaquePass(InContext, *this),
 				new DirectLightingPass(InContext, *this),
+				new RayTracedReflectionsPass(InContext, *this),
 				new DebugObjectBoundingBoxPass(InContext, *this),
 				new VolumetricCloudsPass(InContext, *this),
 				new TonemappingPass(InContext, *this),

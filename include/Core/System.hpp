@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Platform/WindowsProcess.hpp"
+#include "Core/SystemCreateInformation.hpp"
 #include "Parallel/ParallelSystem.hpp"
 #include "Graphics/GraphicsContext.hpp"
 #include "Resources/TextureFactory.hpp"
@@ -77,7 +77,6 @@ namespace Eternal
 		using namespace Eternal::Graphics;
 		using namespace Eternal::GraphicsEngine;
 		using namespace Eternal::Time;
-		using namespace Eternal::Platform;
 		using namespace Eternal::LogSystem;
 		using namespace Eternal::InputSystem;
 		using namespace Eternal::Import;
@@ -184,25 +183,6 @@ namespace Eternal
 			Camera* PendingViewCamera										= nullptr;
 		};
 
-		struct SystemCreateInformation
-		{
-			SystemCreateInformation(_In_ GraphicsContextCreateInformation& InContextInformation)
-				: ContextInformation(InContextInformation)
-			{
-			}
-
-			GraphicsContextCreateInformation& ContextInformation;
-
-			Game* GameContext						= nullptr;
-
-			vector<const char*> ShaderIncludePath;
-			const char* ShaderPDBPath				= nullptr;
-			const char* FBXPath						= nullptr;
-			const char* FBXCachePath				= nullptr;
-			const char* TexturePath					= nullptr;
-			const char* LevelPath					= nullptr;
-		};
-
 		class System
 		{
 		public:
@@ -262,6 +242,8 @@ namespace Eternal
 				return _MaterialUpdateBatcher;
 			}
 
+			void InitializeSystem();
+
 			SystemFrame& GetGameFrame();
 			SystemFrame& GetOldestGameFrame();
 			SystemFrame& GetRenderFrame();
@@ -276,19 +258,23 @@ namespace Eternal
 			void UpdateDebug();
 			void RenderDebug();
 
+			virtual void UpdatePlatform() {}
+
+		protected:
+			Input*														_Input						= nullptr;
+			GraphicsContext*											_GraphicsContext			= nullptr;
+			AutoRecompileShaderTask*									_AutoRecompileShaderTask	= nullptr;
+
 		private:
 			void _LoadBuiltin();
 			
 			SystemCreateInformation										_SystemCreateInformation;
-			WindowsProcess												_WindowProcess;
 			TextureFactory												_TextureFactory;
 			MaterialUpdateBatcher										_MaterialUpdateBatcher;
 			ParallelSystem*												_ParallelSystem				= nullptr;
-			GraphicsContext*											_GraphicsContext			= nullptr;
 			Imgui*														_Imgui						= nullptr;
 			Timer*														_Timer						= nullptr;
 			Log*														_Logs						= nullptr;
-			Input*														_Input						= nullptr;
 			Streaming*													_Streaming					= nullptr;
 			Renderer*													_Renderer					= nullptr;
 
@@ -296,7 +282,6 @@ namespace Eternal
 			// Tasks
 			RendererTask*												_RendererTask				= nullptr;
 			StreamingTask*												_StreamingTask				= nullptr;
-			AutoRecompileShaderTask*									_AutoRecompileShaderTask	= nullptr;
 
 			//////////////////////////////////////////////////////////////////////////
 			// System state

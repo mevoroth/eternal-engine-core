@@ -1,3 +1,5 @@
+#if ETERNAL_PLATFORM_WINDOWS
+
 #include "Platform/WindowsProcess.hpp"
 
 #include "Input/Input.hpp"
@@ -181,3 +183,5 @@ namespace Eternal
 		}
 	}
 }
+
+#endif

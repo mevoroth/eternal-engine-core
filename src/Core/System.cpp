@@ -20,7 +20,6 @@
 #include "Mesh/Mesh.hpp"
 #include "Camera/Camera.hpp"
 #include "Components/TransformComponent.hpp"
-
 #include "Mesh/Mesh.hpp"
 
 namespace Eternal
@@ -30,7 +29,6 @@ namespace Eternal
 		using namespace Eternal::Graphics;
 		using namespace Eternal::FileSystem;
 		using namespace Eternal::LogSystem;
-		using namespace Eternal::Platform;
 		using namespace Eternal::Parallel;
 
 		namespace SystemPrivate
@@ -47,8 +45,8 @@ namespace Eternal
 
 		System::System(_In_ SystemCreateInformation& InSystemCreateInformation)
 			: _SystemCreateInformation(InSystemCreateInformation)
-			, _GameIndex(CreateAtomicS32())
 			, _RenderIndex(CreateAtomicS32())
+			, _GameIndex(CreateAtomicS32())
 		{
 			for (uint32_t IncludeIndex = 0; IncludeIndex < InSystemCreateInformation.ShaderIncludePath.size(); ++IncludeIndex)
 				FilePath::Register(InSystemCreateInformation.ShaderIncludePath[IncludeIndex],	FileType::FILE_TYPE_SHADERS);
@@ -61,11 +59,6 @@ namespace Eternal
 			_Timer						= CreateTimer(TimeType::TIME_TYPE_WIN);
 			_Logs						= CreateMultiChannelLog({ LogType::LOG_TYPE_CONSOLE/*, LogType::LOG_TYPE_FILE*/ });
 			_Input						= CreateMultiInput({ InputType::INPUT_TYPE_WIN, InputType::INPUT_TYPE_XINPUT });
-
-			WindowsProcess::SetInputHandler(_Input);
-			WindowsProcess::SetIsRunning(&InSystemCreateInformation.GameContext->_Running);
-			
-			_GraphicsContext			= CreateGraphicsContext(InSystemCreateInformation.ContextInformation);
 
 			_Streaming					= new Streaming(_TextureFactory);
 			_Streaming->RegisterLoader(AssetType::ASSET_TYPE_LEVEL, new LevelLoader());
@@ -82,14 +75,17 @@ namespace Eternal
 			TaskCreateInformation StreamingCreateInformation("StreamingTask");
 			_StreamingTask				= new StreamingTask(StreamingCreateInformation, *_Streaming);
 
-			TaskCreateInformation AutoRecompileShaderTaskCreateInformation("AutoRecompileShaderTask");
-			_AutoRecompileShaderTask	= new AutoRecompileShaderTask(AutoRecompileShaderTaskCreateInformation, *_GraphicsContext);
+		}
 
-			ParallelSystemCreateInformation ParallelSystemInformation(
-				GraphicsContext::FrameBufferingCount,
-				{ _RendererTask, _StreamingTask, _AutoRecompileShaderTask }
-			);
-			_ParallelSystem				= new ParallelSystem(ParallelSystemInformation);
+		void System::InitializeSystem()
+		{
+			vector<Task*> Tasks = { _RendererTask, _StreamingTask };
+			if (_AutoRecompileShaderTask)
+				Tasks.push_back(_AutoRecompileShaderTask);
+
+			_ParallelSystem = new ParallelSystem(ParallelSystemCreateInformation(
+				GraphicsContext::FrameBufferingCount, Tasks
+			));
 
 			Optick::OptickStart(*_GraphicsContext);
 
@@ -243,7 +239,7 @@ namespace Eternal
 		void System::Update()
 		{
 			ETERNAL_PROFILER(BASIC)();
-			WindowsProcess::ExecuteMessageLoop();
+			UpdatePlatform();
 			_Timer->Update();
 			_Input->Update();
 		}
@@ -430,7 +426,6 @@ namespace Eternal
 				if (ImGui::TreeNode("Visibility"))
 				{
 					SystemFrame& CurrentGameFrame = GetGameFrame();
-					GraphicsContext& GfxContext = GetGraphicsContext();
 
 					if (CurrentGameFrame.ViewCamera && CurrentGameFrame.MeshCollectionsVisibility.GetSize() > 0)
 					{
@@ -444,8 +439,6 @@ namespace Eternal
 
 							for (uint32_t InstanceIndex = 0; InstanceIndex < CurrentInstancedObject.Instances.size(); ++InstanceIndex)
 							{
-								Matrix4x4 LocalToWorld = CurrentInstancedObject.Instances[InstanceIndex]->GetTransform().GetLocalToWorld();
-
 								for (uint32_t MeshIndex = 0; MeshIndex < Meshes.size(); ++MeshIndex)
 								{
 									vector<AxisAlignedBoundingBox>& CurrentBoundingBoxes = Meshes[MeshIndex]->GetGPUMesh().BoundingBoxes;

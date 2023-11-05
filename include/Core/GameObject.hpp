@@ -41,13 +41,13 @@ namespace Eternal
 				InComponent->SetParent(this);
 				if (SetupFunctor)
 					SetupFunctor(InComponent);
-				InComponent->OnAddComponent<ComponentType>();
+				InComponent->template OnAddComponent<ComponentType>();
 			}
 
 			template<typename ComponentType>
 			inline void RemoveComponent(_In_ ComponentType* InComponent)
 			{
-				InComponent->OnRemoveComponent<ComponentType>();
+				InComponent->template OnRemoveComponent<ComponentType>();
 				InComponent->SetParent(nullptr);
 				vector<Component*>::iterator ComponentIterator = remove(_Components.begin(), _Components.end(), InComponent);
 			}

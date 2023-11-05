@@ -81,7 +81,7 @@ namespace Eternal
 				const GameDataSource& Lights = InNode.GetSubNode(GameDataSourceKey::LIGHTS);
 				IterateGameDataCollection(
 					Lights,
-					[OutLevel = OutLevelPayload->LoadedLevel, OutLevelPayload](_In_ const GameDataSource& LightItem)
+					[OutLevel = OutLevelPayload->LoadedLevel](_In_ const GameDataSource& LightItem)
 					{
 						const GameDataSource& Transforms = LightItem.GetSubNode(GameDataSourceKey::TRANSFORM);
 
