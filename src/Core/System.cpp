@@ -56,9 +56,9 @@ namespace Eternal
 			FilePath::Register(InSystemCreateInformation.FBXCachePath,							FileType::FILE_TYPE_CACHED_MESHES);
 			FilePath::Register(InSystemCreateInformation.TexturePath,							FileType::FILE_TYPE_TEXTURES);
 
-			_Timer						= CreateTimer(TimeType::TIME_TYPE_WIN);
+			_Timer						= CreateTimer(TimeType::TIME_TYPE_DEFAULT);
 			_Logs						= CreateMultiChannelLog({ LogType::LOG_TYPE_CONSOLE/*, LogType::LOG_TYPE_FILE*/ });
-			_Input						= CreateMultiInput({ InputType::INPUT_TYPE_WIN, InputType::INPUT_TYPE_XINPUT });
+			_Input						= CreateMultiInput({ InputType::INPUT_TYPE_KEYBOARD, InputType::INPUT_TYPE_DEFAULT_PAD });
 
 			_Streaming					= new Streaming(_TextureFactory);
 			_Streaming->RegisterLoader(AssetType::ASSET_TYPE_LEVEL, new LevelLoader());
