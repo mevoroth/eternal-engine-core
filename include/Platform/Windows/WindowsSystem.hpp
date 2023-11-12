@@ -3,7 +3,7 @@
 #if ETERNAL_PLATFORM_WINDOWS
 
 #include "Core/System.hpp"
-#include "Platform/WindowsProcess.hpp"
+#include "Platform/Windows/WindowsProcess.hpp"
 
 namespace Eternal
 {

@@ -13,7 +13,7 @@ namespace Eternal
 			WindowsProcess::SetInputHandler(_Input);
 			WindowsProcess::SetIsRunning(&InSystemCreateInformation.GameContext->_Running);
 
-			_GraphicsContext = CreateGraphicsContext(InSystemCreateInformation.ContextInformation);
+			_GraphicsContext = CreateGraphicsContext(static_cast<const WindowsGraphicsContextCreateInformation&>(InSystemCreateInformation.ContextInformation));
 
 			TaskCreateInformation AutoRecompileShaderTaskCreateInformation("AutoRecompileShaderTask");
 			_AutoRecompileShaderTask = new WindowsAutoRecompileShaderTask(AutoRecompileShaderTaskCreateInformation, *_GraphicsContext);
