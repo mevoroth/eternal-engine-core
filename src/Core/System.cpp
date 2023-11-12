@@ -63,12 +63,6 @@ namespace Eternal
 			_Streaming					= new Streaming(_TextureFactory);
 			_Streaming->RegisterLoader(AssetType::ASSET_TYPE_LEVEL, new LevelLoader());
 
-			_Renderer					= new Renderer(*_GraphicsContext);
-			_Imgui						= new Imgui(*_GraphicsContext, *_Renderer, _Input);
-
-			for (uint32_t FrameIndex = 0; FrameIndex < GraphicsContext::FrameBufferingCount; ++FrameIndex)
-				_Frames[FrameIndex].InitializeSystemFrame(*_GraphicsContext, _Imgui->CreateContext(*_GraphicsContext));
-
 			TaskCreateInformation RendererCreateInformation("RendererTask");
 			_RendererTask				= new RendererTask(RendererCreateInformation, *this);
 
@@ -79,6 +73,13 @@ namespace Eternal
 
 		void System::InitializeSystem()
 		{
+			_Renderer					= new Renderer(*_GraphicsContext);
+			_Imgui						= new Imgui(*_GraphicsContext, *_Renderer, _Input);
+
+			for (uint32_t FrameIndex = 0; FrameIndex < GraphicsContext::FrameBufferingCount; ++FrameIndex)
+				_Frames[FrameIndex].InitializeSystemFrame(*_GraphicsContext, _Imgui->CreateContext(*_GraphicsContext));
+
+
 			vector<Task*> Tasks = { _RendererTask, _StreamingTask };
 			if (_AutoRecompileShaderTask)
 				Tasks.push_back(_AutoRecompileShaderTask);

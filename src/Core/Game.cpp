@@ -1,6 +1,7 @@
 #include "Core/Game.hpp"
 #include "Core/GameState.hpp"
 #include "Core/System.hpp"
+#include "Core/SystemFactory.hpp"
 #include "Resources/Streaming.hpp"
 #include "Resources/Payload.hpp"
 #include "Resources/LevelPayload.hpp"
@@ -20,8 +21,7 @@ namespace Eternal
 			: _World(*this)
 		{
 			InGameCreateInformation.SystemInformation.GameContext = this;
-			_System = new System(InGameCreateInformation.SystemInformation);
-			_System->InitializeSystem();
+			_System = CreateSystem(InGameCreateInformation.SystemInformation);
 		}
 
 		Game::~Game()

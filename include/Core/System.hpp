@@ -188,7 +188,7 @@ namespace Eternal
 		public:
 
 			System(_In_ SystemCreateInformation& InSystemCreateInformation);
-			~System();
+			virtual ~System();
 
 			inline GraphicsContext& GetGraphicsContext()
 			{
