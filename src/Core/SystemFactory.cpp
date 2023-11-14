@@ -10,13 +10,13 @@ namespace Eternal
 		{
 			System* OutSystem = nullptr;
 
-		#if ETERNAL_USE_PRIVATE
+#if ETERNAL_USE_PRIVATE
 			OutSystem = CreateSystemPrivate(InSystemCreateInformation);
-		#endif
+#endif
 
-		#if ETERNAL_PLATFORM_WINDOWS
+#if ETERNAL_PLATFORM_WINDOWS
 			OutSystem = new WindowsSystem(InSystemCreateInformation);
-		#endif
+#endif
 
 			ETERNAL_ASSERT(OutSystem);
 			OutSystem->InitializeSystem();
