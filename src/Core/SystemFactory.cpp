@@ -1,6 +1,8 @@
 #include "Platform/Windows/WindowsSystem.hpp"
-#include "Platform/SystemFactoryPrivate.hpp"
 #include "Core/System.hpp"
+#if ETERNAL_USE_PRIVATE
+#include "Platform/SystemFactoryPrivate.hpp"
+#endif
 
 namespace Eternal
 {
