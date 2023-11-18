@@ -1,6 +1,6 @@
 #if ETERNAL_PLATFORM_WINDOWS
 
-#include "Platform/WindowsProcess.hpp"
+#include "Platform/Windows/WindowsProcess.hpp"
 
 #include "Input/Input.hpp"
 

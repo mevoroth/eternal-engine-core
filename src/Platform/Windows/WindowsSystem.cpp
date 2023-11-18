@@ -1,7 +1,9 @@
 #if ETERNAL_PLATFORM_WINDOWS
 
-#include "Platform/WindowsSystem.hpp"
-#include "Platform/WindowsAutoRecompileShaderTask.hpp"
+#include "Platform/Windows/WindowsSystem.hpp"
+#include "Platform/Windows/WindowsAutoRecompileShaderTask.hpp"
+#include "Windows/WindowsGraphicsContext.hpp"
+#include "Core/Game.hpp"
 
 namespace Eternal
 {
@@ -11,7 +13,7 @@ namespace Eternal
 			: System(InSystemCreateInformation)
 		{
 			WindowsProcess::SetInputHandler(_Input);
-			WindowsProcess::SetIsRunning(&InSystemCreateInformation.GameContext->_Running);
+			WindowsProcess::SetIsRunning(InSystemCreateInformation.GameContext->GetRunningPointer());
 
 			_GraphicsContext = CreateGraphicsContext(static_cast<const WindowsGraphicsContextCreateInformation&>(InSystemCreateInformation.ContextInformation));
 

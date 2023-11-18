@@ -1,6 +1,6 @@
 #if ETERNAL_PLATFORM_WINDOWS
 
-#include "Task/Tools/WindowsAutoRecompileShaderTask.hpp"
+#include "Platform/Windows/WindowsAutoRecompileShaderTask.hpp"
 
 #include "Graphics/GraphicsContext.hpp"
 #include "File/FilePath.hpp"

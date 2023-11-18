@@ -41,6 +41,8 @@ namespace Eternal
 				return *_System;
 			}
 
+			bool* GetRunningPointer() { return &_Running; }
+
 		protected:
 			void Update();
 			void UpdateDebug();
