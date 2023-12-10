@@ -49,7 +49,7 @@ namespace Eternal
 			_Pipeline = CreatePipeline(
 				InContext,
 				GraphicsPipelineCreateInformation(
-					*_RootSignature,
+					_RootSignature,
 					InContext.GetEmptyInputLayout(),
 					_DirectLightingRenderPass,
 					ScreenVertex,

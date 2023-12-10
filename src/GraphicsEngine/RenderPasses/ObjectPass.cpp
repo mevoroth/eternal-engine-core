@@ -79,7 +79,7 @@ namespace Eternal
 				Shader* OpaqueMesh = InContext.GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_MESH, ShaderName, "object.mesh.hlsl", InObjectPassCreateInformation.Defines));
 				
 				MeshPipelineCreateInformation OpaquePipelineCreateInformation(
-					*_RootSignature,
+					_RootSignature,
 					_ObjectRenderPass,
 					OpaqueMesh, InObjectPassCreateInformation.ObjectPixel,
 					DepthStencilTestWriteNone
@@ -93,7 +93,7 @@ namespace Eternal
 				Shader* OpaqueVertex = InContext.GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_VERTEX, ShaderName, "object.vertex.hlsl", InObjectPassCreateInformation.Defines));
 
 				GraphicsPipelineCreateInformation OpaquePipelineCreateInformation(
-					*_RootSignature,
+					_RootSignature,
 					_ObjectInputLayout,
 					_ObjectRenderPass,
 					OpaqueVertex, InObjectPassCreateInformation.ObjectPixel,

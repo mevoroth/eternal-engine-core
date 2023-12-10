@@ -47,7 +47,7 @@ namespace Eternal
 			_Pipeline = CreatePipeline(
 				InContext,
 				GraphicsPipelineCreateInformation(
-					*_RootSignature,
+					_RootSignature,
 					_DebugObjectBoundingBoxInputLayout,
 					_DebugObjectBoundingBoxRenderPass,
 					BoundingBoxWireframeVertex,

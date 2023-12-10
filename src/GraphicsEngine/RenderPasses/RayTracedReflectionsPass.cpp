@@ -11,6 +11,9 @@ namespace Eternal
 
 		RayTracedReflectionsPass::RayTracedReflectionsPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 		{
+			_IsPassEnabled = false;
+			return;
+
 			Shader* RayTracedReflectionsRayGeneration	= InContext.GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_RAYTRACING_RAY_GENERATION, "RayTracedReflectionsRayGeneration", "RayTracing/raytracedreflections.raygeneration.hlsl"));
 			Shader* RayTracedReflectionsClosestHit		= InContext.GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_RAYTRACING_CLOSEST_HIT, "RayTracedReflectionsClosestHit", "RayTracing/raytracedreflections.closesthit.hlsl"));
 			Shader* RayTracedReflectionsMiss			= InContext.GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_RAYTRACING_MISS, "RayTracedReflectionsMiss", "RayTracing/raytracedreflections.miss.hlsl"));
@@ -33,7 +36,7 @@ namespace Eternal
 			_Pipeline = CreatePipeline(
 				InContext,
 				RayTracingPipelineCreateInformation(
-					*_RootSignature,
+					_RootSignature,
 					RayTracedReflectionsRayGeneration,
 					RayTracedReflectionsClosestHit,
 					RayTracedReflectionsMiss

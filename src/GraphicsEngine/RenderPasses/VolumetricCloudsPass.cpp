@@ -60,7 +60,7 @@ namespace Eternal
 			_Pipeline = CreatePipeline(
 				InContext,
 				ComputePipelineCreateInformation(
-					*_RootSignature,
+					_RootSignature,
 					VolumetricCloudsCompute
 				)
 			);

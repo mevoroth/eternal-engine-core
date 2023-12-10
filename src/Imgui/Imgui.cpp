@@ -126,7 +126,7 @@ namespace Eternal
 			_ImguiDescriptorTable	= _ImguiRootSignature->CreateRootDescriptorTable(InContext);
 
 			GraphicsPipelineCreateInformation ImguiPipelineCreateInformation(
-				*_ImguiRootSignature,
+				_ImguiRootSignature,
 				_ImguiInputLayout,
 				_ImguiRenderPass,
 				ImguiVertex,

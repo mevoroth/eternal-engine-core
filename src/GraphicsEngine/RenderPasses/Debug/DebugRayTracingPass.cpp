@@ -13,6 +13,7 @@ namespace Eternal
 			: _DebugRayTracingRayGenerationConstantBuffer(InContext, "DebugRayTracingRayGenerationBuffer")
 		{
 			_IsPassEnabled = false;
+			return;
 
 			Shader* DebugRayTracingRayGeneration	= InContext.GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_RAYTRACING_RAY_GENERATION, "DebugRayTracingRayGeneration", "RayTracing/Debug/debugraytracing.raygeneration.hlsl"));
 			Shader* DebugRayTracingClosestHit		= InContext.GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_RAYTRACING_CLOSEST_HIT, "DebugRayTracingClosestHit", "RayTracing/Debug/debugraytracing.closesthit.hlsl"));
@@ -34,7 +35,7 @@ namespace Eternal
 			_Pipeline = CreatePipeline(
 				InContext,
 				RayTracingPipelineCreateInformation(
-					*_RootSignature,
+					_RootSignature,
 					DebugRayTracingRayGeneration,
 					DebugRayTracingClosestHit,
 					DebugRayTracingMiss,
