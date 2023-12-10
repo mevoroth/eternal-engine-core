@@ -33,6 +33,7 @@ namespace Eternal
 			const char* FBXCachePath				= nullptr;
 			const char* TexturePath					= nullptr;
 			const char* LevelPath					= nullptr;
+			const char* PipelineCachePath			= nullptr;
 		};
 	}
 }

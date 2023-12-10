@@ -152,7 +152,7 @@ namespace Eternal
 						string FullPathSource = FilePath::Find(FileNameString, FileType::FILE_TYPE_SHADERS);
 						if (FullPathSource.length() > 0)
 						{
-							ResolvedPipelineDependency PipelineDependencies = _Context.GetPipelineDependency().ResolveSource(FullPathSource);
+							ResolvedPipelineDependency PipelineDependencies = _Context.GetPipelineLibrary().ResolveSource(FullPathSource);
 							if (PipelineDependencies.IsShaderSourceResolved())
 								_Context.RegisterPipelineRecompile(PipelineDependencies);
 						}
