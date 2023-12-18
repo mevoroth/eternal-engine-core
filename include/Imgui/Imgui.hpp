@@ -90,10 +90,10 @@ namespace Eternal
 			uint32_t					_PreviousDrawCount = 1;
 
 			// Graphics resources
-			MultiBuffered<Resource>*	_ImguiConstantBuffer;
-			MultiBuffered<View>*		_ImguiConstantBufferView;
-			MultiBuffered<Resource>*	_ImguiVertexBuffer;
-			MultiBuffered<Resource>*	_ImguiIndexBuffer;
+			MultiBuffered<Resource>*	_ImguiConstantBuffer		= nullptr;
+			MultiBuffered<View>*		_ImguiConstantBufferView	= nullptr;
+			MultiBuffered<Resource>*	_ImguiVertexBuffer			= nullptr;
+			MultiBuffered<Resource>*	_ImguiIndexBuffer			= nullptr;
 			
 			RenderPass*					_ImguiRenderPass			= nullptr;
 			Pipeline*					_ImguiPipeline				= nullptr;
