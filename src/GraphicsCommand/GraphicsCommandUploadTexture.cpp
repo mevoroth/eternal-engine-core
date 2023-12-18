@@ -97,7 +97,7 @@ namespace Eternal
 
 				//////////////////////////////////////////////////////////////////////////
 				// Upload
-				UploadTextureCommandList->CopyResource(
+				UploadTextureCommandList->TransferResource(
 					Cache.CachedTexture->GetTexture(),
 					*UploadTexture,
 					CopyRegion(

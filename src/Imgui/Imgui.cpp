@@ -370,7 +370,7 @@ namespace Eternal
 				);
 				ResourceTransition TransitionToCopyWrite(_ImguiFontTexture, TransitionState::TRANSITION_COPY_WRITE);
 				UploadFontCommandList->Transition(&TransitionToCopyWrite, 1);
-				UploadFontCommandList->CopyResource(*_ImguiFontTexture, *ImguiFontUploadTexture, ImguiFontCopyRegion);
+				UploadFontCommandList->TransferResource(*_ImguiFontTexture, *ImguiFontUploadTexture, ImguiFontCopyRegion);
 				ResourceTransition TransitionToShaderRead(_ImguiFontTexture, TransitionState::TRANSITION_PIXEL_SHADER_READ);
 				UploadFontCommandList->Transition(&TransitionToShaderRead, 1);
 
