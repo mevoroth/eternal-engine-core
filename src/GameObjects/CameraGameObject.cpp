@@ -48,7 +48,7 @@ namespace Eternal
 			);
 
 			Component->GetTransform().Rotate(
-				Vector3(0.0f, RXWithDeadZone * 0.1f, 0.0f /*RYWithDeadZone * 0.1f*/)
+				Euler(0.0f, RXWithDeadZone * 0.1f, 0.0f /*RYWithDeadZone * 0.1f*/)
 			);
 		}
 
