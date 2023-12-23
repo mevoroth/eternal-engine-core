@@ -368,10 +368,10 @@ namespace Eternal
 						UploadBufferSize
 					)
 				);
-				ResourceTransition TransitionToCopyWrite(_ImguiFontTexture, TransitionState::TRANSITION_COPY_WRITE);
+				ResourceTransition TransitionToCopyWrite(_ImguiFontTextureView, TransitionState::TRANSITION_COPY_WRITE);
 				UploadFontCommandList->Transition(&TransitionToCopyWrite, 1);
 				UploadFontCommandList->TransferResource(*_ImguiFontTexture, *ImguiFontUploadTexture, ImguiFontCopyRegion);
-				ResourceTransition TransitionToShaderRead(_ImguiFontTexture, TransitionState::TRANSITION_PIXEL_SHADER_READ);
+				ResourceTransition TransitionToShaderRead(_ImguiFontTextureView, TransitionState::TRANSITION_PIXEL_SHADER_READ);
 				UploadFontCommandList->Transition(&TransitionToShaderRead, 1);
 
 				_ImguiFontMetaData.Pixels = nullptr;
