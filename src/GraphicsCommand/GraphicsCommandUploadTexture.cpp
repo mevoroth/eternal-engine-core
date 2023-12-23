@@ -22,7 +22,7 @@ namespace Eternal
 			MaterialUpdateBatch& CurrentMaterialBatch	= _System.GetMaterialUpdateBatcher().MaterialUpdates.find(_Payload.Key)->second;
 			const RawTextureData& InTextureData			= CurrentMaterialBatch.TextureData;
 
-			if (!Cache.CachedTexture)
+			if (!Cache.CachedTexture && InTextureData.TextureData)
 			{
 				ETERNAL_ASSERT(InTextureData.TextureData);
 

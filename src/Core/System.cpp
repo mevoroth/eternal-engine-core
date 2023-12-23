@@ -295,7 +295,7 @@ namespace Eternal
 			GfxContext.RegisterGraphicsCommands(CurrentRenderFrame.GraphicsCommands.size() ? &CurrentRenderFrame.GraphicsCommands : nullptr);
 			GfxContext.BeginFrame();
 
-			if (CurrentRenderFrame.MeshCollectionsVisibility.GetBitCount() > 0)
+			if (CurrentRenderFrame.MeshCollectionsVisibility.GetBitCount() > 0 && CurrentRenderFrame.MeshCollectionsAccelerationStructure)
 			{
 				CommandListScope BuildAccelerationStructureCommandlist = GfxContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "BuildAccelerationStructure");
 				const vector<ObjectsList<MeshCollection>::InstancedObjects>& MeshCollections = CurrentRenderFrame.MeshCollections;
