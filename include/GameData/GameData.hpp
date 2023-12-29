@@ -26,6 +26,7 @@ namespace Eternal
 
 			virtual const GameDataSource& GetSubNode(_In_ const GameDataSourceKey& InKey) const
 			{
+				(void)InKey;
 				ETERNAL_BREAK();
 				return *static_cast<const GameDataSource*>(nullptr);
 			}
@@ -40,7 +41,10 @@ namespace Eternal
 			}
 
 		protected:
-			virtual void InternalGet(_Out_ void* OutValue) const {}
+			virtual void InternalGet(_Out_ void* OutValue) const
+			{
+				(void)OutValue;
+			}
 		};
 
 		class GameData

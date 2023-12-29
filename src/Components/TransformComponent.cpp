@@ -14,6 +14,7 @@ namespace Eternal
 
 		void TransformComponent::Update(_In_ TimeSecondsT InDeltaSeconds)
 		{
+			(void)InDeltaSeconds;
 			_OnTransformChanged.Notify(static_cast<const Transform&>(_Transform));
 		}
 	}

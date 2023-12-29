@@ -135,8 +135,6 @@ namespace Eternal
 
 				ETERNAL_ASSERT(OverlappedResult == TRUE);
 
-				char DebugFileName[1024] = {};
-
 				FILE_NOTIFY_INFORMATION* FileNotifyInformation = reinterpret_cast<FILE_NOTIFY_INFORMATION*>(_AutoRecompileShaderData->AutoRecompileChangeBuffers[_AutoRecompileShaderData->WaitObjectIndex].data());
 				for (;;)
 				{

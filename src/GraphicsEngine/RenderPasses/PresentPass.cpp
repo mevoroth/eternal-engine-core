@@ -39,6 +39,8 @@ namespace Eternal
 
 		void PresentPass::Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer)
 		{
+			(void)InSystem;
+			(void)InRenderer;
 			//GraphicsCommandListScope PresentCommandList = InContext.CreateNewGraphicsCommandList(InContext.GetCurrentFrameBackBufferRenderPass(), "Present");
 			CommandListScope PresentCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "Present");
 

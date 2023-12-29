@@ -21,6 +21,7 @@ namespace Eternal
 	{
 		void OptickStart(_In_ GraphicsContext& InContext)
 		{
+			(void)InContext;
 //			switch (InContext.GetDevice().GetDeviceType())
 //			{
 //#if ETERNAL_ENABLE_D3D12
