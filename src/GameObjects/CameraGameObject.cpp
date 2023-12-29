@@ -41,10 +41,12 @@ namespace Eternal
 			float RXWithDeadZone = InputSystem.GetAxisWithDeadZone(Input::JOY0_RX);
 			float RYWithDeadZone = InputSystem.GetAxisWithDeadZone(Input::JOY0_RY);
 
+			static float Multiplier = 1000.0f;
+
 			Component->GetTransform().Translate(
-				RightVector * LXWithDeadZone * 10.0f +
-				ForwardVector * LYWithDeadZone * 10.0f +
-				Vector3::Up * RYWithDeadZone * 10.0f
+				RightVector * LXWithDeadZone * Multiplier +
+				ForwardVector * LYWithDeadZone * Multiplier +
+				Vector3::Up * RYWithDeadZone * Multiplier
 			);
 
 			Component->GetTransform().Rotate(
