@@ -31,7 +31,6 @@ namespace Eternal
 				InContext,
 				RootSignatureCreateInformation(
 					InObjectPassCreateInformation.RootSignatureParameters,
-					{}, {},
 					/*InHasInputAssembler=*/ true
 				)
 			);
@@ -123,7 +122,7 @@ namespace Eternal
 
 			const vector<ObjectsList<MeshCollection>::InstancedObjects>& MeshCollections = InSystem.GetRenderFrame().MeshCollections;
 			
-			if (MeshCollections.size() == 0)
+			if (MeshCollections.size() == 0 || !Material::DefaultMaterial->IsValid(TextureType::TEXTURE_TYPE_DIFFUSE))
 				return;
 
 			CommandListScope ObjectCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, _GetPassName());
@@ -141,7 +140,11 @@ namespace Eternal
 			MapRange PerDrawInstanceBufferMapRange(sizeof(PerDrawInstanceConstants) * 4096);
 			MapScope<PerDrawInstanceConstants> PerDrawInstanceBufferMapScope(*_ObjectPerDrawInstanceBuffer, PerDrawInstanceBufferMapRange);
 
-			StackAllocation<View> ObjectPerDrawInstanceBufferViews(alloca(GetViewSize(InContext) * MeshCollections.size()), GetViewSize(InContext), static_cast<uint32_t>(MeshCollections.size()));
+			uint32_t PerDrawCount = 0;
+			for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
+				PerDrawCount += static_cast<uint32_t>(MeshCollections[CollectionIndex].Instances.size());
+
+			StackAllocation<View> ObjectPerDrawInstanceBufferViews(alloca(GetViewSize(InContext) * PerDrawCount), GetViewSize(InContext), PerDrawCount);
 
 			uint32_t DrawInstanceCount	= 0;
 
@@ -181,6 +184,9 @@ namespace Eternal
 					for (uint32_t MeshIndex = 0; MeshIndex < Meshes.size(); ++MeshIndex)
 					{
 						GPUMesh& CurrentGPUMesh = Meshes[MeshIndex]->GetGPUMesh();
+						if (!CurrentGPUMesh.MeshIndexBuffer)
+							continue;
+
 						const Resource* MeshVertexBuffer = CurrentGPUMesh.MeshVertexBuffer;
 						if (UseMeshPipeline)
 						{
@@ -220,6 +226,7 @@ namespace Eternal
 						}
 					}
 				}
+				DrawInstanceCount += InstancesCount;
 			}
 			ObjectCommandList->EndRenderPass();
 		}
