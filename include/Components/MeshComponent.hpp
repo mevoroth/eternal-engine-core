@@ -16,7 +16,10 @@ namespace Eternal
 			MeshComponent() {}
 
 			void Begin() {}
-			void Update(_In_ TimeSecondsT InDeltaSeconds) {}
+			void Update(_In_ TimeSecondsT InDeltaSeconds)
+			{
+				(void)InDeltaSeconds;
+			}
 			void SetMesh(_In_ MeshCollection* InMeshCollection);
 
 		private:

@@ -36,7 +36,10 @@ namespace Eternal
 			LightComponent(_In_ World* InWorld = nullptr);
 
 			void Begin();
-			void Update(_In_ const TimeSecondsT DeltaSeconds) {}
+			void Update(_In_ const TimeSecondsT InDeltaSeconds)
+			{
+				(void)InDeltaSeconds;
+			}
 			Light& GetLight()
 			{
 				ETERNAL_ASSERT(_Light);

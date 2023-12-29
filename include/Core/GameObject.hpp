@@ -23,7 +23,10 @@ namespace Eternal
 		public:
 			GameObject();
 
-			virtual void Update(const TimeSecondsT InDeltaSeconds) {}
+			virtual void Update(const TimeSecondsT InDeltaSeconds)
+			{
+				(void)InDeltaSeconds;
+			}
 			virtual void SetWorld(_In_ World* InWorld) override final;
 
 			template<typename ComponentType>

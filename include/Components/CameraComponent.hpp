@@ -36,7 +36,10 @@ namespace Eternal
 			CameraComponent(_In_ World* InWorld = nullptr);
 
 			void Begin();
-			void Update(_In_ TimeSecondsT InDeltaSeconds) {}
+			void Update(_In_ TimeSecondsT InDeltaSeconds)
+			{
+				(void)InDeltaSeconds;
+			}
 			void SetCamera(_In_ Camera* InCamera)
 			{
 				_Camera = InCamera;

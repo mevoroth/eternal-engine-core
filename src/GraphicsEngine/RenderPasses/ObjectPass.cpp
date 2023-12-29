@@ -23,6 +23,7 @@ namespace Eternal
 		ObjectPass::ObjectPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 			: _ObjectPerInstanceBuffer(InContext, "ObjectPerInstanceBuffer", 4096)
 		{
+			(void)InRenderer;
 		}
 
 		void ObjectPass::_InitializeObjectPass(_In_ GraphicsContext& InContext, _In_ const ObjectPassCreateInformation& InObjectPassCreateInformation)

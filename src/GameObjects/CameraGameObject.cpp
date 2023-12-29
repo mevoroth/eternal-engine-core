@@ -22,6 +22,7 @@ namespace Eternal
 
 		void CameraGameObject::Update(const TimeSecondsT InDeltaSeconds)
 		{
+			(void)InDeltaSeconds;
 			Input& InputSystem = GetWorld()->GetGame().GetSystem().GetInput();
 
 			TransformComponent* Component = GetComponent<TransformComponent>();
