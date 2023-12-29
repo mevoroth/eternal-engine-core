@@ -34,6 +34,7 @@ namespace Eternal
 			const char* TexturePath					= nullptr;
 			const char* LevelPath					= nullptr;
 			const char* PipelineCachePath			= nullptr;
+			const char* MaterialPath				= nullptr;
 		};
 	}
 }
