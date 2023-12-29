@@ -60,7 +60,7 @@ namespace Eternal
 
 			_Timer						= CreateTimer(TimeType::TIME_TYPE_DEFAULT);
 			_Logs						= CreateMultiChannelLog({ LogType::LOG_TYPE_CONSOLE/*, LogType::LOG_TYPE_FILE*/ });
-			_Input						= CreateMultiInput({ InputType::INPUT_TYPE_KEYBOARD, InputType::INPUT_TYPE_DEFAULT_PAD });
+			_Input						= CreateMultiInput({ InputType::INPUT_TYPE_KEYBOARD, InputType::INPUT_TYPE_DEFAULT_PAD, InputType::INPUT_TYPE_MOUSE });
 
 			_Streaming					= new Streaming(_TextureFactory);
 			_Streaming->RegisterLoader(AssetType::ASSET_TYPE_LEVEL, new LevelLoader());
