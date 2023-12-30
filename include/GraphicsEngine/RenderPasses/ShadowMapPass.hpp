@@ -9,6 +9,7 @@ namespace Eternal
 		class ShadowMapPass final : public DepthOnlyPass
 		{
 		public:
+			static constexpr uint32_t ShadowMapPassInstancesCount = 4096u;
 			static const string ShadowMapPassName;
 
 			ShadowMapPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer);

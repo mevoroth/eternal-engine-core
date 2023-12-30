@@ -10,10 +10,11 @@ namespace Eternal
 	{
 		using namespace Eternal::GraphicData;
 
+		constexpr uint32_t OpaquePass::OpaquePassInstancesCount;
 		const string OpaquePass::OpaquePassName = "OpaquePass";
 
 		OpaquePass::OpaquePass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
-			: ObjectPass(InContext, InRenderer)
+			: ObjectPass(InContext, InRenderer, OpaquePassInstancesCount)
 		{
 			GlobalResources& InGlobalResources = InRenderer.GetGlobalResources();
 
@@ -25,9 +26,9 @@ namespace Eternal
 				"OBJECT_NEEDS_UV",			"1"
 			};
 
-			ShaderCreateInformation OpaquePSCreateInformation(ShaderType::SHADER_TYPE_PIXEL, "OpaquePixel", "opaque.pixel.hlsl", Defines);
+			ShaderCreateInformation OpaquePixelCreateInformation(ShaderType::SHADER_TYPE_PIXEL, "OpaquePixel", "opaque.pixel.hlsl", Defines);
 
-			vector<RootSignatureParameter> ParametersVSPS =
+			vector<RootSignatureParameter> ParametersVertexPixel =
 			{
 				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VERTEX),
 				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VERTEX),
@@ -39,7 +40,7 @@ namespace Eternal
 				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_SAMPLER,			RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PIXEL)
 			};
 
-			vector<RootSignatureParameter> ParametersMSPS =
+			vector<RootSignatureParameter> ParametersMeshPixel =
 			{
 				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MESH),
 				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MESH),
@@ -56,7 +57,7 @@ namespace Eternal
 			ObjectPassCreateInformation ObjectPassInformation =
 			{
 				Defines,
-				UseMeshPipeline ? ParametersMSPS : ParametersVSPS,
+				UseMeshPipeline ? ParametersMeshPixel : ParametersVertexPixel,
 				RenderPassCreateInformation(
 					InContext.GetMainViewport(),
 					{
@@ -67,7 +68,7 @@ namespace Eternal
 					},
 					InGlobalResources.GetGBufferDepthStencil().GetRenderTargetDepthStencilView(), RenderTargetOperator::Clear_Store
 				),
-				InContext.GetShader(OpaquePSCreateInformation)
+				InContext.GetShader(OpaquePixelCreateInformation)
 			};
 			_InitializeObjectPass(InContext, ObjectPassInformation);
 		}
@@ -97,8 +98,9 @@ namespace Eternal
 			);
 
 			PerDrawFunctionType PerDrawFunctorOpaque(
-				[this](_In_ Material* InPerDrawMaterial)
+				[this](_In_ Material* InPerDrawMaterial, _In_ Renderer& InRenderer)
 				{
+					(void)InRenderer;
 					InPerDrawMaterial->CommitMaterial(*_ObjectDescriptorTable);
 				}
 			);

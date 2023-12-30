@@ -66,12 +66,11 @@ namespace Eternal
 
 		void DirectLightingPass::Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer)
 		{
-			//GraphicsCommandListScope DirectLightingCommandList = InContext.CreateNewGraphicsCommandList(*_DirectLightingRenderPass, "DirectLighting");
 			CommandListScope DirectLightingCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "DirectLighting");
 
 			const vector<ObjectsList<Light>::InstancedObjects>& Lights = InSystem.GetRenderFrame().Lights;
 			{
-				MapRange LightsBufferMapRange(sizeof(LightInformation) * 1024);
+				MapRange LightsBufferMapRange(sizeof(LightInformation) * (*_DirectLightingLightsBuffer.ResourceBuffer)->GetElementCount());
 				MapScope<LightInformation> LightsBufferMapScope(*_DirectLightingLightsBuffer.ResourceBuffer, LightsBufferMapRange);
 
 				for (uint32_t LightIndex = 0; LightIndex < Lights.size(); ++LightIndex)

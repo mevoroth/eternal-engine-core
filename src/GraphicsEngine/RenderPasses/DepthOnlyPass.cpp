@@ -6,8 +6,8 @@ namespace Eternal
 	{
 		const string DepthOnlyPass::DepthOnlyPassName = "DepthOnlyPass";
 
-		DepthOnlyPass::DepthOnlyPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer, _In_ const Viewport& InDepthOnlyViewport, _In_ View* InDepthStencilView, _In_ View* InDepthOnlyViewConstantBufferView)
-			: ObjectPass(InContext, InRenderer)
+		DepthOnlyPass::DepthOnlyPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer, _In_ uint32_t InInstanceCount, _In_ const Viewport& InDepthOnlyViewport, _In_ View* InDepthStencilView, _In_ View* InDepthOnlyViewConstantBufferView)
+			: ObjectPass(InContext, InRenderer, InInstanceCount)
 			, _DepthOnlyViewport(InDepthOnlyViewport)
 			, _DepthStencilView(InDepthStencilView)
 			, _DepthOnlyViewConstantBufferView(InDepthOnlyViewConstantBufferView)
@@ -32,15 +32,14 @@ namespace Eternal
 				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MESH)
 			};
 
-			ObjectPassCreateInformation ObjectPassInformation =
-			{
+			ObjectPassCreateInformation ObjectPassInformation(
 				Defines,
 				UseMeshPipeline ? ParametersMSPS : ParametersVSPS,
 				RenderPassCreateInformation(
 					InDepthOnlyViewport,
 					_DepthStencilView, RenderTargetOperator::Clear_Store
 				)
-			};
+			);
 			_InitializeObjectPass(InContext, ObjectPassInformation);
 		}
 
@@ -49,6 +48,7 @@ namespace Eternal
 			TransitionFunctionType TransitionFunctorDepthOnly(
 				[this](_In_ CommandList* InObjectCommandList, _In_ Renderer& InRenderer) -> void
 				{
+					(void)InRenderer;
 					ResourceTransition Transitions[] =
 					{
 						ResourceTransition(_DepthStencilView, TransitionState::TRANSITION_DEPTH_STENCIL_WRITE)
@@ -60,16 +60,26 @@ namespace Eternal
 			PerPassFunctionType PerPassFunctorDepthOnly(
 				[this](_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer) -> void
 				{
+					(void)InContext;
+					(void)InRenderer;
 					_ObjectDescriptorTable->SetDescriptor(2, _DepthOnlyViewConstantBufferView);
 				}
 			);
 
 			PerDrawFunctionType PerDrawFunctorDepthOnly(
-				[](_In_ Material* InPerDrawMaterial) {}
+				[](_In_ Material* InPerDrawMaterial, _In_ Renderer& InRenderer)
+				{
+					(void)InPerDrawMaterial;
+					(void)InRenderer;
+				}
 			);
 
 			IsVisibleFunctionType IsVisibleFunctorDepthonly(
-				[](_In_ uint32_t InKey) -> bool { return false; }
+				[](_In_ uint32_t InKey) -> bool
+				{
+					(void)InKey;
+					return false;
+				}
 			);
 
 			_BeginRender(InSystem, InRenderer);

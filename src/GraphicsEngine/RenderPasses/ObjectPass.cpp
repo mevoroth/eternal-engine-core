@@ -20,8 +20,8 @@ namespace Eternal
 			DestroyDescriptorTable(_ObjectDescriptorTable);
 		}
 
-		ObjectPass::ObjectPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
-			: _ObjectPerInstanceBuffer(InContext, "ObjectPerInstanceBuffer", 4096)
+		ObjectPass::ObjectPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer, _In_ uint32_t InInstanceCount)
+			: _ObjectPerInstanceBuffer(InContext, "ObjectPerInstanceBuffer", InInstanceCount)
 		{
 			(void)InRenderer;
 		}
@@ -82,7 +82,8 @@ namespace Eternal
 					_RootSignature,
 					_ObjectRenderPass,
 					OpaqueMesh, InObjectPassCreateInformation.ObjectPixel,
-					DepthStencilTestWriteNone
+					InObjectPassCreateInformation.ObjectDepthStencil,
+					InObjectPassCreateInformation.ObjectRasterizer
 				);
 				_Pipeline = CreatePipeline(InContext, OpaquePipelineCreateInformation);
 			}
@@ -97,7 +98,8 @@ namespace Eternal
 					_ObjectInputLayout,
 					_ObjectRenderPass,
 					OpaqueVertex, InObjectPassCreateInformation.ObjectPixel,
-					DepthStencilTestWriteNone
+					InObjectPassCreateInformation.ObjectDepthStencil,
+					InObjectPassCreateInformation.ObjectRasterizer
 				);
 				_Pipeline = CreatePipeline(InContext, OpaquePipelineCreateInformation);
 			}
@@ -135,10 +137,10 @@ namespace Eternal
 
 			InPerPassFunctor(InContext, InRenderer);
 
-			MapRange PerInstanceBufferMapRange(sizeof(PerInstanceInformation) * 4096);
+			MapRange PerInstanceBufferMapRange(sizeof(PerInstanceInformation) * (*_ObjectPerInstanceBuffer.ResourceBuffer)->GetElementCount());
 			MapScope<PerInstanceInformation> PerInstanceBufferMapScope(*_ObjectPerInstanceBuffer.ResourceBuffer, PerInstanceBufferMapRange);
 
-			MapRange PerDrawInstanceBufferMapRange(sizeof(PerDrawInstanceConstants) * 4096);
+			MapRange PerDrawInstanceBufferMapRange(sizeof(PerDrawInstanceConstants) * (*_ObjectPerDrawInstanceBuffer)->GetElementCount());
 			MapScope<PerDrawInstanceConstants> PerDrawInstanceBufferMapScope(*_ObjectPerDrawInstanceBuffer, PerDrawInstanceBufferMapRange);
 
 			uint32_t PerDrawCount = 0;
@@ -207,7 +209,7 @@ namespace Eternal
 							if (!InIsVisibleFunctor(VisibilityKey++))
 								continue;
 
-							InPerDrawFunctor(DrawInformation.PerDrawMaterial);
+							InPerDrawFunctor(DrawInformation.PerDrawMaterial, InRenderer);
 
 							_ObjectDescriptorTable->SetDescriptor(0, DrawInformation.PerDrawConstantBufferMSVS);
 							ObjectCommandList->SetGraphicsDescriptorTable(InContext, *_ObjectDescriptorTable);

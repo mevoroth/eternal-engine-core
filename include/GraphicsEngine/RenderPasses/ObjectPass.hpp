@@ -18,17 +18,36 @@ namespace Eternal
 
 		using TransitionFunctionType	= std::function<void(_In_ CommandList* InObjectCommandList, _In_ Renderer& InRenderer)>;
 		using PerPassFunctionType		= std::function<void(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)>;
-		using PerDrawFunctionType		= std::function<void(_In_ Material* InPerDrawMaterial)>;
+		using PerDrawFunctionType		= std::function<void(_In_ Material* InPerDrawMaterial, _In_ Renderer& InRenderer)>;
 		using IsVisibleFunctionType		= std::function<bool(_In_ uint32_t InKey)>;
 
 		static constexpr bool UseMeshPipeline = false;
 
 		struct ObjectPassCreateInformation
 		{
+			ObjectPassCreateInformation(
+				_In_ const vector<string>& InDefines,
+				_In_ const vector<RootSignatureParameter>& InRootSignatureParameters,
+				_In_ const RenderPassCreateInformation& InRenderPassInformation,
+				_In_ Shader* InObjectPixel = nullptr,
+				_In_ const Rasterizer& InObjectRasterizer = RasterizerDefault,
+				_In_ const DepthStencil& InObjectDepthStencil = DepthStencilTestWriteNone
+			)
+				: Defines(InDefines)
+				, RootSignatureParameters(InRootSignatureParameters)
+				, RenderPassInformation(InRenderPassInformation)
+				, ObjectPixel(InObjectPixel)
+				, ObjectRasterizer(InObjectRasterizer)
+				, ObjectDepthStencil(InObjectDepthStencil)
+			{
+			}
+
 			const vector<string>&					Defines;
 			const vector<RootSignatureParameter>&	RootSignatureParameters;
 			RenderPassCreateInformation				RenderPassInformation;
-			Shader*									ObjectPixel = nullptr;
+			Shader*									ObjectPixel			= nullptr;
+			const Rasterizer&						ObjectRasterizer	= RasterizerDefault;
+			const DepthStencil&						ObjectDepthStencil	= DepthStencilTestWriteNone;
 		};
 
 		class ObjectPass : public Pass
@@ -39,7 +58,7 @@ namespace Eternal
 
 		protected:
 
-			ObjectPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer);
+			ObjectPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer, _In_ uint32_t InInstanceCount);
 
 			virtual const string& _GetPassName() const = 0;
 			

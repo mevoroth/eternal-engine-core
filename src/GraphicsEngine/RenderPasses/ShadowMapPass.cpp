@@ -7,12 +7,14 @@ namespace Eternal
 {
 	namespace GraphicsEngine
 	{
+		constexpr uint32_t ShadowMapPass::ShadowMapPassInstancesCount;
 		const string ShadowMapPass::ShadowMapPassName = "ShadowMapPass";
 
 		ShadowMapPass::ShadowMapPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 			: DepthOnlyPass(
 				InContext,
 				InRenderer,
+				ShadowMapPassInstancesCount,
 				InRenderer.GetGlobalResources().GetShadowMapViewport(),
 				InRenderer.GetGlobalResources().GetShadowMap().GetRenderTargetDepthStencilView(),
 				InRenderer.GetGlobalResources().GetShadowMapViewConstantBufferView()

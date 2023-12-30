@@ -77,6 +77,9 @@ namespace Eternal
 		{
 			CommandListScope SkyCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "SkyPass");
 
+			ResourceTransition SkyTransition(InRenderer.GetGlobalResources().GetSky().GetShaderResourceView(), TransitionState::TRANSITION_RENDER_TARGET);
+			SkyCommandList->Transition(SkyTransition);
+
 			{
 				const vector<ObjectsList<Light>::InstancedObjects>& Lights = InSystem.GetRenderFrame().Lights;
 

@@ -9,6 +9,7 @@ namespace Eternal
 		class OpaquePass final : public ObjectPass
 		{
 		public:
+			static constexpr uint32_t OpaquePassInstancesCount = 1024u;
 			static const string OpaquePassName;
 
 			OpaquePass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer);
