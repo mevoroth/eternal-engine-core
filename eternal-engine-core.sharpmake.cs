@@ -34,7 +34,7 @@ namespace EternalEngine
 				EternalEngineSettings.FBXSDKPath + @"\include",
 			});
 
-			if (InConfiguration.Platform != Platform.win64 && InConfiguration.Platform != Platform.win32)
+			if (!ExtensionMethods.IsPC(InTarget.Platform))
 			{
 				InConfiguration.IncludePaths.AddRange(new string[] {
 					@"$(SolutionDir)eternal-engine-core\CorePrivate\include",
