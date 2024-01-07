@@ -13,6 +13,7 @@ namespace Eternal
 
 		void MeshComponent::SetMesh(_In_ MeshCollection* InMeshCollection)
 		{
+			ETERNAL_ASSERT(GetWorld());
 			_MeshCollection = InMeshCollection;
 			System& EngineSystem = GetWorld()->GetGame().GetSystem();
 			TransformComponent* Transform = GetParent()->GetComponent<TransformComponent>();
