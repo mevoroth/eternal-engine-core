@@ -136,21 +136,21 @@ namespace Eternal
 			vector<InstancedObjects> PendingObjects;
 
 		private:
-			InstancedObjects* FindOrCreate(_In_ ObjectType* InObject, _In_ vector<InstancedObjects>& InObjects)
+			InstancedObjects* FindOrCreate(_In_ ObjectType* InObject, _Inout_ vector<InstancedObjects>& InOutObjects)
 			{
 				InstancedObjects* CurrentInstancedObjects = nullptr;
-				for (uint32_t ObjectIndex = 0; ObjectIndex < InObjects.size(); ++ObjectIndex)
+				for (uint32_t ObjectIndex = 0; ObjectIndex < InOutObjects.size(); ++ObjectIndex)
 				{
-					if (InObjects[ObjectIndex].Object == InObject)
+					if (InOutObjects[ObjectIndex].Object == InObject)
 					{
-						CurrentInstancedObjects = &InObjects[ObjectIndex];
+						CurrentInstancedObjects = &InOutObjects[ObjectIndex];
 						break;
 					}
 				}
 				if (!CurrentInstancedObjects)
 				{
-					InObjects.push_back({});
-					CurrentInstancedObjects = &InObjects.back();
+					InOutObjects.push_back({});
+					CurrentInstancedObjects = &InOutObjects.back();
 					CurrentInstancedObjects->Object = InObject;
 				}
 				return CurrentInstancedObjects;
