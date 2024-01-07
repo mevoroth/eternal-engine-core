@@ -23,7 +23,7 @@ namespace EternalEngine
 			base.ConfigureAll(InConfiguration, InTarget);
 
 			// Include paths
-			InConfiguration.IncludePaths.Add(new string[] {
+			InConfiguration.IncludePaths.AddRange(new string[] {
 				@"$(SolutionDir)eternal-engine-components\include",
 				@"$(SolutionDir)eternal-engine-graphics\include",
 				@"$(SolutionDir)eternal-engine-extern\imgui",
@@ -33,6 +33,14 @@ namespace EternalEngine
 				EternalEngineSettings.VulkanPath + @"\Include",
 				EternalEngineSettings.FBXSDKPath + @"\include",
 			});
+
+			if (!ExtensionMethods.IsPC(InTarget.Platform))
+			{
+				InConfiguration.IncludePaths.AddRange(new string[] {
+					@"$(SolutionDir)eternal-engine-core\CorePrivate\include",
+					@"$(SolutionDir)eternal-engine-graphics\GraphicsPrivate\include",
+				});
+			}
 
 			InConfiguration.AddPublicDependency<EternalEngineExternProject>(InTarget);
 			InConfiguration.AddPublicDependency<EternalEngineUtilsProject>(InTarget);
