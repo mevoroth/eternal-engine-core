@@ -18,14 +18,10 @@ namespace Eternal
 		{
 			vector<AccelerationStructureGeometry> Geometries;
 			uint32_t GeometryIndex = 0u;
-			uint32_t GeometriesCount = 0u;
-			for (uint32_t MeshIndex = 0, MeshCount = static_cast<uint32_t>(_Payload.LoadedMesh->Meshes.size()); MeshIndex < MeshCount; ++MeshIndex)
-				GeometriesCount += static_cast<uint32_t>(_Payload.LoadedMesh->Meshes[MeshIndex]->GetGPUMesh().PerDrawInformations.size());
-			Geometries.resize(GeometriesCount);
+			Geometries.resize(static_cast<uint32_t>(_Payload.LoadedMesh->Meshes->GetGPUMesh().PerDrawInformations.size()));
 
-			for (uint32_t MeshIndex = 0, MeshCount = static_cast<uint32_t>(_Payload.LoadedMesh->Meshes.size()); MeshIndex < MeshCount; ++MeshIndex)
 			{
-				Mesh* CurrentMesh = _Payload.LoadedMesh->Meshes[MeshIndex];
+				Mesh* CurrentMesh = _Payload.LoadedMesh->Meshes;
 
 				// Vertex buffer
 				uint32_t VerticesCount		= CurrentMesh->GetVerticesCount();

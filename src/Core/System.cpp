@@ -222,13 +222,9 @@ namespace Eternal
 				uint32_t BoundingBoxesCount = 0;
 				for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
 				{
-					vector<Mesh*>& Meshes = MeshCollections[CollectionIndex].Object->Meshes;
+					Mesh*& Meshes = MeshCollections[CollectionIndex].Object->Meshes;
 
-					uint32_t SubMeshCount = 0;
-					for (uint32_t MeshIndex = 0; MeshIndex < Meshes.size(); ++MeshIndex)
-						SubMeshCount += static_cast<uint32_t>(Meshes[MeshIndex]->GetGPUMesh().BoundingBoxes.size());
-
-					BoundingBoxesCount += SubMeshCount * static_cast<uint32_t>(MeshCollections[CollectionIndex].Instances.size());
+					BoundingBoxesCount += static_cast<uint32_t>(Meshes->GetGPUMesh().BoundingBoxes.size()) * static_cast<uint32_t>(MeshCollections[CollectionIndex].Instances.size());
 				}
 
 				if (CurrentGameFrame.MeshCollectionsVisibility.GetBitCount() != BoundingBoxesCount)
@@ -267,25 +263,22 @@ namespace Eternal
 					uint32_t VisibilityIndex = 0;
 					for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
 					{
-						vector<Mesh*>& Meshes = MeshCollections[CollectionIndex].Object->Meshes;
+						Mesh* Meshes = MeshCollections[CollectionIndex].Object->Meshes;
 
 						for (uint32_t InstanceIndex = 0; InstanceIndex < MeshCollections[CollectionIndex].Instances.size(); ++InstanceIndex)
 						{
 							Matrix4x4 LocalToWorld = MeshCollections[CollectionIndex].Instances[InstanceIndex]->GetTransform().GetLocalToWorld();
 
-							for (uint32_t MeshIndex = 0; MeshIndex < Meshes.size(); ++MeshIndex)
-							{
-								vector<AxisAlignedBoundingBox>& CurrentBoundingBoxes = Meshes[MeshIndex]->GetGPUMesh().BoundingBoxes;
+							vector<AxisAlignedBoundingBox>& CurrentBoundingBoxes = Meshes->GetGPUMesh().BoundingBoxes;
 
-								for (uint32_t BoundingBoxIndex = 0; BoundingBoxIndex < CurrentBoundingBoxes.size(); ++BoundingBoxIndex)
-								{
-									bool IsIntersecting = CameraFrustum.Intersect(CurrentBoundingBoxes[BoundingBoxIndex].TransformBy(LocalToWorld));
-									if (IsIntersecting)
-										CurrentRenderFrame.MeshCollectionsVisibility.Set(VisibilityIndex);
-									else
-										CurrentRenderFrame.MeshCollectionsVisibility.Unset(VisibilityIndex);
-									++VisibilityIndex;
-								}
+							for (uint32_t BoundingBoxIndex = 0; BoundingBoxIndex < CurrentBoundingBoxes.size(); ++BoundingBoxIndex)
+							{
+								bool IsIntersecting = CameraFrustum.Intersect(CurrentBoundingBoxes[BoundingBoxIndex].TransformBy(LocalToWorld));
+								if (IsIntersecting)
+									CurrentRenderFrame.MeshCollectionsVisibility.Set(VisibilityIndex);
+								else
+									CurrentRenderFrame.MeshCollectionsVisibility.Unset(VisibilityIndex);
+								++VisibilityIndex;
 							}
 						}
 					}
@@ -313,28 +306,22 @@ namespace Eternal
 					{
 						vector<AccelerationStructureGeometry> Geometries;
 						uint32_t GeometryIndex = 0u;
-						uint32_t GeometriesCount = 0u;
-						for (uint32_t MeshIndex = 0, MeshCount = static_cast<uint32_t>(MeshCollections[CollectionIndex].Object->Meshes.size()); MeshIndex < MeshCount; ++MeshIndex)
-							GeometriesCount += static_cast<uint32_t>(MeshCollections[CollectionIndex].Object->Meshes[MeshIndex]->GetGPUMesh().PerDrawInformations.size());
-						Geometries.resize(GeometriesCount);
+						Geometries.resize(static_cast<uint32_t>(MeshCollections[CollectionIndex].Object->Meshes->GetGPUMesh().PerDrawInformations.size()));
 
-						for (uint32_t MeshIndex = 0; MeshIndex < MeshCollections[CollectionIndex].Object->Meshes.size(); ++MeshIndex)
+						GPUMesh& CurrentGPUMesh = MeshCollections[CollectionIndex].Object->Meshes->GetGPUMesh();
+
+						for (uint32_t DrawIndex = 0; DrawIndex < CurrentGPUMesh.PerDrawInformations.size(); ++DrawIndex)
 						{
-							GPUMesh& CurrentGPUMesh = MeshCollections[CollectionIndex].Object->Meshes[MeshIndex]->GetGPUMesh();
+							GPUMesh::PerDrawInformation& CurrentPerDrawInformation = CurrentGPUMesh.PerDrawInformations[DrawIndex];
 
-							for (uint32_t DrawIndex = 0; DrawIndex < CurrentGPUMesh.PerDrawInformations.size(); ++DrawIndex)
-							{
-								GPUMesh::PerDrawInformation& CurrentPerDrawInformation = CurrentGPUMesh.PerDrawInformations[DrawIndex];
-
-								AccelerationStructureGeometry& CurrentGeometry = Geometries[GeometryIndex++];
-								CurrentGeometry.VertexBuffer	= CurrentGPUMesh.MeshVertexBuffer;
-								CurrentGeometry.IndexBuffer		= CurrentGPUMesh.MeshIndexBuffer;
-								CurrentGeometry.TransformBuffer	= CurrentGPUMesh.MeshConstantBuffer;
-								CurrentGeometry.IndicesCount	= CurrentPerDrawInformation.IndicesCount;
-								CurrentGeometry.IndicesOffset	= CurrentPerDrawInformation.IndicesOffset;
-								CurrentGeometry.VerticesOffset	= CurrentPerDrawInformation.VerticesOffset;
-								CurrentGeometry.TransformsOffet	= DrawIndex;
-							}
+							AccelerationStructureGeometry& CurrentGeometry = Geometries[GeometryIndex++];
+							CurrentGeometry.VertexBuffer	= CurrentGPUMesh.MeshVertexBuffer;
+							CurrentGeometry.IndexBuffer		= CurrentGPUMesh.MeshIndexBuffer;
+							CurrentGeometry.TransformBuffer	= CurrentGPUMesh.MeshConstantBuffer;
+							CurrentGeometry.IndicesCount	= CurrentPerDrawInformation.IndicesCount;
+							CurrentGeometry.IndicesOffset	= CurrentPerDrawInformation.IndicesOffset;
+							CurrentGeometry.VerticesOffset	= CurrentPerDrawInformation.VerticesOffset;
+							CurrentGeometry.TransformsOffet	= DrawIndex;
 						}
 
 						GfxContext.DelayedDelete(CurrentAccelerationStructure);
@@ -438,29 +425,26 @@ namespace Eternal
 						for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
 						{
 							const ObjectsList<MeshCollection>::InstancedObjects& CurrentInstancedObject = MeshCollections[CollectionIndex];
-							vector<Mesh*>& Meshes = CurrentInstancedObject.Object->Meshes;
+							Mesh*& Meshes = CurrentInstancedObject.Object->Meshes;
 
 							for (uint32_t InstanceIndex = 0; InstanceIndex < CurrentInstancedObject.Instances.size(); ++InstanceIndex)
 							{
-								for (uint32_t MeshIndex = 0; MeshIndex < Meshes.size(); ++MeshIndex)
-								{
-									vector<AxisAlignedBoundingBox>& CurrentBoundingBoxes = Meshes[MeshIndex]->GetGPUMesh().BoundingBoxes;
+								vector<AxisAlignedBoundingBox>& CurrentBoundingBoxes = Meshes->GetGPUMesh().BoundingBoxes;
 
-									for (uint32_t BoundingBoxIndex = 0; BoundingBoxIndex < CurrentBoundingBoxes.size(); ++BoundingBoxIndex)
+								for (uint32_t BoundingBoxIndex = 0; BoundingBoxIndex < CurrentBoundingBoxes.size(); ++BoundingBoxIndex)
+								{
+									bool IsIntersecting = CurrentGameFrame.MeshCollectionsVisibility.IsSet(VisibilityIndex);
+									bool ShowBoundingBox = IsIntersecting;// CurrentGameFrame.MeshCollectionsBoundingBoxVisibility.IsSet(VisibilityIndex);
+									char MeshName[255];
+									sprintf_s(MeshName, "[%c] %s %d", IsIntersecting ? 'O' : 'X', Meshes->GetName().c_str(), BoundingBoxIndex);
+									if (ImGui::Checkbox(MeshName, &ShowBoundingBox))
 									{
-										bool IsIntersecting = CurrentGameFrame.MeshCollectionsVisibility.IsSet(VisibilityIndex);
-										bool ShowBoundingBox = IsIntersecting;// CurrentGameFrame.MeshCollectionsBoundingBoxVisibility.IsSet(VisibilityIndex);
-										char MeshName[255];
-										sprintf_s(MeshName, "[%c] %s %d", IsIntersecting ? 'O' : 'X', Meshes[MeshIndex]->GetName().c_str(), BoundingBoxIndex);
-										if (ImGui::Checkbox(MeshName, &ShowBoundingBox))
-										{
-											if (ShowBoundingBox)
-												CurrentGameFrame.MeshCollectionsVisibility.Set(VisibilityIndex);
-											else
-												CurrentGameFrame.MeshCollectionsVisibility.Unset(VisibilityIndex);
-										}
-										++VisibilityIndex;
+										if (ShowBoundingBox)
+											CurrentGameFrame.MeshCollectionsVisibility.Set(VisibilityIndex);
+										else
+											CurrentGameFrame.MeshCollectionsVisibility.Unset(VisibilityIndex);
 									}
+									++VisibilityIndex;
 								}
 							}
 						}

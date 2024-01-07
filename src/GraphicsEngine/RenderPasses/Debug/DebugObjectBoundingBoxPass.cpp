@@ -90,33 +90,30 @@ namespace Eternal
 			for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
 			{
 				const ObjectsList<MeshCollection>::InstancedObjects& CurrentInstancedObject = MeshCollections[CollectionIndex];
-				vector<Mesh*>& Meshes = CurrentInstancedObject.Object->Meshes;
+				Mesh* Meshes = CurrentInstancedObject.Object->Meshes;
 
 				uint32_t InstancesCount = static_cast<uint32_t>(CurrentInstancedObject.Instances.size());
 				for (uint32_t InstanceIndex = 0; InstanceIndex < InstancesCount; ++InstanceIndex)
 				{
 					Matrix4x4 LocalToWorld = CurrentInstancedObject.Instances[InstanceIndex]->GetTransform().GetLocalToWorld();
 
-					for (uint32_t MeshIndex = 0; MeshIndex < Meshes.size(); ++MeshIndex)
+					GPUMesh& CurrentGPUMesh = Meshes->GetGPUMesh();
+					vector<AxisAlignedBoundingBox>& CurrentBoundingBoxes = CurrentGPUMesh.BoundingBoxes;
+
+					for (uint32_t BoundingBoxIndex = 0; BoundingBoxIndex < CurrentBoundingBoxes.size(); ++BoundingBoxIndex)
 					{
-						GPUMesh& CurrentGPUMesh = Meshes[MeshIndex]->GetGPUMesh();
-						vector<AxisAlignedBoundingBox>& CurrentBoundingBoxes = CurrentGPUMesh.BoundingBoxes;
-
-						for (uint32_t BoundingBoxIndex = 0; BoundingBoxIndex < CurrentBoundingBoxes.size(); ++BoundingBoxIndex)
+						if (CurrentFrame.MeshCollectionsVisibility.IsSet(VisibilityCount))
 						{
-							if (CurrentFrame.MeshCollectionsVisibility.IsSet(VisibilityCount))
-							{
-								AxisAlignedBoundingBox CurrentBoundingBox = CurrentBoundingBoxes[BoundingBoxIndex];
+							AxisAlignedBoundingBox CurrentBoundingBox = CurrentBoundingBoxes[BoundingBoxIndex];
 
-								DebugObjectBoundingBoxPerInstanceBufferMapScope[BoundingBoxPerInstanceCount].InstanceWorldToWorld	= LocalToWorld;
-								DebugObjectBoundingBoxPerInstanceBufferMapScope[BoundingBoxPerInstanceCount].CubeOrigin				= CurrentBoundingBox.GetOrigin();
-								DebugObjectBoundingBoxPerInstanceBufferMapScope[BoundingBoxPerInstanceCount].CubeExtent				= CurrentBoundingBox.GetExtent();
+							DebugObjectBoundingBoxPerInstanceBufferMapScope[BoundingBoxPerInstanceCount].InstanceWorldToWorld	= LocalToWorld;
+							DebugObjectBoundingBoxPerInstanceBufferMapScope[BoundingBoxPerInstanceCount].CubeOrigin				= CurrentBoundingBox.GetOrigin();
+							DebugObjectBoundingBoxPerInstanceBufferMapScope[BoundingBoxPerInstanceCount].CubeExtent				= CurrentBoundingBox.GetExtent();
 
-								++BoundingBoxPerInstanceCount;
-							}
-
-							++VisibilityCount;
+							++BoundingBoxPerInstanceCount;
 						}
+
+						++VisibilityCount;
 					}
 				}
 			}

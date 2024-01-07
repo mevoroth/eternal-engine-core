@@ -157,7 +157,7 @@ namespace Eternal
 
 			for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
 			{
-				vector<Mesh*>& Meshes = MeshCollections[CollectionIndex].Object->Meshes;
+				Mesh*& Meshes = MeshCollections[CollectionIndex].Object->Meshes;
 				
 				PerDrawInstanceBufferMapScope[CollectionIndex].InstanceStart		= DrawInstanceCount;
 
@@ -184,48 +184,45 @@ namespace Eternal
 					);
 					_ObjectDescriptorTable->SetDescriptor(1, ObjectPerDrawInstanceBufferView);
 
-					for (uint32_t MeshIndex = 0; MeshIndex < Meshes.size(); ++MeshIndex)
+					GPUMesh& CurrentGPUMesh = Meshes->GetGPUMesh();
+					if (!CurrentGPUMesh.MeshIndexBuffer)
+						continue;
+
+					const Resource* MeshVertexBuffer = CurrentGPUMesh.MeshVertexBuffer;
+					if (UseMeshPipeline)
 					{
-						GPUMesh& CurrentGPUMesh = Meshes[MeshIndex]->GetGPUMesh();
-						if (!CurrentGPUMesh.MeshIndexBuffer)
+						_ObjectDescriptorTable->SetDescriptor(7, CurrentGPUMesh.MeshVertexStructuredBufferView);
+						_ObjectDescriptorTable->SetDescriptor(8, CurrentGPUMesh.MeshIndexStructuredBufferView);
+					}
+					else
+					{
+						ObjectCommandList->SetIndexBuffer(*CurrentGPUMesh.MeshIndexBuffer);
+						ObjectCommandList->SetVertexBuffers(&MeshVertexBuffer);
+					}
+
+					for (uint32_t DrawIndex = 0; DrawIndex < CurrentGPUMesh.PerDrawInformations.size(); ++DrawIndex)
+					{
+						GPUMesh::PerDrawInformation& DrawInformation = CurrentGPUMesh.PerDrawInformations[DrawIndex];
+
+						if (!InIsVisibleFunctor(VisibilityKey++))
 							continue;
 
-						const Resource* MeshVertexBuffer = CurrentGPUMesh.MeshVertexBuffer;
+						InPerDrawFunctor(DrawInformation.PerDrawMaterial, InRenderer);
+
+						_ObjectDescriptorTable->SetDescriptor(0, DrawInformation.PerDrawConstantBufferMSVS);
+						ObjectCommandList->SetGraphicsDescriptorTable(InContext, *_ObjectDescriptorTable);
 						if (UseMeshPipeline)
 						{
-							_ObjectDescriptorTable->SetDescriptor(7, CurrentGPUMesh.MeshVertexStructuredBufferView);
-							_ObjectDescriptorTable->SetDescriptor(8, CurrentGPUMesh.MeshIndexStructuredBufferView);
+							ObjectCommandList->DispatchMesh();
 						}
 						else
 						{
-							ObjectCommandList->SetIndexBuffer(*CurrentGPUMesh.MeshIndexBuffer);
-							ObjectCommandList->SetVertexBuffers(&MeshVertexBuffer);
-						}
-
-						for (uint32_t DrawIndex = 0; DrawIndex < CurrentGPUMesh.PerDrawInformations.size(); ++DrawIndex)
-						{
-							GPUMesh::PerDrawInformation& DrawInformation = CurrentGPUMesh.PerDrawInformations[DrawIndex];
-
-							if (!InIsVisibleFunctor(VisibilityKey++))
-								continue;
-
-							InPerDrawFunctor(DrawInformation.PerDrawMaterial, InRenderer);
-
-							_ObjectDescriptorTable->SetDescriptor(0, DrawInformation.PerDrawConstantBufferMSVS);
-							ObjectCommandList->SetGraphicsDescriptorTable(InContext, *_ObjectDescriptorTable);
-							if (UseMeshPipeline)
-							{
-								ObjectCommandList->DispatchMesh();
-							}
-							else
-							{
-								ObjectCommandList->DrawIndexedInstanced(
-									DrawInformation.IndicesCount,
-									1,
-									DrawInformation.IndicesOffset,
-									DrawInformation.VerticesOffset
-								);
-							}
+							ObjectCommandList->DrawIndexedInstanced(
+								DrawInformation.IndicesCount,
+								1,
+								DrawInformation.IndicesOffset,
+								DrawInformation.VerticesOffset
+							);
 						}
 					}
 				}
