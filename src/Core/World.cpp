@@ -3,6 +3,7 @@
 #include "Components/TransformComponent.hpp"
 #include "Components/CameraComponent.hpp"
 #include "Components/LightComponent.hpp"
+#include "Components/MeshComponent.hpp"
 
 namespace Eternal
 {
@@ -33,6 +34,7 @@ namespace Eternal
 			ComponentPool<TransformComponent>::Update(InDeltaSeconds);
 			ComponentPool<CameraComponent>::Update(InDeltaSeconds);
 			ComponentPool<LightComponent>::Update(InDeltaSeconds);
+			ComponentPool<MeshComponent>::Update(InDeltaSeconds);
 		}
 
 		void World::UpdateDebug()
