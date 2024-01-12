@@ -20,6 +20,7 @@ namespace Eternal
 				InRenderer.GetGlobalResources().GetShadowMapViewConstantBufferView()
 			)
 		{
+			_ObjectBucket = MaterialType::MATERIAL_TYPE_OPAQUE;
 		}
 
 		void ShadowMapPass::_BeginRender(_In_ System& InSystem, _In_ Renderer& InRenderer)

@@ -10,6 +10,8 @@ namespace Eternal
 		DistantObjectPass::DistantObjectPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 			: ObjectPass(InContext, InRenderer, DistantObjectInstancesCount)
 		{
+			_ObjectBucket = MaterialType::MATERIAL_TYPE_DISTANT;
+
 			GlobalResources& InGlobalResources = InRenderer.GetGlobalResources();
 
 			vector<string> Defines =

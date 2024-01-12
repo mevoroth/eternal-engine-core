@@ -16,6 +16,8 @@ namespace Eternal
 		OpaquePass::OpaquePass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 			: ObjectPass(InContext, InRenderer, OpaquePassInstancesCount)
 		{
+			_ObjectBucket = MaterialType::MATERIAL_TYPE_OPAQUE;
+
 			GlobalResources& InGlobalResources = InRenderer.GetGlobalResources();
 
 			vector<string> Defines =

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GraphicsEngine/Pass.hpp"
+#include "Material/MaterialType.hpp"
 #include "ShadersReflection/HLSLPerDrawConstants.hpp"
 #include "ShadersReflection/HLSLPerInstanceInformation.hpp"
 #include <functional>
@@ -84,6 +85,7 @@ namespace Eternal
 			DescriptorTable*							_ObjectDescriptorTable				= nullptr;
 			MultiBuffered<Resource>*					_ObjectPerDrawInstanceBuffer		= nullptr;
 			StructuredBuffer<PerInstanceInformation>	_ObjectPerInstanceBuffer;
+			MaterialType								_ObjectBucket						= Components::MaterialType::MATERIAL_TYPE_COUNT;
 		};
 	}
 }
