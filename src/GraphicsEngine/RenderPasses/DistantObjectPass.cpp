@@ -49,12 +49,13 @@ namespace Eternal
 				RenderPassCreateInformation(
 					InContext.GetMainViewport(),
 					{
-						RenderTargetInformation(BlendStateAdditive, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferLuminance().GetRenderTargetDepthStencilView())
+						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferLuminance().GetRenderTargetDepthStencilView())
 					},
 					InGlobalResources.GetGBufferDepthStencil().GetRenderTargetDepthStencilView(), RenderTargetOperator::NoLoad_NoStore
 				),
 				InContext.GetShader(DistantPixelCreateInformation),
-				Rasterizer(CullMode::CULL_MODE_FRONT)
+				Rasterizer(CullMode::CULL_MODE_FRONT),
+				DepthStencilTestNone
 			);
 			_InitializeObjectPass(InContext, ObjectPassInformation);
 		}
