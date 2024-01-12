@@ -55,6 +55,7 @@ namespace Eternal
 		void Renderer::Render(_In_ GraphicsContext& InContext, _In_ System& InSystem)
 		{
 			ETERNAL_PROFILER(BASIC)("Frame");
+			_StencilTracker.Validate();
 			if (_GlobalResources->BeginRender(InContext, InSystem))
 			{
 				for (uint32_t PassIndex = 0; PassIndex < _Passes.size(); ++PassIndex)
@@ -67,6 +68,7 @@ namespace Eternal
 
 		void Renderer::Present(_In_ GraphicsContext& InContext, _In_ System& InSystem)
 		{
+			_StencilTracker.Validate();
 			_PresentPass->Render(InContext, InSystem, *this);
 		}
 

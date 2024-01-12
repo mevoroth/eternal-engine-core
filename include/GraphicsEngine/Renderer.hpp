@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include "NextGenGraphics/StencilTracker.hpp"
 
 namespace Eternal
 {
@@ -45,8 +46,11 @@ namespace Eternal
 				return *_GlobalResources;
 			}
 
+			StencilTracker& GetStencilTracker() { return _StencilTracker; }
+
 		private:
 
+			StencilTracker		_StencilTracker;
 			GlobalResources*	_GlobalResources	= nullptr;
 			vector<Pass*>		_Passes;
 			Pass*				_PresentPass		= nullptr;
