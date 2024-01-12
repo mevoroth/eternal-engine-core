@@ -13,6 +13,8 @@ namespace Eternal
 {
 	namespace Core
 	{
+		static ComponentPool<LightComponent> LightComponentsPool;
+
 		void LightOnTransformChanged::OnTransformChanged(_In_ const Transform& InTransform)
 		{
 			_LightComponent->GetLight().UpdateWorldToView(InTransform);
