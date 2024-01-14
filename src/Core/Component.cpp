@@ -1,6 +1,8 @@
 #include "Core/Component.hpp"
 #include "Core/GameObject.hpp"
 #include "Core/World.hpp"
+#include "Parallel/AtomicS32Factory.hpp"
+#include "Parallel/AtomicGuard.hpp"
 
 #include "Components/TransformComponent.hpp"
 #include "Components/CameraComponent.hpp"
@@ -23,6 +25,7 @@ namespace Eternal
 		template<typename ComponentType> bool ComponentPool<ComponentType>::IsInitialized = false;
 		template<typename ComponentType> vector<ComponentType*> ComponentPool<ComponentType>::_ComponentsAdded;
 		template<typename ComponentType> vector<ComponentType*> ComponentPool<ComponentType>::_ComponentsToUpdate;
+		template<typename ComponentType> AtomicS32* ComponentPool<ComponentType>::_ComponentsAddedGuard = nullptr;
 
 		template<typename ComponentType>
 		ComponentPool<ComponentType>::ComponentPool()
@@ -30,23 +33,35 @@ namespace Eternal
 			ETERNAL_ASSERT(!IsInitialized);
 			_ComponentsAdded.reserve(World::ComponentsAddedCountInitialPool);
 			_ComponentsToUpdate.reserve(World::ComponentsToUpdateCountInitialPool);
+			_ComponentsAddedGuard = CreateAtomicS32();
 			IsInitialized = true;
+		}
+
+		template<typename ComponentType>
+		ComponentPool<ComponentType>::~ComponentPool()
+		{
+			DestroyAtomicS32(_ComponentsAddedGuard);
 		}
 
 		template<typename ComponentType>
 		void ComponentPool<ComponentType>::OnAddComponent(_In_ ComponentType* InComponent)
 		{
+			ETERNAL_ASSERT(IsInitialized);
+			AtomicGuard AddComponentGuard(_ComponentsAddedGuard);
 			_ComponentsAdded.push_back(InComponent);
 		}
 
 		template<typename ComponentType>
 		void ComponentPool<ComponentType>::OnRemoveComponent()
 		{
+			ETERNAL_ASSERT(IsInitialized);
 		}
 
 		template<typename ComponentType>
 		void ComponentPool<ComponentType>::Update(_In_ TimeSecondsT InDeltaSeconds)
 		{
+			ETERNAL_ASSERT(IsInitialized);
+			AtomicGuard AddComponentGuard(_ComponentsAddedGuard);
 			uint32_t ComponentsCount = static_cast<uint32_t>(_ComponentsAdded.size());
 			for (uint32_t ComponentIndex = 0; ComponentIndex < ComponentsCount; ++ComponentIndex)
 			{

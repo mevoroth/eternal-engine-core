@@ -2,6 +2,7 @@
 
 #include "NextGenGraphics/FrameGraph.hpp"
 #include <vector>
+#include "NextGenGraphics/StencilTracker.hpp"
 
 namespace Eternal
 {
@@ -48,9 +49,12 @@ namespace Eternal
 				return *_GlobalResources;
 			}
 
+			StencilTracker& GetStencilTracker() { return _StencilTracker; }
+
 		private:
 
 			FrameGraph			_FrameGraph;
+			StencilTracker		_StencilTracker;
 			GlobalResources*	_GlobalResources	= nullptr;
 			vector<Pass*>		_Passes;
 			Pass*				_PresentPass		= nullptr;

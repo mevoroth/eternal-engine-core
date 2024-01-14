@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/WorldObject.hpp"
+#include "Parallel/AtomicS32.hpp"
 #include <vector>
 
 namespace Eternal
@@ -14,11 +15,13 @@ namespace Eternal
 	{
 		using namespace std;
 		using namespace Eternal::Time;
+		using namespace Eternal::Parallel;
 
 		template<typename ComponentType>
 		struct ComponentPool
 		{
 			ComponentPool();
+			~ComponentPool();
 
 			static void OnAddComponent(_In_ ComponentType* InComponent);
 			static void OnRemoveComponent();
@@ -27,6 +30,7 @@ namespace Eternal
 			static bool IsInitialized;
 			static vector<ComponentType*> _ComponentsAdded;
 			static vector<ComponentType*> _ComponentsToUpdate;
+			static AtomicS32* _ComponentsAddedGuard;
 		};
 
 		class Component : public WorldObject

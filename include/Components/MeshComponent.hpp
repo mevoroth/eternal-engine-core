@@ -13,9 +13,9 @@ namespace Eternal
 		{
 		public:
 
-			MeshComponent() {}
+			MeshComponent();
 
-			void Begin() {}
+			void Begin();
 			void Update(_In_ TimeSecondsT InDeltaSeconds)
 			{
 				(void)InDeltaSeconds;

@@ -20,6 +20,7 @@ namespace Eternal
 				InRenderer.GetGlobalResources().GetShadowMapViewConstantBufferView()
 			)
 		{
+			_ObjectBucket = MaterialType::MATERIAL_TYPE_OPAQUE;
 		}
 
 		void ShadowMapPass::GetInputs(_Out_ FrameGraphPassInputs& OutInputs) const

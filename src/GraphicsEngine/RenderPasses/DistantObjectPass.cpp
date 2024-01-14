@@ -10,6 +10,8 @@ namespace Eternal
 		DistantObjectPass::DistantObjectPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 			: ObjectPass(InContext, InRenderer, DistantObjectInstancesCount)
 		{
+			_ObjectBucket = MaterialType::MATERIAL_TYPE_DISTANT;
+
 			GlobalResources& InGlobalResources = InRenderer.GetGlobalResources();
 
 			vector<string> Defines =
@@ -47,12 +49,13 @@ namespace Eternal
 				RenderPassCreateInformation(
 					InContext.GetMainViewport(),
 					{
-						RenderTargetInformation(BlendStateAdditive, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferLuminance().GetRenderTargetDepthStencilView())
+						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferLuminance().GetRenderTargetDepthStencilView())
 					},
 					InGlobalResources.GetGBufferDepthStencil().GetRenderTargetDepthStencilView(), RenderTargetOperator::NoLoad_NoStore
 				),
 				InContext.GetShader(DistantPixelCreateInformation),
-				RasterizerCullFront
+				RasterizerCullFront,
+				DepthStencilTestNone
 			);
 			_InitializeObjectPass(InContext, ObjectPassInformation);
 		}

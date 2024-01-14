@@ -11,13 +11,23 @@ namespace Eternal
 	{
 		static ComponentPool<MeshComponent> MeshComponentsPool;
 
-		void MeshComponent::SetMesh(_In_ MeshCollection* InMeshCollection)
+		MeshComponent::MeshComponent()
 		{
-			ETERNAL_ASSERT(GetWorld());
-			_MeshCollection = InMeshCollection;
+		}
+
+		void MeshComponent::Begin()
+		{
 			System& EngineSystem = GetWorld()->GetGame().GetSystem();
 			TransformComponent* Transform = GetParent()->GetComponent<TransformComponent>();
-			EngineSystem.GetGameFrame().MeshCollections.AddObject(InMeshCollection, Transform);
+			ETERNAL_ASSERT(_MeshCollection);
+			EngineSystem.GetGameFrame().MeshCollections.AddObject(_MeshCollection, Transform);
+		}
+
+		void MeshComponent::SetMesh(_In_ MeshCollection* InMeshCollection)
+		{
+			_MeshCollection = InMeshCollection;
+			ComponentPool<MeshComponent>::OnAddComponent(this);
+			SetHasBehavior();
 		}
 	}
 }

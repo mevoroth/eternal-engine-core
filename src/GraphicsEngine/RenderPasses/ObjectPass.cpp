@@ -123,6 +123,8 @@ namespace Eternal
 		{
 			ETERNAL_PROFILER(BASIC)();
 
+			ETERNAL_ASSERT(_ObjectBucket != MaterialType::MATERIAL_TYPE_COUNT);
+
 			const vector<ObjectsList<MeshCollection>::InstancedObjects>& MeshCollections = InSystem.GetRenderFrame().MeshCollections;
 			
 			if (MeshCollections.size() == 0 || !Material::DefaultMaterial->IsValid(TextureType::TEXTURE_TYPE_DIFFUSE))
@@ -157,7 +159,8 @@ namespace Eternal
 
 			for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
 			{
-				Mesh*& Meshes = MeshCollections[CollectionIndex].Object->Meshes;
+				Mesh*& Meshes					= MeshCollections[CollectionIndex].Object->Meshes;
+				const vector<uint16_t>& Bucket	= MeshCollections[CollectionIndex].Object->RenderBuckets[static_cast<uint32_t>(_ObjectBucket)];
 				
 				PerDrawInstanceBufferMapScope[CollectionIndex].InstanceStart		= DrawInstanceCount;
 
@@ -200,9 +203,9 @@ namespace Eternal
 						ObjectCommandList->SetVertexBuffers(&MeshVertexBuffer);
 					}
 
-					for (uint32_t DrawIndex = 0; DrawIndex < CurrentGPUMesh.PerDrawInformations.size(); ++DrawIndex)
+					for (uint16_t DrawIndex = 0; DrawIndex < Bucket.size(); ++DrawIndex)
 					{
-						GPUMesh::PerDrawInformation& DrawInformation = CurrentGPUMesh.PerDrawInformations[DrawIndex];
+						GPUMesh::PerDrawInformation& DrawInformation = CurrentGPUMesh.PerDrawInformations[Bucket[DrawIndex]];
 
 						if (!InIsVisibleFunctor(VisibilityKey++))
 							continue;
