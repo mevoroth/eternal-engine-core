@@ -19,6 +19,8 @@ namespace Eternal
 	{
 		using namespace Eternal::GraphicData;
 
+		constexpr bool Renderer::UseFrameGraph;
+
 		static void DestroyPass(_Inout_ Pass*& InOutPass)
 		{
 			delete InOutPass;
@@ -41,6 +43,16 @@ namespace Eternal
 			})
 			, _PresentPass(new PresentPass(InContext, *this))
 		{
+			Pass::RegisterRenderer(this);
+
+			if (UseFrameGraph)
+			{
+				for (uint32_t PassIndex = 0; PassIndex < _Passes.size(); ++PassIndex)
+				{
+					if (_Passes[PassIndex]->CanRenderPass())
+						_FrameGraph.RegisterGraphPass(_Passes[PassIndex]);
+				}
+			}
 		}
 
 		Renderer::~Renderer()
@@ -57,10 +69,22 @@ namespace Eternal
 			ETERNAL_PROFILER(BASIC)("Frame");
 			if (_GlobalResources->BeginRender(InContext, InSystem))
 			{
-				for (uint32_t PassIndex = 0; PassIndex < _Passes.size(); ++PassIndex)
+				if (UseFrameGraph)
 				{
-					if (_Passes[PassIndex]->CanRenderPass())
-						_Passes[PassIndex]->Render(InContext, InSystem, *this);
+					_FrameGraph.RunGraph(
+						[this, &InContext, &InSystem](_In_ FrameGraphPass* InPass)
+						{
+							static_cast<Pass*>(InPass)->Render(InContext, InSystem, *this);
+						}
+					);
+				}
+				else
+				{
+					for (uint32_t PassIndex = 0; PassIndex < _Passes.size(); ++PassIndex)
+					{
+						if (_Passes[PassIndex]->CanRenderPass())
+							_Passes[PassIndex]->Render(InContext, InSystem, *this);
+					}
 				}
 			}
 		}

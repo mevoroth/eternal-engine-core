@@ -4,6 +4,14 @@ namespace Eternal
 {
 	namespace GraphicsEngine
 	{
+		Renderer* Pass::StaticRenderer = nullptr;
+
+		void Pass::RegisterRenderer(_In_ Renderer* InRenderer)
+		{
+			ETERNAL_ASSERT(!StaticRenderer);
+			StaticRenderer = InRenderer;
+		}
+
 		Pass::~Pass()
 		{
 			DestroyPipeline(_Pipeline);

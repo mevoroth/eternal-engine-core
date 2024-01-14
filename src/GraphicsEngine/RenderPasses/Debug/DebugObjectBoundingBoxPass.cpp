@@ -121,5 +121,18 @@ namespace Eternal
 			DebugObjectBoundingBoxCommandList->DrawInstanced(24, BoundingBoxPerInstanceCount);
 			DebugObjectBoundingBoxCommandList->EndRenderPass();
 		}
+
+		void DebugObjectBoundingBoxPass::GetInputs(_Out_ FrameGraphPassInputs& OutInputs) const
+		{
+			(void)OutInputs;
+		}
+
+		void DebugObjectBoundingBoxPass::GetOutputs(_Out_ FrameGraphPassOutputs& OutOutputs) const
+		{
+			OutOutputs.OutputViews[&StaticRenderer->GetGlobalResources().GetGBufferLuminance().GetTexture()] = {
+				StaticRenderer->GetGlobalResources().GetGBufferLuminance().GetRenderTargetDepthStencilView(),
+				TransitionState::TRANSITION_DEPTH_STENCIL_WRITE
+			};
+		}
 	}
 }

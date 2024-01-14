@@ -62,5 +62,21 @@ namespace Eternal
 			RayTracedReflectionsCommandList->SetRayTracingDescriptorTable(InContext, *_RayTracedReflectionsDescriptorTable);
 			RayTracedReflectionsCommandList->DispatchRays(*_RayTracedReflectionsShaderTable, InContext.GetOutputDevice().GetWidth(), InContext.GetOutputDevice().GetHeight());
 		}
+
+		void RayTracedReflectionsPass::GetInputs(_Out_ FrameGraphPassInputs& OutInputs) const
+		{
+			OutInputs.InputViews = {
+				StaticRenderer->GetGlobalResources().GetGBufferDepthStencil().GetShaderResourceView(),
+				StaticRenderer->GetGlobalResources().GetGBufferNormals().GetShaderResourceView()
+			};
+		}
+
+		void RayTracedReflectionsPass::GetOutputs(_Out_ FrameGraphPassOutputs& OutOutputs) const
+		{
+			OutOutputs.OutputViews[&StaticRenderer->GetGlobalResources().GetGBufferLuminance().GetTexture()] = {
+				StaticRenderer->GetGlobalResources().GetGBufferLuminance().GetUnorderedAccessView(),
+				TransitionState::TRANSITION_SHADER_WRITE
+			};
+		}
 	}
 }

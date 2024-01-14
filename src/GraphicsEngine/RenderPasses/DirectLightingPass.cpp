@@ -117,5 +117,23 @@ namespace Eternal
 				DirectLightingCommandList->EndRenderPass();
 			}
 		}
+
+		void DirectLightingPass::GetInputs(_Out_ FrameGraphPassInputs& OutInputs) const
+		{
+			OutInputs.InputViews = {
+				StaticRenderer->GetGlobalResources().GetGBufferDepthStencil().GetShaderResourceView(),
+				StaticRenderer->GetGlobalResources().GetGBufferAlbedo().GetShaderResourceView(),
+				StaticRenderer->GetGlobalResources().GetGBufferNormals().GetShaderResourceView(),
+				StaticRenderer->GetGlobalResources().GetGBufferRoughnessMetallicSpecular().GetShaderResourceView()
+			};
+		}
+
+		void DirectLightingPass::GetOutputs(_Out_ FrameGraphPassOutputs& OutOutputs) const
+		{
+			OutOutputs.OutputViews[&StaticRenderer->GetGlobalResources().GetGBufferLuminance().GetTexture()] = {
+				StaticRenderer->GetGlobalResources().GetGBufferLuminance().GetRenderTargetDepthStencilView(),
+				TransitionState::TRANSITION_DEPTH_STENCIL_WRITE
+			};
+		}
 	}
 }

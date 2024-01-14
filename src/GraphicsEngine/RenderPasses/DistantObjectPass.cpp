@@ -52,7 +52,7 @@ namespace Eternal
 					InGlobalResources.GetGBufferDepthStencil().GetRenderTargetDepthStencilView(), RenderTargetOperator::NoLoad_NoStore
 				),
 				InContext.GetShader(DistantPixelCreateInformation),
-				Rasterizer(CullMode::CULL_MODE_FRONT)
+				RasterizerCullFront
 			);
 			_InitializeObjectPass(InContext, ObjectPassInformation);
 		}
@@ -106,6 +106,23 @@ namespace Eternal
 				PerDrawFunctorOpaque,
 				IsVisibleFunctorOpaque
 			);
+		}
+
+		void DistantObjectPass::GetInputs(_Out_ FrameGraphPassInputs& OutInputs) const
+		{
+			OutInputs.InputViews.push_back(StaticRenderer->GetGlobalResources().GetSky().GetShaderResourceView());
+		}
+
+		void DistantObjectPass::GetOutputs(_Out_ FrameGraphPassOutputs& OutOutputs) const
+		{
+			OutOutputs.OutputViews[&StaticRenderer->GetGlobalResources().GetGBufferLuminance().GetTexture()] = {
+				StaticRenderer->GetGlobalResources().GetGBufferLuminance().GetRenderTargetDepthStencilView(),
+				TransitionState::TRANSITION_RENDER_TARGET
+			};
+			OutOutputs.OutputViews[&StaticRenderer->GetGlobalResources().GetGBufferDepthStencil().GetTexture()] = {
+				StaticRenderer->GetGlobalResources().GetGBufferDepthStencil().GetRenderTargetDepthStencilView(),
+				TransitionState::TRANSITION_DEPTH_STENCIL_WRITE
+			};
 		}
 
 		const string& DistantObjectPass::_GetPassName() const

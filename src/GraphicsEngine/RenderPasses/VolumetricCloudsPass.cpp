@@ -126,5 +126,18 @@ namespace Eternal
 				ImGui::TreePop();
 			}
 		}
+
+		void VolumetricCloudsPass::GetInputs(_Out_ FrameGraphPassInputs& OutInputs) const
+		{
+			OutInputs.InputViews.push_back(StaticRenderer->GetGlobalResources().GetGBufferDepthStencil().GetShaderResourceView());
+		}
+
+		void VolumetricCloudsPass::GetOutputs(_Out_ FrameGraphPassOutputs& OutOutputs) const
+		{
+			OutOutputs.OutputViews[&StaticRenderer->GetGlobalResources().GetGBufferLuminance().GetTexture()] = {
+				StaticRenderer->GetGlobalResources().GetGBufferLuminance().GetUnorderedAccessView(),
+				TransitionState::TRANSITION_SHADER_WRITE
+			};
+		}
 	}
 }

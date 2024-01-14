@@ -14,6 +14,9 @@ namespace Eternal
 
 			ShadowMapPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer);
 
+			virtual void GetInputs(_Out_ FrameGraphPassInputs& OutInputs) const override;
+			virtual void GetOutputs(_Out_ FrameGraphPassOutputs& OutOutputs) const override;
+
 		protected:
 			virtual const string& _GetPassName() const override final;
 

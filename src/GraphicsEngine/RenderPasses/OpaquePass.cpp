@@ -124,6 +124,33 @@ namespace Eternal
 			);
 		}
 
+		void OpaquePass::GetInputs(_Out_ FrameGraphPassInputs& OutInputs) const
+		{
+			(void)OutInputs;
+		}
+
+		void OpaquePass::GetOutputs(_Out_ FrameGraphPassOutputs& OutOutputs) const
+		{
+			GlobalResources& Resources = StaticRenderer->GetGlobalResources();
+
+			OutOutputs.OutputViews[&Resources.GetGBufferLuminance().GetTexture()] = {
+				Resources.GetGBufferLuminance().GetRenderTargetDepthStencilView(),
+				TransitionState::TRANSITION_RENDER_TARGET
+			};
+			OutOutputs.OutputViews[&Resources.GetGBufferNormals().GetTexture()] = {
+				StaticRenderer->GetGlobalResources().GetGBufferNormals().GetRenderTargetDepthStencilView(),
+				TransitionState::TRANSITION_RENDER_TARGET
+			};
+			OutOutputs.OutputViews[&Resources.GetGBufferRoughnessMetallicSpecular().GetTexture()] = {
+				StaticRenderer->GetGlobalResources().GetGBufferRoughnessMetallicSpecular().GetRenderTargetDepthStencilView(),
+				TransitionState::TRANSITION_RENDER_TARGET
+			};
+			OutOutputs.OutputViews[&Resources.GetGBufferDepthStencil().GetTexture()] = {
+				StaticRenderer->GetGlobalResources().GetGBufferDepthStencil().GetRenderTargetDepthStencilView(),
+				TransitionState::TRANSITION_DEPTH_STENCIL_WRITE
+			};
+		}
+
 		const string& OpaquePass::_GetPassName() const
 		{
 			return OpaquePassName;

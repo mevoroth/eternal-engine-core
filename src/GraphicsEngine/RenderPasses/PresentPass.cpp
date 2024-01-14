@@ -6,6 +6,8 @@ namespace Eternal
 	{
 		PresentPass::PresentPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 		{
+			(void)InRenderer;
+
 			Shader* ScreenVertex		= InContext.GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_VERTEX, "ScreenVertex", "screen.vertex.hlsl"));
 			Shader* SampleTexturePixel	= InContext.GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_PIXEL, "SampleTexturePixel", "sampletexture.pixel.hlsl"));
 
@@ -57,6 +59,16 @@ namespace Eternal
 				PresentCommandList->DrawInstanced(6);
 				PresentCommandList->EndRenderPass();
 			}
+		}
+
+		void PresentPass::GetInputs(_Out_ FrameGraphPassInputs& OutInputs) const
+		{
+			(void)OutInputs;
+		}
+
+		void PresentPass::GetOutputs(_Out_ FrameGraphPassOutputs& OutOutputs) const
+		{
+			(void)OutOutputs;
 		}
 	}
 }

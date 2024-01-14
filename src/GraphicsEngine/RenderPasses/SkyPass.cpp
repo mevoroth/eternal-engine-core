@@ -116,5 +116,18 @@ namespace Eternal
 				ImGui::TreePop();
 			}
 		}
+
+		void SkyPass::GetInputs(_Out_ FrameGraphPassInputs& OutInputs) const
+		{
+			(void)OutInputs;
+		}
+
+		void SkyPass::GetOutputs(_Out_ FrameGraphPassOutputs& OutOutputs) const
+		{
+			OutOutputs.OutputViews[&StaticRenderer->GetGlobalResources().GetSky().GetTexture()] = {
+				StaticRenderer->GetGlobalResources().GetSky().GetRenderTargetDepthStencilView(),
+				TransitionState::TRANSITION_DEPTH_STENCIL_WRITE
+			};
+		}
 	}
 }

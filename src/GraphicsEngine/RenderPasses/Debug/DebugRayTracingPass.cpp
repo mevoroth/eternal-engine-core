@@ -75,5 +75,18 @@ namespace Eternal
 			DebugRayTracingCommandList->SetRayTracingDescriptorTable(InContext, *_DebugRayTracingDescriptorTable);
 			DebugRayTracingCommandList->DispatchRays(*_DebugRayTracingShaderTable, InContext.GetOutputDevice().GetWidth(), InContext.GetOutputDevice().GetHeight());
 		}
+
+		void DebugRayTracingPass::GetInputs(_Out_ FrameGraphPassInputs& OutInputs) const
+		{
+			(void)OutInputs;
+		}
+
+		void DebugRayTracingPass::GetOutputs(_Out_ FrameGraphPassOutputs& OutOutputs) const
+		{
+			OutOutputs.OutputViews[&StaticRenderer->GetGlobalResources().GetGBufferLuminance().GetTexture()] = {
+				StaticRenderer->GetGlobalResources().GetGBufferLuminance().GetUnorderedAccessView(),
+				TransitionState::TRANSITION_SHADER_WRITE
+			};
+		}
 	}
 }

@@ -3,6 +3,7 @@
 #include "GraphicsEngine/Renderer.hpp"
 #include "GraphicData/GlobalResources.hpp"
 #include "Graphics/GraphicsInclude.hpp"
+#include "NextGenGraphics/FrameGraph.hpp"
 
 namespace Eternal
 {
@@ -28,9 +29,11 @@ namespace Eternal
 
 		class Renderer;
 
-		class Pass
+		class Pass : public FrameGraphPass
 		{
 		public:
+
+			static void RegisterRenderer(_In_ Renderer* InRenderer);
 
 			virtual ~Pass();
 
@@ -40,6 +43,8 @@ namespace Eternal
 			bool CanRenderPass() const;
 
 		protected:
+
+			static Renderer* StaticRenderer;
 
 			RootSignature*	_RootSignature	= nullptr;
 			Pipeline*		_Pipeline		= nullptr;

@@ -22,6 +22,19 @@ namespace Eternal
 		{
 		}
 
+		void ShadowMapPass::GetInputs(_Out_ FrameGraphPassInputs& OutInputs) const
+		{
+			(void)OutInputs;
+		}
+
+		void ShadowMapPass::GetOutputs(_Out_ FrameGraphPassOutputs& OutOutputs) const
+		{
+			OutOutputs.OutputViews[&StaticRenderer->GetGlobalResources().GetShadowMap().GetTexture()] = {
+				StaticRenderer->GetGlobalResources().GetShadowMap().GetRenderTargetDepthStencilView(),
+				TransitionState::TRANSITION_DEPTH_STENCIL_WRITE
+			};
+		}
+
 		void ShadowMapPass::_BeginRender(_In_ System& InSystem, _In_ Renderer& InRenderer)
 		{
 			GlobalResources& InGlobalResources = InRenderer.GetGlobalResources();

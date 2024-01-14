@@ -11,6 +11,8 @@ namespace Eternal
 
 		TonemappingPass::TonemappingPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 		{
+			(void)InRenderer;
+
 			char ThreadGroupCountXString[4];
 			char ThreadGroupCountYString[4];
 			char ThreadGroupCountZString[4];
@@ -57,6 +59,8 @@ namespace Eternal
 
 		void TonemappingPass::Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer)
 		{
+			(void)InSystem;
+
 			CommandListScope TonemappingCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "Tonemapping");
 
 			_TonemappingDescriptorTable->SetDescriptor(0, InRenderer.GetGlobalResources().GetViewConstantBufferView());
@@ -74,6 +78,19 @@ namespace Eternal
 					1
 				);
 			}
+		}
+
+		void TonemappingPass::GetInputs(_Out_ FrameGraphPassInputs& OutInputs) const
+		{
+			(void)OutInputs;
+		}
+
+		void TonemappingPass::GetOutputs(_Out_ FrameGraphPassOutputs& OutOutputs) const
+		{
+			OutOutputs.OutputViews[&StaticRenderer->GetGlobalResources().GetGBufferLuminance().GetTexture()] = {
+				StaticRenderer->GetGlobalResources().GetGBufferLuminance().GetUnorderedAccessView(),
+				TransitionState::TRANSITION_SHADER_WRITE
+			};
 		}
 	}
 }

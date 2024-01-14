@@ -1,5 +1,6 @@
 #pragma once
 
+#include "NextGenGraphics/FrameGraph.hpp"
 #include <vector>
 
 namespace Eternal
@@ -32,6 +33,8 @@ namespace Eternal
 		{
 		public:
 
+			static constexpr bool UseFrameGraph = false;
+
 			Renderer(_In_ GraphicsContext& InContext);
 			~Renderer();
 
@@ -47,6 +50,7 @@ namespace Eternal
 
 		private:
 
+			FrameGraph			_FrameGraph;
 			GlobalResources*	_GlobalResources	= nullptr;
 			vector<Pass*>		_Passes;
 			Pass*				_PresentPass		= nullptr;
