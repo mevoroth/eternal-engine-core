@@ -127,7 +127,7 @@ namespace Eternal
 				new TextureRequest(
 					FilePath::Find("black.tga", FileType::FILE_TYPE_TEXTURES),
 					"black",
-					"black"
+					"black.tga"
 				)
 			);
 			_Streaming->EnqueueRequest_MainThread(
@@ -147,15 +147,27 @@ namespace Eternal
 			{
 				for (uint32_t TextureIndex = 0; TextureIndex < static_cast<uint32_t>(TextureType::TEXTURE_TYPE_COUNT); ++TextureIndex)
 				{
+					if (static_cast<TextureType>(TextureIndex) == TextureType::TEXTURE_TYPE_NORMAL)
+						continue;
+
 					TextureRequest* DefaultMaterialTexture = new TextureRequest(
 						FilePath::Find("black.tga", FileType::FILE_TYPE_TEXTURES),
 						"black",
-						"black"
+						"black.tga"
 					);
 					DefaultMaterialTexture->MaterialToUpdate.MaterialToUpdate	= Material::DefaultMaterial;
 					DefaultMaterialTexture->MaterialToUpdate.Slot				= static_cast<TextureType>(TextureIndex);
 					_Streaming->EnqueueRequest_MainThread(DefaultMaterialTexture);
 				}
+
+				TextureRequest* DefaultNormalTexture = new TextureRequest(
+					FilePath::Find("defaultnormal.tga", FileType::FILE_TYPE_TEXTURES),
+					"defaultnormal",
+					"defaultnormal.tga"
+				);
+				DefaultNormalTexture->MaterialToUpdate.MaterialToUpdate			= Material::DefaultMaterial;
+				DefaultNormalTexture->MaterialToUpdate.Slot						= TextureType::TEXTURE_TYPE_NORMAL;
+				_Streaming->EnqueueRequest_MainThread(DefaultNormalTexture);
 			}
 			_Streaming->CommitRequests_MainThread();
 		}
