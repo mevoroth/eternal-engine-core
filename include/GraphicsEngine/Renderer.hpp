@@ -1,8 +1,8 @@
 #pragma once
 
 #include "NextGenGraphics/FrameGraph.hpp"
-#include <vector>
 #include "NextGenGraphics/StencilTracker.hpp"
+#include <vector>
 
 namespace Eternal
 {
