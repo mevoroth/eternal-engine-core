@@ -1,4 +1,5 @@
 #include "GraphicsEngine/RenderPasses/OpaquePass.hpp"
+#include "GraphicsEngine/StencilAllocation.hpp"
 #include "Core/System.hpp"
 #include "GraphicData/MeshVertexFormat.hpp"
 #include "Material/Material.hpp"
@@ -56,6 +57,20 @@ namespace Eternal
 				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MESH)
 			};
 
+			StencilTest::FaceOperator FaceStencil;
+			FaceStencil.Pass = StencilTest::StencilOperator::STENCIL_OPERATOR_REPLACE;
+
+			DepthStencil DepthStencilTestWriteWriteOpaqueStencil(
+				DepthStencilTestWriteNone.GetDepthTest(),
+				StencilTest(
+					FaceStencil,
+					FaceStencil,
+					0x0,
+					StencilAllocation::OpaqueStencil,
+					StencilAllocation::OpaqueStencil
+				)
+			);
+
 			ObjectPassCreateInformation ObjectPassInformation =
 			{
 				Defines,
@@ -70,7 +85,9 @@ namespace Eternal
 					},
 					InGlobalResources.GetGBufferDepthStencil().GetRenderTargetDepthStencilView(), RenderTargetOperator::Clear_Store
 				),
-				InContext.GetShader(OpaquePixelCreateInformation)
+				InContext.GetShader(OpaquePixelCreateInformation),
+				RasterizerDefault,
+				DepthStencilTestWriteWriteOpaqueStencil
 			};
 			_InitializeObjectPass(InContext, ObjectPassInformation);
 		}

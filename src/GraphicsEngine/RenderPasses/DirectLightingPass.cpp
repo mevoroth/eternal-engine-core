@@ -1,4 +1,5 @@
 #include "GraphicsEngine/RenderPasses/DirectLightingPass.hpp"
+#include "GraphicsEngine/StencilAllocation.hpp"
 #include "Light/Light.hpp"
 #include "Core/System.hpp"
 #include "Types/Types.hpp"
@@ -42,7 +43,26 @@ namespace Eternal
 					InContext.GetMainViewport(),
 					{
 						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Load_Store, InRenderer.GetGlobalResources().GetGBufferLuminance().GetRenderTargetDepthStencilView())
-					}
+					},
+					InRenderer.GetGlobalResources().GetGBufferDepthStencil().GetRenderTargetDepthStencilView(),
+					RenderTargetOperator::Load_Store
+				)
+			);
+
+			StencilTest::FaceOperator FrontFace;
+			FrontFace.Comparison = ComparisonFunction::COMPARISON_FUNCTION_EQUAL;
+
+			StencilTest::FaceOperator BackFace;
+			BackFace.Comparison = ComparisonFunction::COMPARISON_FUNCTION_NEVER;
+
+			DepthStencil DepthStencilTestNoneReadOpaqueStencil(
+				DepthStencilNoneNone.GetDepthTest(),
+				StencilTest(
+					FrontFace,
+					BackFace,
+					StencilAllocation::OpaqueStencil,
+					0x0,
+					StencilAllocation::OpaqueStencil
 				)
 			);
 
@@ -53,7 +73,8 @@ namespace Eternal
 					InContext.GetEmptyInputLayout(),
 					_DirectLightingRenderPass,
 					ScreenVertex,
-					DirectLightingPixel
+					DirectLightingPixel,
+					DepthStencilTestNoneReadOpaqueStencil
 				)
 			);
 		}
@@ -105,7 +126,7 @@ namespace Eternal
 					ResourceTransition(InRenderer.GetGlobalResources().GetGBufferAlbedo().GetRenderTargetDepthStencilView(),					TransitionState::TRANSITION_PIXEL_SHADER_READ),
 					ResourceTransition(InRenderer.GetGlobalResources().GetGBufferNormals().GetRenderTargetDepthStencilView(),					TransitionState::TRANSITION_PIXEL_SHADER_READ),
 					ResourceTransition(InRenderer.GetGlobalResources().GetGBufferRoughnessMetallicSpecular().GetRenderTargetDepthStencilView(),	TransitionState::TRANSITION_PIXEL_SHADER_READ),
-					ResourceTransition(InRenderer.GetGlobalResources().GetGBufferDepthStencil().GetRenderTargetDepthStencilView(),				TransitionState::TRANSITION_PIXEL_SHADER_READ)
+					ResourceTransition(InRenderer.GetGlobalResources().GetGBufferDepthStencil().GetRenderTargetDepthStencilView(),				TransitionState::TRANSITION_PIXEL_SHADER_READ | TransitionState::TRANSITION_DEPTH_STENCIL_READ)
 				};
 				//ResourceTransitionScope GBufferToShaderReadScope(*DirectLightingCommandList, Transitions, ETERNAL_ARRAYSIZE(Transitions));
 				DirectLightingCommandList->Transition(Transitions, ETERNAL_ARRAYSIZE(Transitions));
@@ -116,6 +137,8 @@ namespace Eternal
 				DirectLightingCommandList->DrawInstanced(6);
 				DirectLightingCommandList->EndRenderPass();
 			}
+
+			InRenderer.GetStencilTracker().ReleaseStencil(StencilAllocation::OpaqueStencilBit);
 		}
 
 		void DirectLightingPass::GetInputs(_Out_ FrameGraphPassInputs& OutInputs) const

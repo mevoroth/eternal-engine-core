@@ -1,4 +1,5 @@
 #include "GraphicsEngine/RenderPasses/DistantObjectPass.hpp"
+#include "GraphicsEngine/StencilAllocation.hpp"
 
 namespace Eternal
 {
@@ -43,6 +44,23 @@ namespace Eternal
 				RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_MESH)
 			};
 
+			StencilTest::FaceOperator FrontFace;
+			FrontFace.Comparison = ComparisonFunction::COMPARISON_FUNCTION_NEVER;
+
+			StencilTest::FaceOperator BackFace;
+			BackFace.Comparison = ComparisonFunction::COMPARISON_FUNCTION_NOT_EQUAL;
+
+			DepthStencil DepthStencilTestNoneReadOpaqueStencil(
+				DepthStencilTestNone.GetDepthTest(),
+				StencilTest(
+					FrontFace,
+					BackFace,
+					StencilAllocation::OpaqueStencil,
+					0x0,
+					StencilAllocation::OpaqueStencil
+				)
+			);
+
 			ObjectPassCreateInformation ObjectPassInformation(
 				Defines,
 				UseMeshPipeline ? ParametersMSPS : ParametersVSPS,
@@ -55,7 +73,7 @@ namespace Eternal
 				),
 				InContext.GetShader(DistantPixelCreateInformation),
 				RasterizerCullFront,
-				DepthStencilTestNone
+				DepthStencilTestNoneReadOpaqueStencil
 			);
 			_InitializeObjectPass(InContext, ObjectPassInformation);
 		}
