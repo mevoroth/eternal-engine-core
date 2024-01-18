@@ -5,6 +5,7 @@
 #include "File/FilePath.hpp"
 #include "Time/Timer.hpp"
 #include "Time/TimeFactory.hpp"
+#include "Log/Log.hpp"
 #include "Log/LogFactory.hpp"
 #include "Input/InputFactory.hpp"
 #include "Task/Core/RendererTask.hpp"
@@ -71,6 +72,8 @@ namespace Eternal
 			TaskCreateInformation StreamingCreateInformation("StreamingTask");
 			_StreamingTask				= new StreamingTask(StreamingCreateInformation, *_Streaming);
 
+			string CurrentDirectoryPath = FilePath::CurrentDirectory();
+			LogWrite(LogInfo, LogEngine, CurrentDirectoryPath);
 		}
 
 		void System::InitializeSystem()
