@@ -43,6 +43,12 @@ namespace Eternal
 			})
 			, _PresentPass(new PresentPass(InContext, *this))
 		{
+			GraphicsContext::SetOnStencilWriteFunctor(
+				[this](_In_ uint32_t InStencilBit, _In_ const string& InOwner)
+				{
+					_StencilTracker.AcquireStencil(InStencilBit, InOwner);
+				}
+			);
 			Pass::RegisterRenderer(this);
 
 			if (UseFrameGraph)
