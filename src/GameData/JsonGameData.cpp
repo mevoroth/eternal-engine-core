@@ -288,6 +288,9 @@ namespace Eternal
 				return *_MeshesNode;
 			case GameDataSourceKey::LIGHTS:
 				return *_LightsNode;
+
+			default:
+				break;
 			}
 
 			ETERNAL_BREAK();

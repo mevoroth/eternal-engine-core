@@ -114,6 +114,7 @@ namespace Eternal
 				[&InSystem](_In_ uint32_t InKey) -> bool
 				{
 					(void)InKey;
+					(void)InSystem;
 					return true;
 				}
 			);
