@@ -69,7 +69,7 @@ namespace Eternal
 					{
 						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferLuminance().GetRenderTargetDepthStencilView())
 					},
-					InGlobalResources.GetGBufferDepthStencil().GetRenderTargetDepthStencilView(), RenderTargetOperator::NoLoad_NoStore
+					InGlobalResources.GetGBufferDepthStencil().GetRenderTargetDepthStencilView(), RenderTargetOperator::Load_NoStore
 				),
 				InContext.GetShader(DistantPixelCreateInformation),
 				RasterizerCullFront,
