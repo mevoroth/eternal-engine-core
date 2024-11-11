@@ -1,10 +1,10 @@
-#if ETERNAL_PLATFORM_WINDOWS
+#if ETERNAL_PLATFORM_WINDOWS || ETERNAL_PLATFORM_SCARLETT
 
-#include "Platform/Windows/WindowsProcess.hpp"
+#include "Platform/Microsoft/MicrosoftProcess.hpp"
 
 #include "Input/Input.hpp"
 
-Eternal::InputSystem::Input* Eternal::Platform::WindowsProcess::_InputHandler = nullptr;
+Eternal::InputSystem::Input* Eternal::Platform::MicrosoftProcess::_InputHandler = nullptr;
 Eternal::InputSystem::Input::Key _KeyMapping[256];
 
 namespace Eternal
@@ -13,9 +13,9 @@ namespace Eternal
 	{
 		using namespace Eternal::InputSystem;
 
-		bool* WindowsProcess::_IsRunning = nullptr;
+		bool* MicrosoftProcess::_IsRunning = nullptr;
 
-		WindowsProcess::WindowsProcess()
+		MicrosoftProcess::MicrosoftProcess()
 		{
 			for (uint32_t KeyIndex = 0; KeyIndex < ETERNAL_ARRAYSIZE(_KeyMapping); ++KeyIndex)
 			{
@@ -85,25 +85,25 @@ namespace Eternal
 			Map(VK_OEM_8,			Input::EXCLAIM);
 		}
 
-		void WindowsProcess::SetInputHandler(_In_ Input* InputHandler)
+		void MicrosoftProcess::SetInputHandler(_In_ Input* InInputHandler)
 		{
-			_InputHandler = InputHandler;
+			_InputHandler = InInputHandler;
 		}
 
-		void WindowsProcess::MapRange(_In_ uint32_t WindowsKeyStart, _In_ const Input::Key& KeyNameStart, _In_ uint32_t Range)
+		void MicrosoftProcess::MapRange(_In_ uint32_t InWindowsKeyStart, _In_ const Input::Key& InKeyNameStart, _In_ uint32_t InRange)
 		{
-			for (uint32_t KeyIndex = 0; KeyIndex < Range; ++KeyIndex)
+			for (uint32_t KeyIndex = 0; KeyIndex < InRange; ++KeyIndex)
 			{
-				_KeyMapping[WindowsKeyStart + KeyIndex] = (Input::Key)(KeyNameStart + KeyIndex);
+				_KeyMapping[InWindowsKeyStart + KeyIndex] = static_cast<Input::Key>(InKeyNameStart + KeyIndex);
 			}
 		}
 
-		void WindowsProcess::Map(_In_ uint32_t WindowsKey, _In_ const Input::Key& KeyName)
+		void MicrosoftProcess::Map(_In_ uint32_t InWindowsKey, _In_ const Input::Key& InKeyName)
 		{
-			_KeyMapping[WindowsKey] = KeyName;
+			_KeyMapping[InWindowsKey] = InKeyName;
 		}
 
-		void WindowsProcess::ExecuteMessageLoop()
+		void MicrosoftProcess::ExecuteMessageLoop()
 		{
 			MSG Message = { 0 };
 			if (PeekMessage(&Message, 0, 0, 0, PM_REMOVE))
@@ -113,18 +113,21 @@ namespace Eternal
 			}
 		}
 
-		LRESULT WindowsProcess::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+		LRESULT MicrosoftProcess::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 			ETERNAL_ASSERT(_InputHandler);
 
 			switch (message)
 			{
+#if ETERNAL_PLATFORM_WINDOWS
 			case WM_PAINT:
 			{
 				PAINTSTRUCT PaintStruct;
-				HDC Hdc = BeginPaint(hWnd, &PaintStruct);
+				HDC DeviceContextHandle = BeginPaint(hWnd, &PaintStruct);
+				(void)DeviceContextHandle;
 				EndPaint(hWnd, &PaintStruct);
 			} break;
+#endif
 
 			case WM_LBUTTONDOWN:
 			{

@@ -2,8 +2,7 @@
 
 #if ETERNAL_PLATFORM_WINDOWS
 
-#include "Core/System.hpp"
-#include "Platform/Windows/WindowsProcess.hpp"
+#include "Platform/Microsoft/MicrosoftSystem.hpp"
 
 namespace Eternal
 {
@@ -11,15 +10,12 @@ namespace Eternal
 	{
 		using namespace Eternal::Platform;
 
-		class WindowsSystem : public System
+		class WindowsSystem : public MicrosoftSystem
 		{
 		public:
+
 			WindowsSystem(_In_ SystemCreateInformation& InSystemCreateInformation);
 
-			virtual void UpdatePlatform() override;
-
-		private:
-			WindowsProcess _WindowProcess;
 		};
 	}
 }

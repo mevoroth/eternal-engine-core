@@ -4,9 +4,6 @@
 
 #include "Graphics/GraphicsContext.hpp"
 #include "File/FilePath.hpp"
-#define VC_EXTRALEAN
-#define WIN32_EXTRA_LEAN
-#define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 #include <array>
 #include <locale>

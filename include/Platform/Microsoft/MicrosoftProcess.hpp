@@ -1,10 +1,7 @@
 #pragma once
 
-#if ETERNAL_PLATFORM_WINDOWS
+#if ETERNAL_PLATFORM_WINDOWS || ETERNAL_PLATFORM_SCARLETT
 
-#define WIN32_EXTRA_LEAN
-#define WIN32_LEAN_AND_MEAN
-#define VC_EXTRALEAN
 #include <Windows.h>
 #include "Input/Input.hpp"
 
@@ -14,7 +11,7 @@ namespace Eternal
 	{
 		using namespace Eternal::InputSystem;
 
-		class WindowsProcess
+		class MicrosoftProcess
 		{
 		public:
 			static LRESULT CALLBACK WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
@@ -24,7 +21,7 @@ namespace Eternal
 			static void Map(_In_ uint32_t WindowsKey, _In_ const Input::Key& KeyName);
 			static void SetIsRunning(_In_ bool* InIsRunning) { _IsRunning = InIsRunning; }
 
-			WindowsProcess();
+			MicrosoftProcess();
 
 		private:
 			static Input*	_InputHandler;
