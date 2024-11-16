@@ -1,3 +1,5 @@
 [submodule "CorePrivate"]
 	path = CorePrivate
 	url = git@github.com:mevoroth/eternal-engine-core-private.git
+	branch = main
+	update = rebase
