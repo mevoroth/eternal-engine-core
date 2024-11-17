@@ -180,7 +180,7 @@ namespace Eternal
 				}
 			}
 
-			if (Geometries.size() > 0)
+			if (InContext.GetDevice().SupportsRayTracing() && Geometries.size() > 0)
 			{
 				CommandListScope BuildBottomLevelAccelerationStructureCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "BuildBottomLevelAccelerationStructure");
 

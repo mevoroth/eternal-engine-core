@@ -544,7 +544,7 @@ namespace Eternal
 
 		void SystemFrame::InitializeSystemFrame(_In_ GraphicsContext& InContext, _In_ const ImguiContext& InImguiContext)
 		{
-			MeshCollectionsAccelerationStructure	= CreateTopLevelAccelerationStructure(InContext, TopLevelAccelerationStructureCreateInformation("MeshCollectionsAccelerationStructure"));
+			MeshCollectionsAccelerationStructure	= InContext.GetDevice().SupportsRayTracing() ? CreateTopLevelAccelerationStructure(InContext, TopLevelAccelerationStructureCreateInformation("MeshCollectionsAccelerationStructure")) : nullptr;
 			ImguiFrameContext						= InImguiContext;
 		}
 	}
