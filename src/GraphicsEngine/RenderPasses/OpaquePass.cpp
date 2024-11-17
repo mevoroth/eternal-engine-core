@@ -23,10 +23,13 @@ namespace Eternal
 
 			vector<string> Defines =
 			{
-				"OBJECT_NEEDS_NORMAL",		"1",
-				"OBJECT_NEEDS_TANGENT",		"1",
-				"OBJECT_NEEDS_BINORMAL",	"1",
-				"OBJECT_NEEDS_UV",			"1"
+				"OBJECT_NEEDS_NORMAL",					"1",
+				"OBJECT_NEEDS_TANGENT",					"1",
+				"OBJECT_NEEDS_BINORMAL",				"1",
+				"OBJECT_NEEDS_UV",						"1",
+				"OUTPUTS_ALBEDO",						"1",
+				"OUTPUTS_NORMAL",						"1",
+				"OUTPUTS_ROUGHNESS_METALLIC_SPECULAR",	"1"
 			};
 
 			ShaderCreateInformation OpaquePixelCreateInformation(ShaderType::SHADER_TYPE_PIXEL, "OpaquePixel", "opaque.pixel.hlsl", Defines);
