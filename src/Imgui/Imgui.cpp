@@ -214,31 +214,7 @@ namespace Eternal
 			);
 			_ImguiFontTextureView		= CreateShaderResourceView(ImguiFontTextureViewCreateInformation);
 			IO.Fonts->SetTexID(reinterpret_cast<ImTextureID>(_ImguiFontTextureView));
-		}
 
-		Imgui::~Imgui()
-		{
-			DestroyView(_ImguiFontTextureView);
-			DestroyResource(_ImguiFontTexture);
-			DestroyMultiBufferedResource(_ImguiIndexBuffer);
-			DestroyMultiBufferedResource(_ImguiVertexBuffer);
-			DestroyMultiBufferedView(_ImguiConstantBufferView);
-			DestroyMultiBufferedResource(_ImguiConstantBuffer);
-			DestroyPipeline(_ImguiPipeline);
-			DestroyDescriptorTable(_ImguiDescriptorTable);
-			DestroySampler(_ImguiBilinearSampler);
-			DestroyRootSignature(_ImguiRootSignature);
-			DestroyInputLayout(_ImguiInputLayout);
-			DestroyRenderPass(_ImguiRenderPass);
-			delete _ImguiBlendState;
-			_ImguiBlendState = nullptr;
-		}
-
-		ImguiContext Imgui::CreateContext(_In_ GraphicsContext& InContext)
-		{
-			ImguiContext Context = { ImGui::GetCurrentContext() };// ? ImGui::GetCurrentContext() : ImGui::CreateContext() };
-
-			ImGuiIO& IO = ImGui::GetIO();
 			IO.BackendPlatformName	= "PC";
 			IO.BackendRendererName	= "EternalGraphics";
 			IO.DisplaySize.x		= static_cast<float>(InContext.GetOutputDevice().GetWidth());
@@ -288,7 +264,29 @@ namespace Eternal
 			);
 			IO.Fonts->SetTexID(reinterpret_cast<ImTextureID>(_ImguiFontTextureView));
 
-			//ImGui::SetCurrentContext(nullptr);
+		}
+
+		Imgui::~Imgui()
+		{
+			DestroyView(_ImguiFontTextureView);
+			DestroyResource(_ImguiFontTexture);
+			DestroyMultiBufferedResource(_ImguiIndexBuffer);
+			DestroyMultiBufferedResource(_ImguiVertexBuffer);
+			DestroyMultiBufferedView(_ImguiConstantBufferView);
+			DestroyMultiBufferedResource(_ImguiConstantBuffer);
+			DestroyPipeline(_ImguiPipeline);
+			DestroyDescriptorTable(_ImguiDescriptorTable);
+			DestroySampler(_ImguiBilinearSampler);
+			DestroyRootSignature(_ImguiRootSignature);
+			DestroyInputLayout(_ImguiInputLayout);
+			DestroyRenderPass(_ImguiRenderPass);
+			delete _ImguiBlendState;
+			_ImguiBlendState = nullptr;
+		}
+
+		ImguiContext Imgui::CreateContext(_In_ GraphicsContext& InContext)
+		{
+			ImguiContext Context = { ImGui::GetCurrentContext() };// ? ImGui::GetCurrentContext() : ImGui::CreateContext() };
 
 			return Context;
 		}
