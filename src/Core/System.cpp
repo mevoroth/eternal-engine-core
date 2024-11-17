@@ -352,6 +352,9 @@ namespace Eternal
 						BuildAccelerationStructureCommandlist->TransitionUAV(CurrentAccelerationStructure->GetAccelerationStructure());
 					}
 
+					if (!CurrentAccelerationStructure)
+						continue;
+
 					for (uint32_t InstanceIndex = 0; InstanceIndex < MeshCollections[CollectionIndex].Instances.size(); ++InstanceIndex)
 					{
 						Matrix4x4 LocalToWorldTransposed = MeshCollections[CollectionIndex].Instances[InstanceIndex]->GetTransform().GetLocalToWorld();
