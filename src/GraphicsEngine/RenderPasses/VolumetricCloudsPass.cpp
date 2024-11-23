@@ -32,7 +32,7 @@ namespace Eternal
 			sprintf_s(ThreadGroupCountZString, "%d", ThreadGroupCountZ);
 
 			ShaderCreateInformation VolumetricCloudsComputeCreateInformation(
-				ShaderType::SHADER_TYPE_COMPUTE, "VolumetricClouds", "Volumetrics\\volumetricclouds.compute.hlsl",
+				ShaderType::SHADER_TYPE_COMPUTE, "VolumetricClouds", "Volumetrics/volumetricclouds.compute.hlsl",
 				{
 					"THREAD_GROUP_COUNT_X", ThreadGroupCountXString,
 					"THREAD_GROUP_COUNT_Y", ThreadGroupCountYString,
