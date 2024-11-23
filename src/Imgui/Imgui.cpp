@@ -268,6 +268,7 @@ namespace Eternal
 
 		Imgui::~Imgui()
 		{
+			ImGui::DestroyContext(ImGui::GetCurrentContext());
 			DestroyView(_ImguiFontTextureView);
 			DestroyResource(_ImguiFontTexture);
 			DestroyMultiBufferedResource(_ImguiIndexBuffer);
@@ -293,7 +294,6 @@ namespace Eternal
 
 		void Imgui::DestroyContext(_In_ const ImguiContext& InContext)
 		{
-			ImGui::DestroyContext(InContext.Context);
 		}
 
 		void Imgui::Begin(_In_ const ImguiContext& InContext)
