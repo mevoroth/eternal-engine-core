@@ -1,6 +1,7 @@
 #include "GraphicsEngine/RenderPasses/SkyPass.hpp"
 #include "Core/System.hpp"
 #include "Light/Light.hpp"
+#include "Math/Math.hpp"
 #include "imgui.h"
 
 namespace Eternal
@@ -13,6 +14,7 @@ namespace Eternal
 		ETERNAL_STATIC_ASSERT(ETERNAL_ARRAYSIZE(SkyPass::AtmospherePhaseG) == VOLUMETRIC_PHASE_COUNT, "AtmospherePhaseG not matching count");
 
 		SkyPass::SkyPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
+			: _MipMapConstantBuffer(InContext, "SkyMipMapConstantBuffer")
 		{
 			std::vector<string> Defines =
 			{
@@ -65,6 +67,8 @@ namespace Eternal
 					AtmosphereCubeMapPixel
 				)
 			);
+
+			_SkyMipGenerationDescriptorTable = InRenderer.GetMipMapGeneration().CreateDescriptorTable(InContext);
 		}
 
 		SkyPass::~SkyPass()
@@ -76,10 +80,10 @@ namespace Eternal
 		void SkyPass::Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer)
 		{
 			CommandListScope SkyCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "SkyPass");
-
-			ResourceTransition SkyTransition(InRenderer.GetGlobalResources().GetSky().GetShaderResourceView(), TransitionState::TRANSITION_RENDER_TARGET);
-			SkyCommandList->Transition(SkyTransition);
-
+			{
+				ResourceTransition SkyTransition(InRenderer.GetGlobalResources().GetSky().GetRenderTargetDepthStencilView(), TransitionState::TRANSITION_RENDER_TARGET);
+				SkyCommandList->Transition(SkyTransition);
+			}
 			{
 				const vector<ObjectsList<Light>::InstancedObjects>& Lights = InSystem.GetRenderFrame().Lights;
 
@@ -91,15 +95,73 @@ namespace Eternal
 				AtmosphereConstantsMapScope->AtmosphereDirectionalLightDirection	= Lights[0].Object->GetDirection();
 				AtmosphereConstantsMapScope->AtmosphereDirectionalLightIlluminance	= Lights[0].Object->GetColor() * Lights[0].Object->GetIntensity();
 			}
+			{
+				_SkyDescriptorTable->SetDescriptor(0, InRenderer.GetGlobalResources().GetAtmosphereConstantBufferView());
+				_SkyDescriptorTable->SetDescriptor(1, InRenderer.GetGlobalResources().GetSkyViewCubeMapConstantBufferView());
 
-			_SkyDescriptorTable->SetDescriptor(0, InRenderer.GetGlobalResources().GetAtmosphereConstantBufferView());
-			_SkyDescriptorTable->SetDescriptor(1, InRenderer.GetGlobalResources().GetSkyViewCubeMapConstantBufferView());
+				CommandListEventScope SkyCubemapGeneration(SkyCommandList, InContext, "SkyCubemapGeneration");
+				SkyCommandList->BeginRenderPass(*_SkyRenderPass);
+				SkyCommandList->SetGraphicsPipeline(*_Pipeline);
+				SkyCommandList->SetGraphicsDescriptorTable(InContext, *_SkyDescriptorTable);
+				SkyCommandList->DrawInstanced(3, 6);
+				SkyCommandList->EndRenderPass();
+			}
 
-			SkyCommandList->BeginRenderPass(*_SkyRenderPass);
-			SkyCommandList->SetGraphicsPipeline(*_Pipeline);
-			SkyCommandList->SetGraphicsDescriptorTable(InContext, *_SkyDescriptorTable);
-			SkyCommandList->DrawInstanced(3, 6);
-			SkyCommandList->EndRenderPass();
+			//////////////////////////////////////////////////////////////////////////
+
+			ResourceTransition SkyTransition(InRenderer.GetGlobalResources().GetSky().GetShaderResourceView(), TransitionState::TRANSITION_NON_PIXEL_SHADER_READ);
+			SkyCommandList->Transition(SkyTransition);
+
+			{
+				MapRange MipMapBufferMapRange(sizeof(MipMapConstants));
+				MapScope<MipMapConstants> MipMapMapScope(*_MipMapConstantBuffer.ResourceBuffer, MipMapBufferMapRange);
+
+				View* SkyMipView = InRenderer.GetGlobalResources().GetSkyMipShaderResourceViews()[0];
+				MipMapMapScope->TextureSize = Uint4(SkyMipView->GetResource().GetWidth(), SkyMipView->GetResource().GetHeight(), SkyMipView->GetResource().GetDepthOrArraySize(), 0);
+			}
+
+			const vector<View*>& SkyMipUnorderedAccessViews = InRenderer.GetGlobalResources().GetSkyMipUnorderedAccessViews();
+			for (uint32_t SkyMip = 0, SkyMipCount = 1/*SkyMipUnorderedAccessViews.size() - 1*/; SkyMip < SkyMipCount; ++SkyMip)
+			{
+				View* CurrentMip0 = InRenderer.GetGlobalResources().GetSkyMipShaderResourceViews()[SkyMip];
+
+				ResourceTransition Transitions[] =
+				{
+					ResourceTransition({ ResourceSubResource(0, SkyMip), CurrentMip0 }, TransitionState::TRANSITION_NON_PIXEL_SHADER_READ),
+					ResourceTransition({ ResourceSubResource(1, SkyMip), CurrentMip0 }, TransitionState::TRANSITION_NON_PIXEL_SHADER_READ),
+					ResourceTransition({ ResourceSubResource(2, SkyMip), CurrentMip0 }, TransitionState::TRANSITION_NON_PIXEL_SHADER_READ),
+					ResourceTransition({ ResourceSubResource(3, SkyMip), CurrentMip0 }, TransitionState::TRANSITION_NON_PIXEL_SHADER_READ),
+					ResourceTransition({ ResourceSubResource(4, SkyMip), CurrentMip0 }, TransitionState::TRANSITION_NON_PIXEL_SHADER_READ),
+					ResourceTransition({ ResourceSubResource(5, SkyMip), CurrentMip0 }, TransitionState::TRANSITION_NON_PIXEL_SHADER_READ),
+					ResourceTransition({ ResourceSubResource(0, SkyMip + 1), SkyMipUnorderedAccessViews[SkyMip + 1] }, TransitionState::TRANSITION_SHADER_WRITE),
+					ResourceTransition({ ResourceSubResource(1, SkyMip + 1), SkyMipUnorderedAccessViews[SkyMip + 1] }, TransitionState::TRANSITION_SHADER_WRITE),
+					ResourceTransition({ ResourceSubResource(2, SkyMip + 1), SkyMipUnorderedAccessViews[SkyMip + 1] }, TransitionState::TRANSITION_SHADER_WRITE),
+					ResourceTransition({ ResourceSubResource(3, SkyMip + 1), SkyMipUnorderedAccessViews[SkyMip + 1] }, TransitionState::TRANSITION_SHADER_WRITE),
+					ResourceTransition({ ResourceSubResource(4, SkyMip + 1), SkyMipUnorderedAccessViews[SkyMip + 1] }, TransitionState::TRANSITION_SHADER_WRITE),
+					ResourceTransition({ ResourceSubResource(5, SkyMip + 1), SkyMipUnorderedAccessViews[SkyMip + 1] }, TransitionState::TRANSITION_SHADER_WRITE)
+				};
+				ResourceTransitionScope SkyToShaderWriteScope(*SkyCommandList, Transitions, ETERNAL_ARRAYSIZE(Transitions));
+
+				_SkyMipGenerationDescriptorTable->SetDescriptor(0, CurrentMip0);
+				_SkyMipGenerationDescriptorTable->SetDescriptor(1, InContext.GetBilinearClampSampler());
+				_SkyMipGenerationDescriptorTable->SetDescriptor(2, SkyMipUnorderedAccessViews[SkyMip + 1]);
+				_SkyMipGenerationDescriptorTable->SetDescriptor(3, static_cast<View*>(*_MipMapConstantBuffer.ResourceView));
+
+				uint32_t ReverseMip = SkyMipUnorderedAccessViews.size() - 1;
+
+				CommandListEventScope SkyCubemapMipGeneration(SkyCommandList, InContext, "SkyCubemapMipGeneration");
+				SkyCommandList->SetComputePipeline(InRenderer.GetMipMapGeneration().GetPipeline(
+					MipMapTextureType::MIPMAP_TEXTURE_TYPE_2D_ARRAY,
+					MipMapTextureFormat::MIPMAP_TEXTURE_FORMAT_RGB111110_FLOAT,
+					MipMapThreadGroupCount::MIPMAP_THREAD_GROUP_COUNT_8
+				));
+				SkyCommandList->SetComputeDescriptorTable(InContext, *_SkyMipGenerationDescriptorTable);
+				SkyCommandList->Dispatch(
+					CurrentMip0->GetResource().GetWidth() >> (SkyMip + 4),
+					CurrentMip0->GetResource().GetHeight() >> (SkyMip + 4),
+					6
+				);
+			}
 		}
 
 		void SkyPass::RenderDebug()

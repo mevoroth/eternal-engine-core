@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GraphicsEngine/Pass.hpp"
+#include "ShadersReflection/MipMap/HLSLMipMapConstants.hpp"
 
 namespace Eternal
 {
@@ -24,8 +25,10 @@ namespace Eternal
 			virtual void GetOutputs(_Out_ FrameGraphPassOutputs& OutOutputs) const override;
 
 		private:
-			DescriptorTable*					_SkyDescriptorTable	= nullptr;
-			RenderPass*							_SkyRenderPass		= nullptr;
+			DescriptorTable*	_SkyDescriptorTable					= nullptr;
+			RenderPass*			_SkyRenderPass						= nullptr;
+			DescriptorTable*	_SkyMipGenerationDescriptorTable	= nullptr;
+			ConstantBuffer<MipMapConstants>	_MipMapConstantBuffer;
 		};
 	}
 }
