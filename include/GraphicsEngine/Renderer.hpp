@@ -1,5 +1,6 @@
 #pragma once
 
+#include "GraphicsEngine/MipMapGeneration.hpp"
 #include "NextGenGraphics/FrameGraph.hpp"
 #include "NextGenGraphics/StencilTracker.hpp"
 #include <vector>
@@ -50,11 +51,13 @@ namespace Eternal
 			}
 
 			StencilTracker& GetStencilTracker() { return _StencilTracker; }
+			MipMapGeneration& GetMipMapGeneration() { return _MipMapGeneration; }
 
 		private:
 
 			FrameGraph			_FrameGraph;
 			StencilTracker		_StencilTracker;
+			MipMapGeneration	_MipMapGeneration;
 			GlobalResources*	_GlobalResources	= nullptr;
 			vector<Pass*>		_Passes;
 			Pass*				_PresentPass		= nullptr;

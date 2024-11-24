@@ -28,7 +28,8 @@ namespace Eternal
 		}
 
 		Renderer::Renderer(_In_ GraphicsContext& InContext)
-			: _GlobalResources(new GlobalResources(InContext))
+			: _MipMapGeneration(InContext)
+			, _GlobalResources(new GlobalResources(InContext))
 			, _Passes({
 				new SkyPass(InContext, *this),
 				new ShadowMapPass(InContext, *this),
