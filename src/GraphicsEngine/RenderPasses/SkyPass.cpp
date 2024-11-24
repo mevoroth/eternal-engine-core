@@ -126,7 +126,7 @@ namespace Eternal
 		{
 			OutOutputs.OutputViews[&StaticRenderer->GetGlobalResources().GetSky().GetTexture()] = {
 				StaticRenderer->GetGlobalResources().GetSky().GetRenderTargetDepthStencilView(),
-				TransitionState::TRANSITION_DEPTH_STENCIL_WRITE
+				TransitionState::TRANSITION_SHADER_WRITE
 			};
 		}
 	}
