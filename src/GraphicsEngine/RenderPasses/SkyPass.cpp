@@ -121,24 +121,28 @@ namespace Eternal
 			}
 
 			const vector<View*>& SkyMipUnorderedAccessViews = InRenderer.GetGlobalResources().GetSkyMipUnorderedAccessViews();
-			for (uint32_t SkyMip = 0, SkyMipCount = 1/*SkyMipUnorderedAccessViews.size() - 1*/; SkyMip < SkyMipCount; ++SkyMip)
+			for (uint32_t SkyMip = 0, SkyMipCount = SkyMipUnorderedAccessViews.size() - 1; SkyMip < SkyMipCount; ++SkyMip)
 			{
 				View* CurrentMip0 = InRenderer.GetGlobalResources().GetSkyMipShaderResourceViews()[SkyMip];
+				View* CurrentMip1 = SkyMipUnorderedAccessViews[SkyMip + 1];
+
+				uint8_t Mip0 = static_cast<uint8_t>(SkyMip);
+				uint8_t Mip1 = Mip0 + 1;
 
 				ResourceTransition Transitions[] =
 				{
-					ResourceTransition({ ResourceSubResource(0, SkyMip), CurrentMip0 }, TransitionState::TRANSITION_NON_PIXEL_SHADER_READ),
-					ResourceTransition({ ResourceSubResource(1, SkyMip), CurrentMip0 }, TransitionState::TRANSITION_NON_PIXEL_SHADER_READ),
-					ResourceTransition({ ResourceSubResource(2, SkyMip), CurrentMip0 }, TransitionState::TRANSITION_NON_PIXEL_SHADER_READ),
-					ResourceTransition({ ResourceSubResource(3, SkyMip), CurrentMip0 }, TransitionState::TRANSITION_NON_PIXEL_SHADER_READ),
-					ResourceTransition({ ResourceSubResource(4, SkyMip), CurrentMip0 }, TransitionState::TRANSITION_NON_PIXEL_SHADER_READ),
-					ResourceTransition({ ResourceSubResource(5, SkyMip), CurrentMip0 }, TransitionState::TRANSITION_NON_PIXEL_SHADER_READ),
-					ResourceTransition({ ResourceSubResource(0, SkyMip + 1), SkyMipUnorderedAccessViews[SkyMip + 1] }, TransitionState::TRANSITION_SHADER_WRITE),
-					ResourceTransition({ ResourceSubResource(1, SkyMip + 1), SkyMipUnorderedAccessViews[SkyMip + 1] }, TransitionState::TRANSITION_SHADER_WRITE),
-					ResourceTransition({ ResourceSubResource(2, SkyMip + 1), SkyMipUnorderedAccessViews[SkyMip + 1] }, TransitionState::TRANSITION_SHADER_WRITE),
-					ResourceTransition({ ResourceSubResource(3, SkyMip + 1), SkyMipUnorderedAccessViews[SkyMip + 1] }, TransitionState::TRANSITION_SHADER_WRITE),
-					ResourceTransition({ ResourceSubResource(4, SkyMip + 1), SkyMipUnorderedAccessViews[SkyMip + 1] }, TransitionState::TRANSITION_SHADER_WRITE),
-					ResourceTransition({ ResourceSubResource(5, SkyMip + 1), SkyMipUnorderedAccessViews[SkyMip + 1] }, TransitionState::TRANSITION_SHADER_WRITE)
+					ResourceTransition({ ResourceSubResource(0, Mip0), CurrentMip0 }, TransitionState::TRANSITION_NON_PIXEL_SHADER_READ),
+					ResourceTransition({ ResourceSubResource(1, Mip0), CurrentMip0 }, TransitionState::TRANSITION_NON_PIXEL_SHADER_READ),
+					ResourceTransition({ ResourceSubResource(2, Mip0), CurrentMip0 }, TransitionState::TRANSITION_NON_PIXEL_SHADER_READ),
+					ResourceTransition({ ResourceSubResource(3, Mip0), CurrentMip0 }, TransitionState::TRANSITION_NON_PIXEL_SHADER_READ),
+					ResourceTransition({ ResourceSubResource(4, Mip0), CurrentMip0 }, TransitionState::TRANSITION_NON_PIXEL_SHADER_READ),
+					ResourceTransition({ ResourceSubResource(5, Mip0), CurrentMip0 }, TransitionState::TRANSITION_NON_PIXEL_SHADER_READ),
+					ResourceTransition({ ResourceSubResource(0, Mip1), CurrentMip1 }, TransitionState::TRANSITION_SHADER_WRITE),
+					ResourceTransition({ ResourceSubResource(1, Mip1), CurrentMip1 }, TransitionState::TRANSITION_SHADER_WRITE),
+					ResourceTransition({ ResourceSubResource(2, Mip1), CurrentMip1 }, TransitionState::TRANSITION_SHADER_WRITE),
+					ResourceTransition({ ResourceSubResource(3, Mip1), CurrentMip1 }, TransitionState::TRANSITION_SHADER_WRITE),
+					ResourceTransition({ ResourceSubResource(4, Mip1), CurrentMip1 }, TransitionState::TRANSITION_SHADER_WRITE),
+					ResourceTransition({ ResourceSubResource(5, Mip1), CurrentMip1 }, TransitionState::TRANSITION_SHADER_WRITE)
 				};
 				ResourceTransitionScope SkyToShaderWriteScope(*SkyCommandList, Transitions, ETERNAL_ARRAYSIZE(Transitions));
 
@@ -147,18 +151,19 @@ namespace Eternal
 				_SkyMipGenerationDescriptorTable->SetDescriptor(2, SkyMipUnorderedAccessViews[SkyMip + 1]);
 				_SkyMipGenerationDescriptorTable->SetDescriptor(3, static_cast<View*>(*_MipMapConstantBuffer.ResourceView));
 
-				uint32_t ReverseMip = SkyMipUnorderedAccessViews.size() - 1;
+				uint32_t ThreadGroupCountLog2 = Math::Min(SkyMipCount - SkyMip, static_cast<uint32_t>(MipMapThreadGroupCount::MIPMAP_THREAD_GROUP_COUNT_8));
+				uint32_t ThreadGroupCount = 1 << (SkyMip + 4);
 
 				CommandListEventScope SkyCubemapMipGeneration(SkyCommandList, InContext, "SkyCubemapMipGeneration");
 				SkyCommandList->SetComputePipeline(InRenderer.GetMipMapGeneration().GetPipeline(
 					MipMapTextureType::MIPMAP_TEXTURE_TYPE_2D_ARRAY,
 					MipMapTextureFormat::MIPMAP_TEXTURE_FORMAT_RGB111110_FLOAT,
-					MipMapThreadGroupCount::MIPMAP_THREAD_GROUP_COUNT_8
+					static_cast<MipMapThreadGroupCount>(ThreadGroupCountLog2)
 				));
 				SkyCommandList->SetComputeDescriptorTable(InContext, *_SkyMipGenerationDescriptorTable);
 				SkyCommandList->Dispatch(
-					CurrentMip0->GetResource().GetWidth() >> (SkyMip + 4),
-					CurrentMip0->GetResource().GetHeight() >> (SkyMip + 4),
+					Math::DivideRoundUp(CurrentMip0->GetResource().GetWidth(), ThreadGroupCount),
+					Math::DivideRoundUp(CurrentMip0->GetResource().GetHeight(), ThreadGroupCount),
 					6
 				);
 			}
