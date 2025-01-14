@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Input/Input.hpp"
 #include "Graphics/GraphicsInclude.hpp"
 #include "imgui.h"
 
@@ -19,6 +18,13 @@ namespace Eternal
 	namespace GraphicsEngine
 	{
 		class Renderer;
+	}
+
+	namespace InputSystem
+	{
+		class Input;
+
+		enum class InputKey;
 	}
 
 	namespace ImguiSystem
@@ -63,9 +69,9 @@ namespace Eternal
 			void Render(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer, _In_ const ImguiContext& InImguiContext);
 
 		private:
-			void _Map(_In_ const Input::Key& EternalKey, _In_ const ImGuiKey_& ImguiKey);
-			void _ProcessInputCharacter(_In_ const ImWchar& ImguiKey, _In_ const Input::Key& KeyName);
-			void _ProcessInputCharacterRange(_In_ const ImWchar& ImguiKeyStart, _In_ const Input::Key& KeyNameStart, _In_ uint32_t Range);
+			void _Map(_In_ const InputKey& InEternalKey, _In_ const ImGuiKey_& InImguiKey);
+			void _ProcessInputCharacter(_In_ const ImWchar& InImguiKey, _In_ const InputKey& InKeyName);
+			void _ProcessInputCharacterRange(_In_ const ImWchar& InImguiKeyStart, _In_ const InputKey& InKeyNameStart, _In_ uint32_t InRange);
 			void _UpdateInputs();
 			void _Render(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer, _In_ const ImguiContext& InImguiContext);
 			void _UploadFontTexture(_In_ GraphicsContext& InContext);
@@ -83,7 +89,7 @@ namespace Eternal
 				int BytesPerPixel			= 0;
 			};
 
-			vector<Input::Key>			_MappedKeys;
+			vector<InputKey>			_MappedKeys;
 			Input*						_Input = nullptr;
 
 			ImguiFontMetaData			_ImguiFontMetaData;

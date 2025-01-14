@@ -5,7 +5,9 @@
 #include "GraphicsEngine/Renderer.hpp"
 #include "GraphicData/GlobalResources.hpp"
 #include "Input/Input.hpp"
+#include "Input/InputDefines.hpp"
 #include "Types/Types.hpp"
+#include "Types/Enums.hpp"
 #include "Math/Math.hpp"
 #include "Memory/StackMemory.hpp"
 
@@ -231,26 +233,26 @@ namespace Eternal
 
 			//IO.ImeWindowHandle		= InContext.GetOutputDevice().GetWindowHandler();
 
-			_Map(Input::TAB,		ImGuiKey_Tab);
-			_Map(Input::LEFT,		ImGuiKey_LeftArrow);
-			_Map(Input::RIGHT,		ImGuiKey_RightArrow);
-			_Map(Input::UP,			ImGuiKey_UpArrow);
-			_Map(Input::DOWN,		ImGuiKey_DownArrow);
-			_Map(Input::PGUP,		ImGuiKey_PageUp);
-			_Map(Input::PGDOWN,		ImGuiKey_PageDown);
-			_Map(Input::HOME,		ImGuiKey_Home);
-			_Map(Input::END,		ImGuiKey_End);
-			_Map(Input::DEL,		ImGuiKey_Delete);
-			_Map(Input::BACKSPACE,	ImGuiKey_Backspace);
-			_Map(Input::RETURN,		ImGuiKey_Enter);
-			_Map(Input::ESC,		ImGuiKey_Escape);
-			_Map(Input::SPACE,		ImGuiKey_Space);
-			_Map(Input::A,			ImGuiKey_A);
-			_Map(Input::C,			ImGuiKey_C);
-			_Map(Input::V,			ImGuiKey_V);
-			_Map(Input::X,			ImGuiKey_X);
-			_Map(Input::Y,			ImGuiKey_Y);
-			_Map(Input::Z,			ImGuiKey_Z);
+			_Map(InputKey::KEY_TAB,			ImGuiKey_Tab);
+			_Map(InputKey::KEY_LEFT,		ImGuiKey_LeftArrow);
+			_Map(InputKey::KEY_RIGHT,		ImGuiKey_RightArrow);
+			_Map(InputKey::KEY_UP,			ImGuiKey_UpArrow);
+			_Map(InputKey::KEY_DOWN,		ImGuiKey_DownArrow);
+			_Map(InputKey::KEY_PGUP,		ImGuiKey_PageUp);
+			_Map(InputKey::KEY_PGDOWN,		ImGuiKey_PageDown);
+			_Map(InputKey::KEY_HOME,		ImGuiKey_Home);
+			_Map(InputKey::KEY_END,			ImGuiKey_End);
+			_Map(InputKey::KEY_DEL,			ImGuiKey_Delete);
+			_Map(InputKey::KEY_BACKSPACE,	ImGuiKey_Backspace);
+			_Map(InputKey::KEY_RETURN,		ImGuiKey_Enter);
+			_Map(InputKey::KEY_ESC,			ImGuiKey_Escape);
+			_Map(InputKey::KEY_SPACE,		ImGuiKey_Space);
+			_Map(InputKey::KEY_A,			ImGuiKey_A);
+			_Map(InputKey::KEY_C,			ImGuiKey_C);
+			_Map(InputKey::KEY_V,			ImGuiKey_V);
+			_Map(InputKey::KEY_X,			ImGuiKey_X);
+			_Map(InputKey::KEY_Y,			ImGuiKey_Y);
+			_Map(InputKey::KEY_Z,			ImGuiKey_Z);
 
 			unsigned char* Pixels		= nullptr;
 			int Width					= 0;
@@ -425,26 +427,26 @@ namespace Eternal
 			RenderContext.Clear();
 		}
 
-		void Imgui::_Map(_In_ const Input::Key& EternalKey, _In_ const ImGuiKey_& ImguiKey)
+		void Imgui::_Map(_In_ const InputKey& InEternalKey, _In_ const ImGuiKey_& InImguiKey)
 		{
-			ImGui::GetIO().KeyMap[ImguiKey] = EternalKey;
-			_MappedKeys.push_back(EternalKey);
+			ImGui::GetIO().KeyMap[InImguiKey] = ToInt(InEternalKey);
+			_MappedKeys.push_back(InEternalKey);
 		}
 
-		void Imgui::_ProcessInputCharacter(_In_ const ImWchar& ImguiKey, _In_ const Input::Key& KeyName)
+		void Imgui::_ProcessInputCharacter(_In_ const ImWchar& InImguiKey, _In_ const InputKey& InKeyName)
 		{
 			ImGuiIO& IO = ImGui::GetIO();
-			if (_Input->IsPressed(KeyName))
-				IO.AddInputCharacter(ImguiKey);
+			if (_Input->IsPressed(InKeyName))
+				IO.AddInputCharacter(InImguiKey);
 		}
 
-		void Imgui::_ProcessInputCharacterRange(_In_ const ImWchar& ImguiKeyStart, _In_ const Input::Key& KeyNameStart, _In_ uint32_t Range)
+		void Imgui::_ProcessInputCharacterRange(_In_ const ImWchar& InImguiKeyStart, _In_ const InputKey& InKeyNameStart, _In_ uint32_t InRange)
 		{
 			ImGuiIO& IO = ImGui::GetIO();
-			for (uint32_t KeyIndex = 0; KeyIndex < Range; ++KeyIndex)
+			for (uint32_t KeyIndex = 0; KeyIndex < InRange; ++KeyIndex)
 			{
-				if (_Input->IsPressed((Input::Input::Key)(KeyNameStart + KeyIndex)))
-					IO.AddInputCharacter(ImguiKeyStart + (ImWchar)KeyIndex);
+				if (_Input->IsPressed(static_cast<InputKey>(ToUInt(InKeyNameStart) + KeyIndex)))
+					IO.AddInputCharacter(InImguiKeyStart + (ImWchar)KeyIndex);
 			}
 		}
 
@@ -452,21 +454,21 @@ namespace Eternal
 		{
 			ImGuiIO& IO = ImGui::GetIO();
 			for (int MappedKeyIndex = 0; MappedKeyIndex < _MappedKeys.size(); ++MappedKeyIndex)
-				IO.KeysDown[_MappedKeys[MappedKeyIndex]] = _Input->IsDown(_MappedKeys[MappedKeyIndex]);
+				IO.KeysDown[ToUInt(_MappedKeys[MappedKeyIndex])] = _Input->IsDown(_MappedKeys[MappedKeyIndex]);
 
-			IO.MouseDown[0]	= _Input->IsPressed(Input::Input::MOUSE0); // L-Click
-			IO.MouseDown[1]	= _Input->IsPressed(Input::Input::MOUSE1); // R-Click
-			IO.MouseDown[2]	= _Input->IsPressed(Input::Input::MOUSE2); // M-Click
-			IO.MousePos.x	= _Input->GetAxis(Input::Input::MOUSE_X);
-			IO.MousePos.y	= _Input->GetAxis(Input::Input::MOUSE_Y);
+			IO.MouseDown[0]	= _Input->IsPressed(InputKey::KEY_MOUSE0); // L-Click
+			IO.MouseDown[1]	= _Input->IsPressed(InputKey::KEY_MOUSE1); // R-Click
+			IO.MouseDown[2]	= _Input->IsPressed(InputKey::KEY_MOUSE2); // M-Click
+			IO.MousePos.x	= _Input->GetAxis(InputAxis::AXIS_MOUSE_X);
+			IO.MousePos.y	= _Input->GetAxis(InputAxis::AXIS_MOUSE_Y);
 
-			_ProcessInputCharacterRange((ImWchar)'a',	Input::Input::A,		26);
-			_ProcessInputCharacterRange((ImWchar)'0',	Input::Input::KP0,		10);
-			_ProcessInputCharacter('.',					Input::Input::KPPERIOD);
-			_ProcessInputCharacter('+',					Input::Input::KPPLUS);
-			_ProcessInputCharacter('-',					Input::Input::KPMINUS);
-			_ProcessInputCharacter('*',					Input::Input::KPMUL);
-			_ProcessInputCharacter('/',					Input::Input::KPDIV);
+			_ProcessInputCharacterRange((ImWchar)'a',	InputKey::KEY_A,		26);
+			_ProcessInputCharacterRange((ImWchar)'0',	InputKey::KEY_KP0,		10);
+			_ProcessInputCharacter('.',					InputKey::KEY_KPPERIOD);
+			_ProcessInputCharacter('+',					InputKey::KEY_KPPLUS);
+			_ProcessInputCharacter('-',					InputKey::KEY_KPMINUS);
+			_ProcessInputCharacter('*',					InputKey::KEY_KPMUL);
+			_ProcessInputCharacter('/',					InputKey::KEY_KPDIV);
 		}
 
 		void Imgui::_ImGui_FillBuffers(_In_ const ImDrawData& InDrawData, _In_ ImguiRenderContext& InImguiContext)
