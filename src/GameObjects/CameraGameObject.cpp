@@ -1,15 +1,16 @@
 #include "GameObjects/CameraGameObject.hpp"
 #include "Components/TransformComponent.hpp"
 #include "Core/World.hpp"
-#include "Core/Game.hpp"
-#include "Core/System.hpp"
-#include "Input/Input.hpp"
+#include "Core/CoreHelper.hpp"
+#include "Input/InputDefines.hpp"
+#include "Input/InputMapping.hpp"
 #include "Math/Math.hpp"
-#include <algorithm>
+
 namespace Eternal
 {
 	namespace GameObjects
 	{
+		using namespace Eternal::Core;
 		using namespace Eternal::Components;
 		using namespace Eternal::InputSystem;
 		using namespace Eternal::Math;
@@ -23,7 +24,7 @@ namespace Eternal
 		void CameraGameObject::Update(const TimeSecondsT InDeltaSeconds)
 		{
 			(void)InDeltaSeconds;
-			Input& InputSystem = GetWorld()->GetGame().GetSystem().GetInput();
+			InputMapping& Mapping = GetInputMapping(GetWorld());
 
 			TransformComponent* Component = GetComponent<TransformComponent>();
 
@@ -37,35 +38,36 @@ namespace Eternal
 			Vector3 ForwardVector(Forward.x, Forward.y, Forward.z);
 			Vector3 RightVector(Right.x, Right.y, Right.z);
 
-			float LXWithDeadZone = InputSystem.GetAxisWithDeadZone(Input::JOY0_LX);
-			float LYWithDeadZone = InputSystem.GetAxisWithDeadZone(Input::JOY0_LY);
-			float RXWithDeadZone = InputSystem.GetAxisWithDeadZone(Input::JOY0_RX);
-			float RYWithDeadZone = InputSystem.GetAxisWithDeadZone(Input::JOY0_RY);
+			float LXWithDeadZone = Mapping.GetActionFloat("move_left_right");
+			float LYWithDeadZone = Mapping.GetActionFloat("move_forward_backward");
+			//float LYWithDeadZone = InputSystem.GetAxisWithDeadZone(InputAxis::AXIS_JOY0_LY);
+			//float RXWithDeadZone = InputSystem.GetAxisWithDeadZone(InputAxis::AXIS_JOY0_RX);
+			//float RYWithDeadZone = InputSystem.GetAxisWithDeadZone(InputAxis::AXIS_JOY0_RY);
 
-			static float Multiplier = 1000.0f;
+			static float Multiplier = 100000.0f;
 
 			Component->GetTransform().Translate(
-				RightVector * LXWithDeadZone * Multiplier +
-				ForwardVector * LYWithDeadZone * Multiplier +
-				Vector3::Up * RYWithDeadZone * Multiplier
+				RightVector * LXWithDeadZone * Multiplier * InDeltaSeconds +
+				ForwardVector * LYWithDeadZone * Multiplier * InDeltaSeconds /*+
+				Vector3::Up * RYWithDeadZone * Multiplier * InDeltaSeconds*/
 			);
 
-			Component->GetTransform().Rotate(
-				Euler(0.0f, RXWithDeadZone * 0.1f, 0.0f /*RYWithDeadZone * 0.1f*/)
-			);
+			//Component->GetTransform().Rotate(
+			//	Euler(0.0f, RXWithDeadZone * 0.1f, 0.0f /*RYWithDeadZone * 0.1f*/)
+			//);
 		}
 
 		void CameraGameObject::UpdateDebug()
 		{
-			Input& InputSystem = GetWorld()->GetGame().GetSystem().GetInput();
+			InputMapping& Mapping = GetInputMapping(GetWorld());
 
 			TransformComponent* Component = GetComponent<TransformComponent>();
 
-			ImGui::Begin("Camera");
-			ImGui::Text("Input X: [%.3f] / Input Y: [%.3f]", InputSystem.GetAxisWithDeadZone(Input::JOY0_LX), InputSystem.GetAxisWithDeadZone(Input::JOY0_LY));
-			ImGui::Text("Input RX: [%.3f] / Input RY: [%.3f]", InputSystem.GetAxisWithDeadZone(Input::JOY0_RX), InputSystem.GetAxisWithDeadZone(Input::JOY0_RY));
-			ImGui::InputFloat3("Camera Position:", &Component->GetTransform().GetTranslation().x);
-			ImGui::End();
+			//ImGui::Begin("Camera");
+			//ImGui::Text("Input X: [%.3f] / Input Y: [%.3f]", InputSystem.GetAxisWithDeadZone(InputAxis::AXIS_JOY0_LX), InputSystem.GetAxisWithDeadZone(InputAxis::AXIS_JOY0_LY));
+			//ImGui::Text("Input RX: [%.3f] / Input RY: [%.3f]", InputSystem.GetAxisWithDeadZone(InputAxis::AXIS_JOY0_RX), InputSystem.GetAxisWithDeadZone(InputAxis::AXIS_JOY0_RY));
+			//ImGui::InputFloat3("Camera Position:", &Component->GetTransform().GetTranslation().x);
+			//ImGui::End();
 		}
 	}
 }
