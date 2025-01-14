@@ -2,8 +2,14 @@
 
 namespace Eternal
 {
+	namespace InputSystem
+	{
+		class InputMapping;
+	}
 	namespace Core
 	{
+		using namespace Eternal::InputSystem;
+
 		class Game;
 		class System;
 
@@ -25,6 +31,7 @@ namespace Eternal
 		protected:
 			Game& GetGame() { return _Game; }
 			System& GetSystem();
+			InputMapping& GetInputMapping();
 
 		private:
 			Game& _Game;
