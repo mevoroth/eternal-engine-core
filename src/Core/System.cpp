@@ -7,7 +7,9 @@
 #include "Time/TimeFactory.hpp"
 #include "Log/Log.hpp"
 #include "Log/LogFactory.hpp"
+#include "Input/Input.hpp"
 #include "Input/InputFactory.hpp"
+#include "Input/InputMapping.hpp"
 #include "Task/Core/RendererTask.hpp"
 #include "Task/Core/StreamingTask.hpp"
 #include "Task/Tools/AutoRecompileShaderTask.hpp"
@@ -62,6 +64,7 @@ namespace Eternal
 			_Timer						= CreateTimer(TimeType::TIME_TYPE_DEFAULT);
 			_Logs						= CreateMultiChannelLog({ LogType::LOG_TYPE_CONSOLE/*, LogType::LOG_TYPE_FILE*/ });
 			_Input						= CreateMultiInput({ InputType::INPUT_TYPE_KEYBOARD, InputType::INPUT_TYPE_DEFAULT_PAD, InputType::INPUT_TYPE_MOUSE });
+			_InputMapping				= new InputMapping(*_Input);
 
 			_Streaming					= new Streaming(_TextureFactory);
 			_Streaming->RegisterLoader(AssetType::ASSET_TYPE_LEVEL, new LevelLoader());
@@ -119,6 +122,8 @@ namespace Eternal
 			Destroy(_Streaming);
 			Destroy(_Renderer);
 
+			delete _InputMapping;
+			_InputMapping = nullptr;
 			DestroyInput(_Input);
 			DestroyLog(_Logs);
 			DestroyTimer(_Timer);

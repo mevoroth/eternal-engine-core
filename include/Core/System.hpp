@@ -37,6 +37,7 @@ namespace Eternal
 	namespace InputSystem
 	{
 		class Input;
+		class InputMapping;
 	}
 
 	namespace Import
@@ -196,10 +197,10 @@ namespace Eternal
 				return *_GraphicsContext;
 			}
 
-			inline Input& GetInput()
+			inline InputMapping& GetInputMapping()
 			{
-				ETERNAL_ASSERT(_Input);
-				return *_Input;
+				ETERNAL_ASSERT(_InputMapping);
+				return *_InputMapping;
 			}
 
 			inline ParallelSystem& GetParallelSystem()
@@ -262,6 +263,7 @@ namespace Eternal
 
 		protected:
 			Input*														_Input						= nullptr;
+			InputMapping*												_InputMapping				= nullptr;
 			GraphicsContext*											_GraphicsContext			= nullptr;
 			AutoRecompileShaderTask*									_AutoRecompileShaderTask	= nullptr;
 
