@@ -1,6 +1,7 @@
 #pragma once
 
 #include <vector>
+#include <string>
 
 namespace Eternal
 {
@@ -27,14 +28,14 @@ namespace Eternal
 
 			Game* GameContext						= nullptr;
 
-			vector<const char*> ShaderIncludePath;
-			const char* ShaderPDBPath				= nullptr;
-			const char* FBXPath						= nullptr;
-			const char* FBXCachePath				= nullptr;
-			const char* TexturePath					= nullptr;
-			const char* LevelPath					= nullptr;
-			const char* PipelineCachePath			= nullptr;
-			const char* MaterialPath				= nullptr;
+			vector<string> ShaderIncludePath;
+			string ShaderPDBPath;
+			string FBXPath;
+			string FBXCachePath;
+			string TexturePath;
+			string LevelPath;
+			string PipelineCachePath;
+			string MaterialPath;
 		};
 	}
 }
