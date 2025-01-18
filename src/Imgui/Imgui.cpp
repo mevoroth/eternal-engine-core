@@ -456,9 +456,9 @@ namespace Eternal
 			for (int MappedKeyIndex = 0; MappedKeyIndex < _MappedKeys.size(); ++MappedKeyIndex)
 				IO.KeysDown[ToUInt(_MappedKeys[MappedKeyIndex])] = _Input->IsDown(_MappedKeys[MappedKeyIndex]);
 
-			IO.MouseDown[0]	= _Input->IsPressed(InputKey::KEY_MOUSE0); // L-Click
-			IO.MouseDown[1]	= _Input->IsPressed(InputKey::KEY_MOUSE1); // R-Click
-			IO.MouseDown[2]	= _Input->IsPressed(InputKey::KEY_MOUSE2); // M-Click
+			IO.MouseDown[0]	= _Input->IsDown(InputKey::KEY_MOUSE0); // L-Click
+			IO.MouseDown[1]	= _Input->IsDown(InputKey::KEY_MOUSE1); // R-Click
+			IO.MouseDown[2]	= _Input->IsDown(InputKey::KEY_MOUSE2); // M-Click
 			IO.MousePos.x	= _Input->GetAxis(InputAxis::AXIS_MOUSE_X);
 			IO.MousePos.y	= _Input->GetAxis(InputAxis::AXIS_MOUSE_Y);
 
