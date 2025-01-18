@@ -19,14 +19,12 @@ namespace Eternal
 
 		struct SystemCreateInformation
 		{
-			SystemCreateInformation(_In_ GraphicsContextCreateInformation& InContextInformation)
-				: ContextInformation(InContextInformation)
-			{
-			}
+			SystemCreateInformation(_In_ GraphicsContextCreateInformation* InContextInformation);
+			~SystemCreateInformation();
 
-			GraphicsContextCreateInformation& ContextInformation;
+			GraphicsContextCreateInformation* ContextInformation	= nullptr;
 
-			Game* GameContext						= nullptr;
+			Game* GameContext										= nullptr;
 
 			vector<string> ShaderIncludePath;
 			string ShaderPDBPath;

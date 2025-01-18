@@ -27,7 +27,7 @@ namespace Eternal
 				InMaintInput.ApplicationName,
 				Platform::MicrosoftProcess::WindowProc
 			);
-			WindowsGraphicsContextCreateInformation ContextCreateInformation(Settings, WinArguments);
+			WindowsGraphicsContextCreateInformation* ContextCreateInformation = new WindowsGraphicsContextCreateInformation(Settings, WinArguments);
 
 			return SystemCreateInformation(ContextCreateInformation);
 		}

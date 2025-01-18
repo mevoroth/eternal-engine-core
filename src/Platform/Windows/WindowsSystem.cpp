@@ -11,7 +11,7 @@ namespace Eternal
 		WindowsSystem::WindowsSystem(_In_ SystemCreateInformation& InSystemCreateInformation)
 			: MicrosoftSystem(InSystemCreateInformation)
 		{
-			_GraphicsContext = CreateGraphicsContext(static_cast<const WindowsGraphicsContextCreateInformation&>(InSystemCreateInformation.ContextInformation));
+			_GraphicsContext = CreateGraphicsContext(*static_cast<const WindowsGraphicsContextCreateInformation*>(InSystemCreateInformation.ContextInformation));
 
 			TaskCreateInformation AutoRecompileShaderTaskCreateInformation("AutoRecompileShaderTask");
 			_AutoRecompileShaderTask = new WindowsAutoRecompileShaderTask(AutoRecompileShaderTaskCreateInformation, *_GraphicsContext);

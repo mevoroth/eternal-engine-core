@@ -41,8 +41,6 @@ namespace Eternal
 
 			Eternal::DebugTools::WaitForDebugger();
 
-			const DeviceType ProgramDeviceType = DeviceType::DEVICE_TYPE_DEFAULT;
-
 			//OPTICK_APP(InMainInput.ApplicationName);
 			
 			SystemCreateInformation SystemInformation = CreateSystemInformation(InMaintInput);
