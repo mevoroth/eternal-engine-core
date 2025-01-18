@@ -115,12 +115,12 @@ namespace Eternal
 
 			for (uint32_t FrameIndex = 0; FrameIndex < GraphicsContext::FrameBufferingCount; ++FrameIndex)
 				_Imgui->DestroyContext(_Frames[FrameIndex].ImguiFrameContext);
+			Destroy(_Imgui);
+			Destroy(_Renderer);
 
 			DestroyGraphicsContext(_GraphicsContext);
 
-			Destroy(_Imgui);
 			Destroy(_Streaming);
-			Destroy(_Renderer);
 
 			delete _InputMapping;
 			_InputMapping = nullptr;

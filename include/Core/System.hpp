@@ -270,7 +270,7 @@ namespace Eternal
 		private:
 			void _LoadBuiltin();
 			
-			SystemCreateInformation										_SystemCreateInformation;
+			SystemCreateInformation&									_SystemCreateInformation;
 			TextureFactory												_TextureFactory;
 			MaterialUpdateBatcher										_MaterialUpdateBatcher;
 			ParallelSystem*												_ParallelSystem				= nullptr;
