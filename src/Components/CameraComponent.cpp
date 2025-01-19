@@ -18,6 +18,7 @@ namespace Eternal
 		CameraComponent::CameraComponent(_In_ World* InWorld /* = nullptr */)
 			: Component(InWorld)
 			, _OnTransformChangedReceiver(this)
+			, _OnCameraComponentBegin(&OnCameraComponentBeginEvent::OnCameraComponentBegin)
 		{
 			SetHasBehavior();
 		}
@@ -26,6 +27,7 @@ namespace Eternal
 		{
 			System& SystemEngine = GetWorld()->GetGame().GetSystem();
 			SystemEngine.GetGameFrame().PendingViewCamera = _Camera;
+			_OnCameraComponentBegin.Notify(this);
 		}
 	}
 }

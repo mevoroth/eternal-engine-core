@@ -29,9 +29,18 @@ namespace Eternal
 			CameraComponent* _CameraComponent = nullptr;
 		};
 
+		struct OnCameraComponentBeginEvent
+		{
+			virtual void OnCameraComponentBegin(_Inout_ CameraComponent* InOutCameraComponent) = 0;
+		};
+
+		using OnCameraComponentBeginEventFunctor = void (OnCameraComponentBeginEvent::*)(_Inout_ CameraComponent* InOutCameraComponent);
+
 		class CameraComponent : public Component
 		{
 		public:
+
+			using OnCameraComponentBeginEventSender = EventSender<OnCameraComponentBeginEvent, OnCameraComponentBeginEventFunctor>;
 
 			CameraComponent(_In_ World* InWorld = nullptr);
 
@@ -59,10 +68,12 @@ namespace Eternal
 			}
 
 			OnTransformChangedEvent& OnTransformChangedReceiver() { return _OnTransformChangedReceiver; }
+			OnCameraComponentBeginEventSender& GetOnCameraComponentBegin() { return _OnCameraComponentBegin; }
 
 		private:
-			Camera* _Camera = nullptr;
-			CameraOnTransformChanged _OnTransformChangedReceiver;
+			Camera*								_Camera = nullptr;
+			CameraOnTransformChanged			_OnTransformChangedReceiver;
+			OnCameraComponentBeginEventSender	_OnCameraComponentBegin;
 
 		};
 	}
