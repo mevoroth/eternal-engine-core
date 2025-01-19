@@ -41,6 +41,11 @@ namespace Eternal
 				return *_System;
 			}
 
+			World& GetWorld()
+			{
+				return _World;
+			}
+
 			bool* GetRunningPointer() { return &_Running; }
 
 		protected:

@@ -1,5 +1,6 @@
 #include "Core/System.hpp"
 #include "Core/Game.hpp"
+#include "Core/SystemCreateInformation.hpp"
 #include "Graphics/GraphicsInclude.hpp"
 #include "GraphicsEngine/Renderer.hpp"
 #include "File/FilePath.hpp"
@@ -81,7 +82,7 @@ namespace Eternal
 
 		void System::InitializeSystem()
 		{
-			_Renderer					= new Renderer(*_GraphicsContext);
+			_Renderer					= _SystemCreateInformation.CreateCustomRendererFunction ? _SystemCreateInformation.CreateCustomRendererFunction(*_GraphicsContext) : new Renderer(*_GraphicsContext);
 			_Imgui						= new Imgui(*_GraphicsContext, *_Renderer, _Input);
 
 			for (uint32_t FrameIndex = 0; FrameIndex < GraphicsContext::FrameBufferingCount; ++FrameIndex)
