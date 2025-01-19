@@ -34,7 +34,7 @@ namespace Eternal
 		};
 
 		SystemCreateInformation CreateSystemInformation(_In_ const MainInput& InMaintInput);
-		template<typename GameStateType>
+		template<typename CustomSetupType, typename GameStateType>
 		int Main(_In_ const MainInput& InMaintInput)
 		{
 			using namespace Eternal::FileSystem;
@@ -53,6 +53,8 @@ namespace Eternal
 			SystemInformation.LevelPath			= FilePath::MakePath("assets\\scenes\\");
 			SystemInformation.PipelineCachePath	= FilePath::MakePath("assets\\pipelines\\");
 			SystemInformation.MaterialPath		= FilePath::MakePath("assets\\materials\\");
+
+			CustomSetupType::SetupCustomSystemCreateInformation(SystemInformation);
 
 			GameCreateInformation GameInformation(SystemInformation);
 
