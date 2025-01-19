@@ -1,16 +1,6 @@
 #include "GraphicsEngine/Renderer.hpp"
-#include "GraphicData/GlobalResources.hpp"
-#include "GraphicsEngine/RenderPasses/SkyPass.hpp"
-#include "GraphicsEngine/RenderPasses/ShadowMapPass.hpp"
-#include "GraphicsEngine/RenderPasses/OpaquePass.hpp"
-#include "GraphicsEngine/RenderPasses/DistantObjectPass.hpp"
-#include "GraphicsEngine/RenderPasses/DirectLightingPass.hpp"
-#include "GraphicsEngine/RenderPasses/RayTracedReflectionsPass.hpp"
-#include "GraphicsEngine/RenderPasses/VolumetricCloudsPass.hpp"
-#include "GraphicsEngine/RenderPasses/TonemappingPass.hpp"
+#include "GraphicData/GlobalResourcesPBR.hpp"
 #include "GraphicsEngine/RenderPasses/PresentPass.hpp"
-#include "GraphicsEngine/RenderPasses/Debug/DebugObjectBoundingBoxPass.hpp"
-#include "GraphicsEngine/RenderPasses/Debug/DebugRayTracingPass.hpp"
 #include "imgui.h"
 
 namespace Eternal
@@ -27,21 +17,10 @@ namespace Eternal
 			InOutPass = nullptr;
 		}
 
-		Renderer::Renderer(_In_ GraphicsContext& InContext)
+		Renderer::Renderer(_In_ GraphicsContext& InContext, _In_ GlobalResources* InGlobalResources, _In_ const std::function<vector<Pass*>(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)>& InPassPopulateFunction)
 			: _MipMapGeneration(InContext)
-			, _GlobalResources(new GlobalResources(InContext))
-			, _Passes({
-				new SkyPass(InContext, *this),
-				new ShadowMapPass(InContext, *this),
-				new OpaquePass(InContext, *this),
-				new DistantObjectPass(InContext, *this),
-				new DirectLightingPass(InContext, *this),
-				new RayTracedReflectionsPass(InContext, *this),
-				new DebugObjectBoundingBoxPass(InContext, *this),
-				new VolumetricCloudsPass(InContext, *this),
-				new TonemappingPass(InContext, *this),
-				new DebugRayTracingPass(InContext, *this)
-			})
+			, _GlobalResources(InGlobalResources)
+			, _Passes(InPassPopulateFunction(InContext, *this))
 			, _PresentPass(new PresentPass(InContext, *this))
 		{
 			GraphicsContext::SetOnStencilWriteFunctor(

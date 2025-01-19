@@ -4,6 +4,7 @@
 #include "NextGenGraphics/FrameGraph.hpp"
 #include "NextGenGraphics/StencilTracker.hpp"
 #include <vector>
+#include <functional>
 
 namespace Eternal
 {
@@ -37,8 +38,7 @@ namespace Eternal
 
 			static constexpr bool UseFrameGraph = false;
 
-			Renderer(_In_ GraphicsContext& InContext);
-			~Renderer();
+			virtual ~Renderer();
 
 			void Render(_In_ GraphicsContext& InContext, _In_ System& InSystem);
 			void Present(_In_ GraphicsContext& InContext, _In_ System& InSystem);
@@ -53,7 +53,9 @@ namespace Eternal
 			StencilTracker& GetStencilTracker() { return _StencilTracker; }
 			MipMapGeneration& GetMipMapGeneration() { return _MipMapGeneration; }
 
-		private:
+		protected:
+
+			Renderer(_In_ GraphicsContext& InContext, _In_ GlobalResources* InGlobalResources, _In_ const std::function<vector<Pass*>(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)>& InPassPopulateFunction);
 
 			FrameGraph			_FrameGraph;
 			StencilTracker		_StencilTracker;
