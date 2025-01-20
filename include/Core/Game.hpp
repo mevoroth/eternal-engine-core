@@ -48,6 +48,12 @@ namespace Eternal
 
 			bool* GetRunningPointer() { return &_Running; }
 
+			template<typename GameStateType>
+			GameStateType* GetGameState()
+			{
+				return static_cast<GameStateType*>(_CurrentGameState);
+			}
+
 		protected:
 			void Update();
 			void UpdateDebug();
