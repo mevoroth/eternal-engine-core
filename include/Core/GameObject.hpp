@@ -67,6 +67,42 @@ namespace Eternal
 				return nullptr;
 			}
 
+			template<typename ComponentType>
+			inline void GetComponents(_Out_ vector<ComponentType*>& OutComponents)
+			{
+				OutComponents.reserve(_Components.size());
+				for (uint32_t ComponentIndex = 0; ComponentIndex < _Components.size(); ++ComponentIndex)
+				{
+					if (ComponentType* CastedComponent = dynamic_cast<ComponentType*>(_Components[ComponentIndex]))
+						OutComponents.push_back(CastedComponent);
+				}
+			}
+
+			template<typename ComponentType>
+			inline void RegisterComponents()
+			{
+				vector<ComponentType*> Components;
+				GetComponents<ComponentType>(Components);
+				for (uint32_t ComponentIndex = 0; ComponentIndex < Components.size(); ++ComponentIndex)
+				{
+					Components[ComponentIndex]->template OnAddComponent<ComponentType>();
+				}
+			}
+
+			template<typename ComponentType>
+			inline void UnregisterComponents()
+			{
+				vector<ComponentType*> Components;
+				GetComponents<ComponentType>(Components);
+				for (uint32_t ComponentIndex = 0; ComponentIndex < Components.size(); ++ComponentIndex)
+				{
+					Components[ComponentIndex]->template OnRemoveComponent<ComponentType>();
+				}
+			}
+
+			void RegisterAllComponents();
+			void UnregisterAllComponents();
+
 			virtual void UpdateDebug() {}
 
 		protected:

@@ -2,6 +2,10 @@
 #include "Core/Component.hpp"
 #include "Core/Level.hpp"
 #include "Core/World.hpp"
+#include "Components/CameraComponent.hpp"
+#include "Components/LightComponent.hpp"
+#include "Components/MeshComponent.hpp"
+#include "Components/TransformComponent.hpp"
 
 namespace Eternal
 {
@@ -23,6 +27,22 @@ namespace Eternal
 		Level* GameObject::GetParent()
 		{
 			return static_cast<Level*>(GetParentObject());
+		}
+
+		void GameObject::RegisterAllComponents()
+		{
+			RegisterComponents<CameraComponent>();
+			RegisterComponents<LightComponent>();
+			RegisterComponents<MeshComponent>();
+			RegisterComponents<TransformComponent>();
+		}
+
+		void GameObject::UnregisterAllComponents()
+		{
+			UnregisterComponents<CameraComponent>();
+			UnregisterComponents<LightComponent>();
+			UnregisterComponents<MeshComponent>();
+			UnregisterComponents<TransformComponent>();
 		}
 
 		//////////////////////////////////////////////////////////////////////////
