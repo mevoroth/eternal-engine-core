@@ -96,7 +96,7 @@ namespace Eternal
 
 				for (uint32_t LightIndex = 0; LightIndex < Lights.size(); ++LightIndex)
 				{
-					LightsBufferMapScope.GetDataPointer()[LightIndex] =
+					LightsBufferMapScope[LightIndex] =
 					{
 						Vector4(Lights[LightIndex].Object->GetPosition(), 1.0f),
 						Lights[LightIndex].Object->GetColor() * Lights[LightIndex].Object->GetIntensity(), static_cast<uint32_t>(Lights[LightIndex].Object->GetLightType()),
@@ -108,7 +108,7 @@ namespace Eternal
 			{
 				MapRange DirectLightingMapRange(sizeof(DirectLightingConstants));
 				MapScope<DirectLightingConstants> DirectLightingConstantsMapScope(*_DirectLightingConstantBuffer.ResourceBuffer, DirectLightingMapRange);
-				DirectLightingConstantsMapScope.GetDataPointer()->LightsCount = 1;// static_cast<uint32_t>(Lights.size());
+				DirectLightingConstantsMapScope->LightsCount = 1;// static_cast<uint32_t>(Lights.size());
 			}
 
 			_DirectLightingDescriptorTable->SetDescriptor(0, _DirectLightingConstantBuffer.GetView());

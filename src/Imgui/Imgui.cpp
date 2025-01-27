@@ -155,7 +155,7 @@ namespace Eternal
 			_ImguiConstantBuffer		= CreateMultiBufferedBuffer(InContext, ImguiConstantBufferResourceCreateInformation);
 
 			ViewMetaData ImguiConstantBufferViewMetaData;
-			ImguiConstantBufferViewMetaData.ConstantBufferView.BufferSize = sizeof(ImguiProjectionConstants);
+			ImguiConstantBufferViewMetaData.ConstantBufferView.BufferSize = (*_ImguiConstantBuffer)->GetBufferStride();
 			ConstantBufferViewCreateInformation ImguiConstantBufferViewCreateInformation(
 				InContext,
 				*_ImguiConstantBuffer,
@@ -516,7 +516,7 @@ namespace Eternal
 
 			ViewMetaData ProjectionConstantsMetaData;
 			ProjectionConstantsMetaData.ConstantBufferView.BufferElementOffset	= InImguiContext.ImguiProjectionCount;
-			ProjectionConstantsMetaData.ConstantBufferView.BufferSize			= sizeof(ImguiProjectionConstants);
+			ProjectionConstantsMetaData.ConstantBufferView.BufferSize			= (*_ImguiConstantBuffer)->GetBufferStride();
 
 			View* ProjectionConstantsView = CreateConstantBufferView(
 				ConstantBufferViewCreateInformation(

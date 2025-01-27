@@ -175,7 +175,7 @@ namespace Eternal
 
 					ViewMetaData ObjectPerDrawInstanceConstantsMetaData;
 					ObjectPerDrawInstanceConstantsMetaData.ConstantBufferView.BufferElementOffset	= CollectionIndex;
-					ObjectPerDrawInstanceConstantsMetaData.ConstantBufferView.BufferSize			= sizeof(PerDrawInstanceConstants);
+					ObjectPerDrawInstanceConstantsMetaData.ConstantBufferView.BufferSize			= (*_ObjectPerDrawInstanceBuffer)->GetBufferStride();
 
 					View* ObjectPerDrawInstanceBufferView = CreateConstantBufferView(
 						ConstantBufferViewCreateInformation(
