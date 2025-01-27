@@ -112,6 +112,16 @@ namespace Eternal
 				CurrentPendingInstancedObjects->Instances.push_back(InTransformComponent);
 			}
 
+			void RemoveObject(_In_ ObjectType* InObject, _In_ TransformComponent* InTransformComponent)
+			{
+				InstancedObjects* CurrentInstancedObjects = FindOrCreate(InObject, Objects);
+				InstancedObjects* CurrentDeletedInstancedObjects = FindOrCreate(InObject, DeletedObjects);
+
+				auto FoundInstanceIterator = std::find(CurrentInstancedObjects->Instances.begin(), CurrentInstancedObjects->Instances.end(), InTransformComponent);
+				CurrentInstancedObjects->Instances.erase(FoundInstanceIterator);
+				CurrentDeletedInstancedObjects->Instances.push_back(InTransformComponent);
+			}
+
 			void CommitObjects(_Inout_ ObjectsList<ObjectType>& InOutOldestFrameObjectList)
 			{
 				for (uint32_t PendingObjectIndex = 0; PendingObjectIndex < InOutOldestFrameObjectList.PendingObjects.size(); ++PendingObjectIndex)
@@ -129,12 +139,29 @@ namespace Eternal
 						CurrentPendingInstancedObjects.Instances.clear();
 					}
 				}
+
+				for (uint32_t DeletedObjectIndex = 0; DeletedObjectIndex < InOutOldestFrameObjectList.DeletedObjects.size(); ++DeletedObjectIndex)
+				{
+					if (InOutOldestFrameObjectList.DeletedObjects[DeletedObjectIndex].Instances.size() > 0)
+					{
+						InstancedObjects& CurrentDeletedInstanceObjects = InOutOldestFrameObjectList.DeletedObjects[DeletedObjectIndex];
+
+						InstancedObjects* CurrentInstancedObjects = FindOrCreate(InOutOldestFrameObjectList.DeletedObjects[DeletedObjectIndex].Object, Objects);
+						for (uint32_t InstanceIndex = 0; InstanceIndex < CurrentDeletedInstanceObjects.Instances.size(); ++InstanceIndex)
+						{
+							auto FoundInstanceIterator = std::find(CurrentInstancedObjects->Instances.begin(), CurrentInstancedObjects->Instances.end(), CurrentDeletedInstanceObjects.Instances[InstanceIndex]);
+							CurrentInstancedObjects->Instances.erase(FoundInstanceIterator);
+						}
+						CurrentDeletedInstanceObjects.Instances.clear();
+					}
+				}
 			}
 
 			operator const vector<InstancedObjects>&() const { return Objects; }
 
 			vector<InstancedObjects> Objects;
 			vector<InstancedObjects> PendingObjects;
+			vector<InstancedObjects> DeletedObjects;
 
 		private:
 			InstancedObjects* FindOrCreate(_In_ ObjectType* InObject, _Inout_ vector<InstancedObjects>& InOutObjects)
