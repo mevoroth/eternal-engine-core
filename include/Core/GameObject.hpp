@@ -28,6 +28,23 @@ namespace Eternal
 				(void)InDeltaSeconds;
 			}
 			virtual void SetWorld(_In_ World* InWorld) override final;
+			
+			template<typename ComponentType>
+			inline ComponentType* CreateComponent(_In_ const function<void(_Inout_ ComponentType*)>& SetupFunctor = [](_Inout_ ComponentType*) {})
+			{
+				ComponentType* OutComponent = new ComponentType();
+				CreateComponent<ComponentType>(OutComponent, SetupFunctor);
+				return OutComponent;
+			}
+			
+			template<typename ComponentType>
+			inline void CreateComponent(_In_ ComponentType* InComponent, _In_ const function<void(_Inout_ ComponentType*)>& SetupFunctor = [](_Inout_ ComponentType*) {})
+			{
+				_Components.push_back(InComponent);
+				InComponent->SetParent(this);
+				if (SetupFunctor)
+					SetupFunctor(InComponent);
+			}
 
 			template<typename ComponentType>
 			inline ComponentType* AddComponent(_In_ const function<void (_Inout_ ComponentType*)>& SetupFunctor = [](_Inout_ ComponentType*) {})
