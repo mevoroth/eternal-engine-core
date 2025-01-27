@@ -52,7 +52,8 @@ namespace Eternal
 			{
 				InComponent->template OnRemoveComponent<ComponentType>();
 				InComponent->SetParent(nullptr);
-				vector<Component*>::iterator ComponentIterator = remove(_Components.begin(), _Components.end(), InComponent);
+				vector<Component*>::iterator ComponentIterator = find(_Components.begin(), _Components.end(), InComponent);
+				_Components.erase(ComponentIterator);
 			}
 
 			template<typename ComponentType>
