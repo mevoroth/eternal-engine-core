@@ -23,7 +23,7 @@ namespace Eternal
 		public:
 			GameObject();
 
-			virtual void Update(const TimeSecondsT InDeltaSeconds)
+			virtual void Update(_In_ const TimeSecondsT InDeltaSeconds)
 			{
 				(void)InDeltaSeconds;
 			}
