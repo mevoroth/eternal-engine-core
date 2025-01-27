@@ -121,7 +121,7 @@ namespace Eternal
 			}
 
 			const vector<View*>& SkyMipUnorderedAccessViews = InRenderer.GetGlobalResources().GetSkyMipUnorderedAccessViews();
-			for (uint32_t SkyMip = 0, SkyMipCount = SkyMipUnorderedAccessViews.size() - 1; SkyMip < SkyMipCount; ++SkyMip)
+			for (uint32_t SkyMip = 0, SkyMipCount = static_cast<uint32_t>(SkyMipUnorderedAccessViews.size()) - 1; SkyMip < SkyMipCount; ++SkyMip)
 			{
 				View* CurrentMip0 = InRenderer.GetGlobalResources().GetSkyMipShaderResourceViews()[SkyMip];
 				View* CurrentMip1 = SkyMipUnorderedAccessViews[SkyMip + 1];
