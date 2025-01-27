@@ -27,8 +27,8 @@ namespace Eternal
 		void Level::RemoveGameObject(_In_ GameObject* InGameObject)
 		{
 			InGameObject->SetParent(nullptr);
-			vector<GameObject*>::iterator GameObjectIterator = remove(_GameObjects.begin(), _GameObjects.end(), InGameObject);
-			(void)GameObjectIterator;
+			vector<GameObject*>::iterator GameObjectIterator = find(_GameObjects.begin(), _GameObjects.end(), InGameObject);
+			_GameObjects.erase(GameObjectIterator);
 		}
 
 		void Level::Update(_In_ const TimeSecondsT InDeltaSeconds)
