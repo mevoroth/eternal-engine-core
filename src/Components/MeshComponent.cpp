@@ -1,4 +1,5 @@
 #include "Components/MeshComponent.hpp"
+#include "Core/CoreHelper.hpp"
 #include "Core/World.hpp"
 #include "Core/Game.hpp"
 #include "Core/System.hpp"
@@ -13,21 +14,28 @@ namespace Eternal
 
 		MeshComponent::MeshComponent()
 		{
+			SetHasBehavior();
 		}
 
 		void MeshComponent::Begin()
 		{
-			System& EngineSystem = GetWorld()->GetGame().GetSystem();
+			System& EngineSystem = GetSystem(GetWorld());
 			TransformComponent* Transform = GetParent()->GetComponent<TransformComponent>();
 			ETERNAL_ASSERT(_MeshCollection);
 			EngineSystem.GetGameFrame().MeshCollections.AddObject(_MeshCollection, Transform);
 		}
 
+		void MeshComponent::End()
+		{
+			System& EngineSystem = GetSystem(GetWorld());
+			TransformComponent* Transform = GetParent()->GetComponent<TransformComponent>();
+			ETERNAL_ASSERT(_MeshCollection);
+			EngineSystem.GetGameFrame().MeshCollections.RemoveObject(_MeshCollection, Transform);
+		}
+
 		void MeshComponent::SetMesh(_In_ MeshCollection* InMeshCollection)
 		{
 			_MeshCollection = InMeshCollection;
-			ComponentPool<MeshComponent>::OnAddComponent(this);
-			SetHasBehavior();
 		}
 	}
 }

@@ -28,6 +28,7 @@ namespace Eternal
 
 			void Begin() {}
 			void Update(_In_ TimeSecondsT InDeltaSeconds);
+			void End() {}
 			inline const Transform& GetTransform() const { return _Transform; }
 			inline Transform& GetTransform()
 			{

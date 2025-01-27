@@ -24,12 +24,13 @@ namespace Eternal
 			~ComponentPool();
 
 			static void OnAddComponent(_In_ ComponentType* InComponent);
-			static void OnRemoveComponent();
+			static void OnRemoveComponent(_In_ ComponentType* InComponent);
 			static void Update(_In_ TimeSecondsT InDeltaSeconds);
 
 			static bool IsInitialized;
 			static vector<ComponentType*> _ComponentsAdded;
 			static vector<ComponentType*> _ComponentsToUpdate;
+			static vector<ComponentType*> _ComponentsRemoved;
 			static AtomicS32* _ComponentsAddedGuard;
 		};
 

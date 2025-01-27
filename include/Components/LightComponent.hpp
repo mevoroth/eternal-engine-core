@@ -40,6 +40,7 @@ namespace Eternal
 			{
 				(void)InDeltaSeconds;
 			}
+			void End() {}
 			Light& GetLight()
 			{
 				ETERNAL_ASSERT(_Light);

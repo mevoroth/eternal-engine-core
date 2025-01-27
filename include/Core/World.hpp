@@ -24,6 +24,7 @@ namespace Eternal
 			static constexpr uint32_t ComponentsPerGameObjectInitialPool = 4;
 			static constexpr uint32_t LevelsInitialPool = 4;
 			static constexpr uint32_t ComponentsAddedCountInitialPool = 128;
+			static constexpr uint32_t ComponentsRemovedCountInitialPool = 128;
 			static constexpr uint32_t ComponentsToUpdateCountInitialPool = 4096;
 
 			World(_In_ Game& InGame);

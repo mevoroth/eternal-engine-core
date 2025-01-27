@@ -49,6 +49,7 @@ namespace Eternal
 			{
 				(void)InDeltaSeconds;
 			}
+			void End() {}
 			void SetCamera(_In_ Camera* InCamera)
 			{
 				_Camera = InCamera;

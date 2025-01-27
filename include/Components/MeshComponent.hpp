@@ -20,6 +20,7 @@ namespace Eternal
 			{
 				(void)InDeltaSeconds;
 			}
+			void End();
 			void SetMesh(_In_ MeshCollection* InMeshCollection);
 
 		private:
