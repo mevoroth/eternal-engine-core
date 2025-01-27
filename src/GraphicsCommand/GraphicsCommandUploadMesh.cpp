@@ -18,17 +18,16 @@ namespace Eternal
 		{
 			vector<AccelerationStructureGeometry> Geometries;
 			uint32_t GeometryIndex = 0u;
-			Geometries.resize(static_cast<uint32_t>(_Payload.LoadedMesh->Meshes->GetGPUMesh().PerDrawInformations.size()));
 
+			Mesh* CurrentMesh = _Payload.LoadedMesh->Meshes;
+
+			if (CurrentMesh->GetVertexStride() > 0)
 			{
-				Mesh* CurrentMesh = _Payload.LoadedMesh->Meshes;
-
 				// Vertex buffer
 				uint32_t VerticesCount		= CurrentMesh->GetVerticesCount();
 				uint32_t VertexStride		= CurrentMesh->GetVertexStride();
 				uint32_t VertexBufferSize	= CurrentMesh->GetVertexStride() * VerticesCount;
 
-;
 				Resource* MeshVertexBuffer = CreateBuffer(
 					BufferResourceCreateInformation(
 						InContext.GetDevice(),
@@ -47,9 +46,9 @@ namespace Eternal
 					)
 				);
 				ViewMetaData MeshVertexStructuredBufferViewMetaData;
-				MeshVertexStructuredBufferViewMetaData.ShaderResourceViewBuffer.FirstElement		= 0;
-				MeshVertexStructuredBufferViewMetaData.ShaderResourceViewBuffer.NumElements			= VerticesCount;
-				MeshVertexStructuredBufferViewMetaData.ShaderResourceViewBuffer.StructureByteStride	= VertexStride;
+				MeshVertexStructuredBufferViewMetaData.ShaderResourceViewBuffer.FirstElement = 0;
+				MeshVertexStructuredBufferViewMetaData.ShaderResourceViewBuffer.NumElements = VerticesCount;
+				MeshVertexStructuredBufferViewMetaData.ShaderResourceViewBuffer.StructureByteStride = VertexStride;
 
 				View* MeshVertexStructuredBufferView = CreateShaderResourceView(
 					ShaderResourceViewStructuredBufferCreateInformation(
@@ -74,7 +73,9 @@ namespace Eternal
 				}
 				CurrentMesh->SetMeshVertexStructuredBufferView(MeshVertexStructuredBufferView);
 				CurrentMesh->SetMeshVertexBuffer(MeshVertexBuffer);
-
+			}
+			if (CurrentMesh->GetIndexStride() > 0)
+			{
 				// Index buffer
 				uint32_t IndicesCount		= CurrentMesh->GetIndicesCount();
 				uint32_t IndexStride		= CurrentMesh->GetIndexStride();
@@ -98,9 +99,9 @@ namespace Eternal
 					)
 				);
 				ViewMetaData MeshIndexStructuredBufferViewMetaData;
-				MeshIndexStructuredBufferViewMetaData.ShaderResourceViewBuffer.FirstElement			= 0;
-				MeshIndexStructuredBufferViewMetaData.ShaderResourceViewBuffer.NumElements			= IndicesCount / 3;
-				MeshIndexStructuredBufferViewMetaData.ShaderResourceViewBuffer.StructureByteStride	= IndexStride * 3;
+				MeshIndexStructuredBufferViewMetaData.ShaderResourceViewBuffer.FirstElement = 0;
+				MeshIndexStructuredBufferViewMetaData.ShaderResourceViewBuffer.NumElements = IndicesCount / 3;
+				MeshIndexStructuredBufferViewMetaData.ShaderResourceViewBuffer.StructureByteStride = IndexStride * 3;
 
 				View* MeshIndexStructuredBufferView = CreateShaderResourceView(
 					ShaderResourceViewStructuredBufferCreateInformation(
@@ -117,10 +118,12 @@ namespace Eternal
 				}
 				CurrentMesh->SetMeshIndexBuffer(MeshIndexBuffer);
 				CurrentMesh->SetMeshIndexStructuredBufferView(MeshIndexStructuredBufferView);
-
+			}
+			if (CurrentMesh->GetConstantBufferStride() > 0)
+			{
 				// Constant buffer
-				uint32_t ConstantBufferStride = CurrentMesh->GetConstantBufferStride();
-				uint32_t ConstantBufferCount = CurrentMesh->GetConstantBufferCount();
+				uint32_t ConstantBufferStride	= CurrentMesh->GetConstantBufferStride();
+				uint32_t ConstantBufferCount	= CurrentMesh->GetConstantBufferCount();
 
 				Resource* MeshConstantBuffer = CreateBuffer(
 					BufferResourceCreateInformation(
@@ -137,14 +140,14 @@ namespace Eternal
 				);
 				// Upload
 				{
-					uint32_t ActualConstantBufferStride	= MeshConstantBuffer->GetBufferStride();
+					uint32_t ActualConstantBufferStride = MeshConstantBuffer->GetBufferStride();
 					MapRange MeshConstanBufferRange(ActualConstantBufferStride * ConstantBufferCount);
 					MapScope<uint8_t> MeshConstantBufferMapScope(*MeshConstantBuffer, MeshConstanBufferRange);
 
 					for (uint32_t ElementIndex = 0; ElementIndex < ConstantBufferCount; ++ElementIndex)
 					{
-						uint8_t* DestinationOffset	= MeshConstantBufferMapScope.GetDataPointer() + ActualConstantBufferStride * ElementIndex;
-						const uint8_t* SourceOffset	= static_cast<const uint8_t*>(CurrentMesh->GetConstantBufferData()) + ConstantBufferStride * ElementIndex;
+						uint8_t* DestinationOffset = MeshConstantBufferMapScope.GetDataPointer() + ActualConstantBufferStride * ElementIndex;
+						const uint8_t* SourceOffset = static_cast<const uint8_t*>(CurrentMesh->GetConstantBufferData()) + ConstantBufferStride * ElementIndex;
 
 						memcpy(DestinationOffset, SourceOffset, ConstantBufferStride);
 					}
@@ -164,14 +167,20 @@ namespace Eternal
 					View* PerDrawConstantBufferView = CreateConstantBufferView(PerDrawConstantBufferViewCreateInformation);
 					CurrentMesh->SetPerDrawConstantBufferViewMSVS(ConstantBufferViewIndex, PerDrawConstantBufferView);
 				}
+			}
+			if (CurrentMesh->GetGPUMesh().MeshVertexBuffer &&
+				CurrentMesh->GetGPUMesh().MeshIndexBuffer &&
+				CurrentMesh->GetGPUMesh().MeshConstantBuffer)
+			{
+				Geometries.resize(static_cast<uint32_t>(_Payload.LoadedMesh->Meshes->GetGPUMesh().PerDrawInformations.size()));
 
 				for (uint32_t DrawIndex = 0; DrawIndex < CurrentMesh->GetGPUMesh().PerDrawInformations.size(); ++DrawIndex)
 				{
 					GPUMesh::PerDrawInformation& CurrentPerDrawInformation = CurrentMesh->GetGPUMesh().PerDrawInformations[DrawIndex];
 
 					AccelerationStructureGeometry& CurrentGeometry = Geometries[GeometryIndex++];
-					CurrentGeometry.VertexBuffer	= MeshVertexBuffer;
-					CurrentGeometry.IndexBuffer		= MeshIndexBuffer;
+					CurrentGeometry.VertexBuffer	= CurrentMesh->GetGPUMesh().MeshVertexBuffer;
+					CurrentGeometry.IndexBuffer		= CurrentMesh->GetGPUMesh().MeshIndexBuffer;
 					CurrentGeometry.TransformBuffer	= CurrentMesh->GetGPUMesh().MeshConstantBuffer;
 					CurrentGeometry.IndicesCount	= CurrentPerDrawInformation.IndicesCount;
 					CurrentGeometry.IndicesOffset	= CurrentPerDrawInformation.IndicesOffset;
