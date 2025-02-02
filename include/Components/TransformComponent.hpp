@@ -36,6 +36,36 @@ namespace Eternal
 				return _Transform;
 			}
 
+			const Vector3& GetTranslation() const
+			{
+				return GetTransform().GetTranslation();
+			}
+
+			Vector3& GetTranslation()
+			{
+				return GetTransform().GetTranslation();
+			}
+
+			const Quaternion& GetRotation() const
+			{
+				return GetTransform().GetRotation();
+			}
+
+			Quaternion& GetRotation()
+			{
+				return GetTransform().GetRotation();
+			}
+
+			const Vector3& GetScaling() const
+			{
+				return GetTransform().GetScaling();
+			}
+
+			Vector3& GetScaling()
+			{
+				return GetTransform().GetScaling();
+			}
+
 			OnTransformChangedEventSender& OnTransformChanged() { return _OnTransformChanged; }
 
 		private:
