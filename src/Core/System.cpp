@@ -61,6 +61,7 @@ namespace Eternal
 			FilePath::Register(InSystemCreateInformation.TexturePath,							FileType::FILE_TYPE_TEXTURES);
 			FilePath::Register(InSystemCreateInformation.PipelineCachePath,						FileType::FILE_TYPE_CACHED_PIPELINES);
 			FilePath::Register(InSystemCreateInformation.MaterialPath,							FileType::FILE_TYPE_MATERIALS);
+			FilePath::Register(InSystemCreateInformation.AnimationPath,							FileType::FILE_TYPE_ANIMATIONS);
 
 			_Timer						= CreateTimer(TimeType::TIME_TYPE_DEFAULT);
 			_Logs						= CreateMultiChannelLog({ LogType::LOG_TYPE_CONSOLE/*, LogType::LOG_TYPE_FILE*/ });
