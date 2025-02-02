@@ -27,6 +27,8 @@ namespace Eternal
 
 			Map(VK_BACK,			InputKey::KEY_BACKSPACE);
 			Map(VK_TAB,				InputKey::KEY_TAB);
+			Map(VK_SHIFT,			InputKey::KEY_LEFTSHIFT);
+			Map(VK_CONTROL,			InputKey::KEY_LEFTCTRL);
 			Map(VK_RETURN,			InputKey::KEY_RETURN);
 			Map(VK_PAUSE,			InputKey::KEY_PAUSE);
 			Map(VK_CAPITAL,			InputKey::KEY_CAPSLOCK);
