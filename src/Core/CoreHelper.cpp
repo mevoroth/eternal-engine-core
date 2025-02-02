@@ -17,6 +17,11 @@ namespace Eternal
 			return GetGame(InWorld).GetSystem();
 		}
 
+		AnimationSystem& GetAnimationSystem(_In_ World* InWorld)
+		{
+			return GetSystem(InWorld).GetAnimationSystem();
+		}
+
 		InputMapping& GetInputMapping(_In_ World* InWorld)
 		{
 			return GetSystem(InWorld).GetInputMapping();
