@@ -17,30 +17,42 @@ namespace Eternal
 			AnimationCollection<Eternal::Types::Vector4>
 		>;
 
-		//class AnimationHandle
-		//{
-		//	uint16_t _CollectionIndex = 0;
-		//	uint16_t
-		//};
+		class AnimationHandle
+		{
+			static constexpr uint32_t InvalidCollectionIndex	= 0xFFFF;
+			static constexpr uint32_t InvalidPropertyIndex		= 0xFFFF;
+
+			uint32_t CollectionIndex	= InvalidCollectionIndex;
+			uint32_t PropertyIndex		= InvalidCollectionIndex;
+
+			friend class AnimationSystem;
+		};
+
+		static constexpr AnimationHandle InvalidAnimationHandle;
 
 		class AnimationSystem
 		{
 		public:
 
+			void UpdateAnimationSystem(_In_ float InDeltaSeconds);
+
 			template<typename AnimationStatePropertyType>
-			void RegisterProperty(_In_ Animation* InAnimation, _In_ AnimationStatePropertyType& InProperty)
+			AnimationHandle RegisterProperty(_In_ Animation* InAnimation, _In_ AnimationStatePropertyType& InProperty)
 			{
+				AnimationHandle Handle = InvalidAnimationHandle;
+
 				bool IsRegistered = false;
 				for (uint32_t CollectionIndex = 0; !IsRegistered && CollectionIndex < _AnimationCollections.size(); ++CollectionIndex)
 				{
 					visit(
-						[InAnimation, &InProperty, &IsRegistered](auto& InOutTimeline) mutable
+						[InAnimation, &InProperty, &IsRegistered, &CollectionIndex, &Handle](auto& InOutTimeline) mutable
 						{
 							if constexpr (std::is_same_v<decltype(InOutTimeline), AnimationCollection<AnimationStatePropertyType>&>)
 							{
 								if (InOutTimeline.AnimationData == InAnimation)
 								{
-									InOutTimeline.AnimationProperties.push_back(AnimationState<AnimationStatePropertyType> { 0.0f, & InProperty });
+									Handle.CollectionIndex	= CollectionIndex;
+									Handle.PropertyIndex	= InOutTimeline.AnimationProperties.PushBack(AnimationState<AnimationStatePropertyType> { AnimationPlaybackState::ANIMATIONPLAYBACKSTATE_STOP, 0.0f, & InProperty });
 									IsRegistered = true;
 								}
 							}
@@ -52,16 +64,26 @@ namespace Eternal
 				if (!IsRegistered)
 				{
 					AnimationCollection<AnimationStatePropertyType> NewCollection;
-					NewCollection.AnimationProperties.reserve(16);
+					NewCollection.AnimationProperties.Reserve(16);
 					AnimationState<AnimationStatePropertyType> NewAnimationState;
 					NewAnimationState.AnimationProperty = &InProperty;
-					NewCollection.AnimationProperties.push_back(NewAnimationState);
+					Handle.PropertyIndex = NewCollection.AnimationProperties.PushBack(move(NewAnimationState));
+
 					NewCollection.AnimationData = InAnimation;
 					_AnimationCollections.push_back(std::move(NewCollection));
+					Handle.CollectionIndex = static_cast<uint32_t>(_AnimationCollections.size()) - 1u;
 				}
-			}
 
-			void UpdateAnimationSystem(_In_ float InDeltaSeconds);
+				return Handle;
+			}
+			
+			void UnregisterProperty(_In_ const AnimationHandle& InHandle);
+
+			void RegisterOnCompleteFunction(_In_ const AnimationHandle& InHandle, _In_ const AnimationOnCompleteFunctor& InFunction);
+
+			void Play(_In_ const AnimationHandle& InHandle);
+			void Stop(_In_ const AnimationHandle& InHandle);
+			void Pause(_In_ const AnimationHandle& InHandle);
 
 		private:
 
