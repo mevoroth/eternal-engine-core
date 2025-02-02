@@ -87,6 +87,7 @@ namespace Eternal
 		using namespace Eternal::Resources;
 		using namespace Eternal::Components;
 
+		class AnimationSystem;
 		class Game;
 		struct SystemFrame;
 		class TransformComponent;
@@ -270,6 +271,12 @@ namespace Eternal
 				return _MaterialUpdateBatcher;
 			}
 
+			inline AnimationSystem& GetAnimationSystem()
+			{
+				ETERNAL_ASSERT(_AnimationSystem);
+				return *_AnimationSystem;
+			}
+
 			void InitializeSystem();
 
 			SystemFrame& GetGameFrame();
@@ -306,6 +313,7 @@ namespace Eternal
 			Log*														_Logs						= nullptr;
 			Streaming*													_Streaming					= nullptr;
 			Renderer*													_Renderer					= nullptr;
+			AnimationSystem*											_AnimationSystem			= nullptr;
 
 			//////////////////////////////////////////////////////////////////////////
 			// Tasks

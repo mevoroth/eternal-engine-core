@@ -24,7 +24,7 @@
 #include "Mesh/Mesh.hpp"
 #include "Camera/Camera.hpp"
 #include "Components/TransformComponent.hpp"
-#include "Mesh/Mesh.hpp"
+#include "Animation/AnimationSystem.hpp"
 
 namespace Eternal
 {
@@ -70,6 +70,8 @@ namespace Eternal
 			_Streaming					= new Streaming(_TextureFactory);
 			_Streaming->RegisterLoader(AssetType::ASSET_TYPE_LEVEL, new LevelLoader());
 
+			_AnimationSystem			= new AnimationSystem();
+
 			TaskCreateInformation RendererCreateInformation("RendererTask");
 			_RendererTask				= new RendererTask(RendererCreateInformation, *this);
 
@@ -87,7 +89,6 @@ namespace Eternal
 
 			for (uint32_t FrameIndex = 0; FrameIndex < GraphicsContext::FrameBufferingCount; ++FrameIndex)
 				_Frames[FrameIndex].InitializeSystemFrame(*_GraphicsContext, _Imgui->CreateContext(*_GraphicsContext));
-
 
 			vector<Task*> Tasks = { _RendererTask, _StreamingTask };
 			if (_AutoRecompileShaderTask)
@@ -120,6 +121,9 @@ namespace Eternal
 			Destroy(_Renderer);
 
 			DestroyGraphicsContext(_GraphicsContext);
+
+			delete _AnimationSystem;
+			_AnimationSystem = nullptr;
 
 			Destroy(_Streaming);
 
@@ -262,6 +266,7 @@ namespace Eternal
 			UpdatePlatform();
 			_Timer->Update();
 			_Input->Update();
+			GetAnimationSystem().UpdateAnimationSystem(static_cast<float>(_Timer->GetDeltaTimeSeconds()));
 		}
 
 		void System::Render()
