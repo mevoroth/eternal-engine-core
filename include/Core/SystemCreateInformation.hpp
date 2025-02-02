@@ -43,6 +43,7 @@ namespace Eternal
 			string LevelPath;
 			string PipelineCachePath;
 			string MaterialPath;
+			string AnimationPath;
 		};
 	}
 }
