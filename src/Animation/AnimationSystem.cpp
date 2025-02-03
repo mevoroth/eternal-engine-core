@@ -57,7 +57,7 @@ namespace Eternal
 				[&InHandle](_Inout_ auto& InOutTimeline) mutable
 				{
 					InOutTimeline.AnimationProperties[InHandle.PropertyIndex].AnimationPlayback		= AnimationPlaybackState::ANIMATIONPLAYBACKSTATE_STOP;
-					InOutTimeline.AnimationProperties[InHandle.PropertyIndex].AnimationCurrentTime	= 0.0f;
+					InOutTimeline.AnimationProperties[InHandle.PropertyIndex].AnimationCurrentTime	= AnimationDefines::TimelineBegin;
 				},
 				_AnimationCollections[InHandle.CollectionIndex]
 			);
