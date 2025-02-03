@@ -102,6 +102,7 @@ namespace Eternal
 			{
 				ObjectType* Object = nullptr;
 				vector<TransformComponent*> Instances;
+				unordered_map<TransformComponent*, const void*> PerInstanceData;
 			};
 
 			void AddObject(_In_ ObjectType* InObject, _In_ TransformComponent* InTransformComponent)
@@ -110,7 +111,9 @@ namespace Eternal
 				InstancedObjects* CurrentPendingInstancedObjects = FindOrCreate(InObject, PendingObjects);
 
 				CurrentInstancedObjects->Instances.push_back(InTransformComponent);
+				CurrentInstancedObjects->PerInstanceData.insert_or_assign(InTransformComponent, nullptr);
 				CurrentPendingInstancedObjects->Instances.push_back(InTransformComponent);
+				CurrentPendingInstancedObjects->PerInstanceData.insert_or_assign(InTransformComponent, nullptr);
 			}
 
 			void RemoveObject(_In_ ObjectType* InObject, _In_ TransformComponent* InTransformComponent)
@@ -120,6 +123,7 @@ namespace Eternal
 
 				auto FoundInstanceIterator = std::find(CurrentInstancedObjects->Instances.begin(), CurrentInstancedObjects->Instances.end(), InTransformComponent);
 				CurrentInstancedObjects->Instances.erase(FoundInstanceIterator);
+				CurrentInstancedObjects->PerInstanceData.erase(InTransformComponent);
 				CurrentDeletedInstancedObjects->Instances.push_back(InTransformComponent);
 			}
 
@@ -138,6 +142,9 @@ namespace Eternal
 							CurrentPendingInstancedObjects.Instances.end()
 						);
 						CurrentPendingInstancedObjects.Instances.clear();
+
+						CurrentInstancedObjects->PerInstanceData.merge(CurrentPendingInstancedObjects.PerInstanceData);
+						CurrentPendingInstancedObjects.PerInstanceData.clear();
 					}
 				}
 
@@ -152,6 +159,7 @@ namespace Eternal
 						{
 							auto FoundInstanceIterator = std::find(CurrentInstancedObjects->Instances.begin(), CurrentInstancedObjects->Instances.end(), CurrentDeletedInstanceObjects.Instances[InstanceIndex]);
 							CurrentInstancedObjects->Instances.erase(FoundInstanceIterator);
+							CurrentInstancedObjects->PerInstanceData.erase(CurrentDeletedInstanceObjects.Instances[InstanceIndex]);
 						}
 						CurrentDeletedInstanceObjects.Instances.clear();
 					}
