@@ -107,8 +107,8 @@ namespace Eternal
 
 			void AddObject(_In_ ObjectType* InObject, _In_ TransformComponent* InTransformComponent)
 			{
-				InstancedObjects* CurrentInstancedObjects = FindOrCreate(InObject, Objects);
-				InstancedObjects* CurrentPendingInstancedObjects = FindOrCreate(InObject, PendingObjects);
+				InstancedObjects* CurrentInstancedObjects			= FindOrCreate(InObject, Objects);
+				InstancedObjects* CurrentPendingInstancedObjects	= FindOrCreate(InObject, PendingObjects);
 
 				CurrentInstancedObjects->Instances.push_back(InTransformComponent);
 				CurrentInstancedObjects->PerInstanceData.insert_or_assign(InTransformComponent, nullptr);
@@ -118,8 +118,8 @@ namespace Eternal
 
 			void RemoveObject(_In_ ObjectType* InObject, _In_ TransformComponent* InTransformComponent)
 			{
-				InstancedObjects* CurrentInstancedObjects = FindOrCreate(InObject, Objects);
-				InstancedObjects* CurrentDeletedInstancedObjects = FindOrCreate(InObject, DeletedObjects);
+				InstancedObjects* CurrentInstancedObjects			= FindOrCreate(InObject, Objects);
+				InstancedObjects* CurrentDeletedInstancedObjects	= FindOrCreate(InObject, DeletedObjects);
 
 				auto FoundInstanceIterator = std::find(CurrentInstancedObjects->Instances.begin(), CurrentInstancedObjects->Instances.end(), InTransformComponent);
 				CurrentInstancedObjects->Instances.erase(FoundInstanceIterator);
@@ -144,6 +144,8 @@ namespace Eternal
 						CurrentPendingInstancedObjects.Instances.clear();
 
 						CurrentInstancedObjects->PerInstanceData.merge(CurrentPendingInstancedObjects.PerInstanceData);
+						for (auto PerInstanceDataIterator = CurrentPendingInstancedObjects.PerInstanceData.begin(); PerInstanceDataIterator != CurrentPendingInstancedObjects.PerInstanceData.end(); ++PerInstanceDataIterator)
+							CurrentInstancedObjects->PerInstanceData[PerInstanceDataIterator->first] = PerInstanceDataIterator->second;
 						CurrentPendingInstancedObjects.PerInstanceData.clear();
 					}
 				}
@@ -164,6 +166,15 @@ namespace Eternal
 						CurrentDeletedInstanceObjects.Instances.clear();
 					}
 				}
+			}
+
+			void PushPerInstanceData(_In_ ObjectType* InObject, _In_ TransformComponent* InTransformComponent, _In_ const void* InPerInstanceData)
+			{
+				InstancedObjects* CurrentInstancedObjects			= FindOrCreate(InObject, Objects);
+				InstancedObjects* CurrentPendingInstancedObjects	= FindOrCreate(InObject, PendingObjects);
+
+				CurrentInstancedObjects->PerInstanceData.insert_or_assign(InTransformComponent, InPerInstanceData);
+				CurrentPendingInstancedObjects->PerInstanceData.insert_or_assign(InTransformComponent, InPerInstanceData);
 			}
 
 			operator const vector<InstancedObjects>&() const { return Objects; }
