@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Animation/AnimationCollection.hpp"
+#include <type_traits>
 #include <variant>
 
 namespace Eternal
@@ -14,7 +15,8 @@ namespace Eternal
 			AnimationCollection<float>,
 			AnimationCollection<Eternal::Types::Vector2>,
 			AnimationCollection<Eternal::Types::Vector3>,
-			AnimationCollection<Eternal::Types::Vector4>
+			AnimationCollection<Eternal::Types::Vector4>,
+			AnimationCollection<AnimationCompositeType>
 		>;
 
 		class AnimationHandle
@@ -51,8 +53,11 @@ namespace Eternal
 							{
 								if (InOutTimeline.AnimationData == InAnimation)
 								{
+									AnimationState<AnimationStatePropertyType> State;
+									State.AnimationProperty	= &InProperty;
+
 									Handle.CollectionIndex	= CollectionIndex;
-									Handle.PropertyIndex	= InOutTimeline.AnimationProperties.PushBack(AnimationState<AnimationStatePropertyType> { AnimationPlaybackState::ANIMATIONPLAYBACKSTATE_STOP, 0.0f, & InProperty });
+									Handle.PropertyIndex	= InOutTimeline.AnimationProperties.PushBack(move(State));
 									IsRegistered = true;
 								}
 							}
@@ -76,7 +81,7 @@ namespace Eternal
 
 				return Handle;
 			}
-			
+
 			void UnregisterProperty(_In_ const AnimationHandle& InHandle);
 
 			void RegisterOnCompleteFunction(_In_ const AnimationHandle& InHandle, _In_ const AnimationOnCompleteFunctor& InFunction);
