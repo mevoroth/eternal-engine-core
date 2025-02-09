@@ -1,10 +1,14 @@
 #pragma once
 
 #include "Core/Component.hpp"
-#include "Mesh/Mesh.hpp"
 
 namespace Eternal
 {
+	namespace Components
+	{
+		class MeshCollection;
+	}
+
 	namespace Core
 	{
 		using namespace Eternal::Components;
@@ -22,6 +26,8 @@ namespace Eternal
 			}
 			void End();
 			void SetMesh(_In_ MeshCollection* InMeshCollection);
+
+			MeshCollection* GetMeshCollection() { return _MeshCollection; }
 
 		private:
 			MeshCollection* _MeshCollection = nullptr;
