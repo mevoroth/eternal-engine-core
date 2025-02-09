@@ -10,6 +10,8 @@
 #include "Imgui/Imgui.hpp"
 #include <array>
 
+#include "Log/Log.hpp"
+
 namespace Eternal
 {
 	namespace Graphics
@@ -111,9 +113,12 @@ namespace Eternal
 				InstancedObjects* CurrentPendingInstancedObjects	= FindOrCreate(InObject, PendingObjects);
 
 				CurrentInstancedObjects->Instances.push_back(InTransformComponent);
-				CurrentInstancedObjects->PerInstanceData.insert_or_assign(InTransformComponent, nullptr);
+				if (CurrentInstancedObjects->PerInstanceData.find(InTransformComponent) == CurrentInstancedObjects->PerInstanceData.end())
+					CurrentInstancedObjects->PerInstanceData.insert({ InTransformComponent, nullptr });
+
 				CurrentPendingInstancedObjects->Instances.push_back(InTransformComponent);
-				CurrentPendingInstancedObjects->PerInstanceData.insert_or_assign(InTransformComponent, nullptr);
+				if (CurrentPendingInstancedObjects->PerInstanceData.find(InTransformComponent) == CurrentPendingInstancedObjects->PerInstanceData.end())
+					CurrentPendingInstancedObjects->PerInstanceData.insert({ InTransformComponent, nullptr });
 			}
 
 			void RemoveObject(_In_ ObjectType* InObject, _In_ TransformComponent* InTransformComponent)
@@ -131,21 +136,27 @@ namespace Eternal
 			{
 				for (uint32_t PendingObjectIndex = 0; PendingObjectIndex < InOutOldestFrameObjectList.PendingObjects.size(); ++PendingObjectIndex)
 				{
-					if (InOutOldestFrameObjectList.PendingObjects[PendingObjectIndex].Instances.size() > 0)
-					{
-						InstancedObjects& CurrentPendingInstancedObjects = InOutOldestFrameObjectList.PendingObjects[PendingObjectIndex];
+					InstancedObjects& CurrentPendingInstancedObjects	= InOutOldestFrameObjectList.PendingObjects[PendingObjectIndex];
+					InstancedObjects* CurrentInstancedObjects			= FindOrCreate(InOutOldestFrameObjectList.PendingObjects[PendingObjectIndex].Object, Objects);
 
-						InstancedObjects* CurrentInstancedObjects = FindOrCreate(InOutOldestFrameObjectList.PendingObjects[PendingObjectIndex].Object, Objects);
+					if (CurrentPendingInstancedObjects.Instances.size() > 0)
+					{
 						CurrentInstancedObjects->Instances.insert(
 							CurrentInstancedObjects->Instances.end(),
 							CurrentPendingInstancedObjects.Instances.begin(),
 							CurrentPendingInstancedObjects.Instances.end()
 						);
 						CurrentPendingInstancedObjects.Instances.clear();
+					}
 
+					if (CurrentPendingInstancedObjects.PerInstanceData.size() > 0)
+					{
 						CurrentInstancedObjects->PerInstanceData.merge(CurrentPendingInstancedObjects.PerInstanceData);
 						for (auto PerInstanceDataIterator = CurrentPendingInstancedObjects.PerInstanceData.begin(); PerInstanceDataIterator != CurrentPendingInstancedObjects.PerInstanceData.end(); ++PerInstanceDataIterator)
-							CurrentInstancedObjects->PerInstanceData[PerInstanceDataIterator->first] = PerInstanceDataIterator->second;
+						{
+							if (!CurrentInstancedObjects->PerInstanceData[PerInstanceDataIterator->first])
+								CurrentInstancedObjects->PerInstanceData[PerInstanceDataIterator->first] = PerInstanceDataIterator->second;
+						}
 						CurrentPendingInstancedObjects.PerInstanceData.clear();
 					}
 				}
