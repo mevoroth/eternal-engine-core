@@ -86,13 +86,23 @@ namespace Eternal
 			ProcessStreamingPayloads();
 
 			_DeltaSeconds	= GetSystem().GetTimer().GetDeltaTimeSeconds();
-			_ElapsedTime	+= _DeltaSeconds;
-			_World.Update(_DeltaSeconds);
+			_ElapsedTime	+= GetGameDeltaSeconds();
+			_World.Update(GetGameDeltaSeconds());
 		}
 
 		void Game::UpdateDebug()
 		{
 			ETERNAL_PROFILER(BASIC)();
+
+			if (ImGui::TreeNode("Game"))
+			{
+				if (ImGui::Button(_TimeDilation > 0.0 ? "Pause" : "Play"))
+				{
+					_TimeDilation = 1.0 - _TimeDilation;
+				}
+
+				ImGui::TreePop();
+			}
 
 			_World.UpdateDebug();
 			GetSystem().UpdateDebug();
@@ -143,6 +153,11 @@ namespace Eternal
 					);
 				}
 			);
+		}
+
+		TimeSecondsT Game::GetGameDeltaSeconds() const
+		{
+			return _DeltaSeconds * _TimeDilation;
 		}
 	}
 }

@@ -54,6 +54,8 @@ namespace Eternal
 				return static_cast<GameStateType*>(_CurrentGameState);
 			}
 
+			TimeSecondsT GetGameDeltaSeconds() const;
+
 		protected:
 			void Update();
 			void UpdateDebug();
@@ -67,6 +69,7 @@ namespace Eternal
 			bool			_Running			= true;
 			TimeSecondsT	_ElapsedTime		= 0.0;
 			TimeSecondsT	_DeltaSeconds		= 0.0;
+			TimeSecondsT	_TimeDilation		= 1.0;
 		};
 
 		template<typename GameStateType>
