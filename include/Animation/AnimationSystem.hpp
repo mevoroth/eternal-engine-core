@@ -82,6 +82,52 @@ namespace Eternal
 				return Handle;
 			}
 
+			template<typename AnimationStatePropertyType>
+			AnimationHandle RegisterProperty(_In_ Animation* InAnimation, _In_ AnimationStatePropertyType* InProperty)
+			{
+				AnimationHandle Handle = InvalidAnimationHandle;
+
+				AnimationCompositeType* CastedProperty = static_cast<AnimationCompositeType*>(InProperty);
+
+				bool IsRegistered = false;
+				for (uint32_t CollectionIndex = 0; !IsRegistered && CollectionIndex < _AnimationCollections.size(); ++CollectionIndex)
+				{
+					visit(
+						[InAnimation, &CastedProperty, &IsRegistered, &CollectionIndex, &Handle](auto& InOutTimeline) mutable
+						{
+							if constexpr (std::is_same_v<decltype(InOutTimeline), AnimationCollection<AnimationCompositeType>&>)
+							{
+								if (InOutTimeline.AnimationData == InAnimation)
+								{
+									AnimationState<AnimationCompositeType> State;
+									State.AnimationProperty	= CastedProperty;
+
+									Handle.CollectionIndex	= CollectionIndex;
+									Handle.PropertyIndex	= InOutTimeline.AnimationProperties.PushBack(move(State));
+									IsRegistered = true;
+								}
+							}
+						},
+						_AnimationCollections[CollectionIndex]
+					);
+				}
+
+				if (!IsRegistered)
+				{
+					AnimationCollection<AnimationCompositeType> NewCollection;
+					NewCollection.AnimationProperties.Reserve(16);
+					AnimationState<AnimationCompositeType> NewAnimationState;
+					NewAnimationState.AnimationProperty = CastedProperty;
+					Handle.PropertyIndex = NewCollection.AnimationProperties.PushBack(move(NewAnimationState));
+
+					NewCollection.AnimationData = InAnimation;
+					_AnimationCollections.push_back(std::move(NewCollection));
+					Handle.CollectionIndex = static_cast<uint32_t>(_AnimationCollections.size()) - 1u;
+				}
+
+				return Handle;
+			}
+
 			void UnregisterProperty(_In_ const AnimationHandle& InHandle);
 
 			void RegisterOnCompleteFunction(_In_ const AnimationHandle& InHandle, _In_ const AnimationOnCompleteFunctor& InFunction);
