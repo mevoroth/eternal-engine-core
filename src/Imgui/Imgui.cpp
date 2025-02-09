@@ -127,6 +127,9 @@ namespace Eternal
 			_ImguiRootSignature		= CreateRootSignature(InContext, ImguiRootSignatureInformation);
 			_ImguiDescriptorTable	= _ImguiRootSignature->CreateRootDescriptorTable(InContext);
 
+			Rasterizer ImguiRasterizer(FrontFace::FRONT_FACE_CLOCKWISE);
+			ImguiRasterizer.SetCullMode(CullMode::CULL_MODE_NONE);
+
 			GraphicsPipelineCreateInformation ImguiPipelineCreateInformation(
 				_ImguiRootSignature,
 				_ImguiInputLayout,
@@ -134,7 +137,7 @@ namespace Eternal
 				ImguiVertex,
 				ImguiPixel,
 				DepthStencilNoneNone,
-				Rasterizer(FrontFace::FRONT_FACE_CLOCKWISE)
+				ImguiRasterizer
 			);
 			_ImguiPipeline			= CreatePipeline(InContext, ImguiPipelineCreateInformation);
 
