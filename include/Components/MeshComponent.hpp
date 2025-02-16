@@ -26,11 +26,13 @@ namespace Eternal
 			}
 			void End();
 			void SetMesh(_In_ MeshCollection* InMeshCollection);
+			void SetTranformIndex(_In_ uint32_t InTransformIndex);
 
 			MeshCollection* GetMeshCollection() { return _MeshCollection; }
 
 		private:
-			MeshCollection* _MeshCollection = nullptr;
+			MeshCollection*	_MeshCollection	= nullptr;
+			uint32_t		_TransformIndex	= 0u;
 		};
 	}
 }
