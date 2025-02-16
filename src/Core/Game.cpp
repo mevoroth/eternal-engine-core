@@ -98,7 +98,13 @@ namespace Eternal
 			{
 				if (ImGui::Button(_TimeDilation > 0.0 ? "Pause" : "Play"))
 				{
-					_TimeDilation = 1.0 - _TimeDilation;
+					_TimeDilation = _TimeDilation > 0.0 ? 0.0 : 1.0;
+				}
+
+				float TimeDilation = static_cast<float>(_TimeDilation);
+				if (ImGui::InputFloat("Time dilation", &TimeDilation, 0.001f))
+				{
+					_TimeDilation = TimeDilation;
 				}
 
 				ImGui::TreePop();
