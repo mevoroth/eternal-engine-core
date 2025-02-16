@@ -36,6 +36,11 @@ namespace Eternal
 				return _Transform;
 			}
 
+			void SetTranslation(_In_ const Vector3& InTranslation)
+			{
+				GetTransform().SetTranslation(InTranslation);
+			}
+
 			const Vector3& GetTranslation() const
 			{
 				return GetTransform().GetTranslation();
@@ -46,6 +51,11 @@ namespace Eternal
 				return GetTransform().GetTranslation();
 			}
 
+			void SetRotation(_In_ const Quaternion& InRotation)
+			{
+				GetTransform().SetRotation(InRotation);
+			}
+
 			const Quaternion& GetRotation() const
 			{
 				return GetTransform().GetRotation();
@@ -54,6 +64,11 @@ namespace Eternal
 			Quaternion& GetRotation()
 			{
 				return GetTransform().GetRotation();
+			}
+
+			void SetScaling(_In_ const Vector3& InScaling)
+			{
+				GetTransform().SetScaling(InScaling);
 			}
 
 			const Vector3& GetScaling() const
