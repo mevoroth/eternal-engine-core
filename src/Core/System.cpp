@@ -3,6 +3,7 @@
 #include "Core/SystemCreateInformation.hpp"
 #include "Audio/AudioSystem.hpp"
 #include "Audio/AudioSystemFactory.hpp"
+#include "Animation/AnimationSystem.hpp"
 #include "Graphics/GraphicsInclude.hpp"
 #include "GraphicsEngine/RendererPBR.hpp"
 #include "File/FilePath.hpp"
@@ -26,7 +27,6 @@
 #include "Mesh/Mesh.hpp"
 #include "Camera/Camera.hpp"
 #include "Components/TransformComponent.hpp"
-#include "Animation/AnimationSystem.hpp"
 
 namespace Eternal
 {
