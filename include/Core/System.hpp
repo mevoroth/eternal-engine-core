@@ -5,7 +5,7 @@
 #include "Graphics/GraphicsContext.hpp"
 #include "Resources/TextureFactory.hpp"
 #include "Resources/Streaming.hpp"
-#include "resources/Payload.hpp"
+#include "Resources/Payload.hpp"
 #include "Bit/BitField.hpp"
 #include "Imgui/Imgui.hpp"
 #include <array>
