@@ -54,6 +54,8 @@ namespace Eternal
 			SystemInformation.PipelineCachePath	= FilePath::MakePath("assets\\pipelines\\");
 			SystemInformation.MaterialPath		= FilePath::MakePath("assets\\materials\\");
 			SystemInformation.AnimationPath		= FilePath::MakePath("assets\\animations\\");
+			SystemInformation.SFXSoundPath		= FilePath::MakePath("assets\\sounds\\sfx\\");
+			SystemInformation.BGMSoundPath		= FilePath::MakePath("assets\\sounds\\bgm\\");
 
 			CustomSetupType::SetupCustomSystemCreateInformation(SystemInformation);
 

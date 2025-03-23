@@ -44,6 +44,8 @@ namespace Eternal
 			string PipelineCachePath;
 			string MaterialPath;
 			string AnimationPath;
+			string SFXSoundPath;
+			string BGMSoundPath;
 		};
 	}
 }

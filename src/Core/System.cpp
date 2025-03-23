@@ -1,6 +1,8 @@
 #include "Core/System.hpp"
 #include "Core/Game.hpp"
 #include "Core/SystemCreateInformation.hpp"
+#include "Audio/AudioSystem.hpp"
+#include "Audio/AudioSystemFactory.hpp"
 #include "Graphics/GraphicsInclude.hpp"
 #include "GraphicsEngine/RendererPBR.hpp"
 #include "File/FilePath.hpp"
@@ -62,6 +64,8 @@ namespace Eternal
 			FilePath::Register(InSystemCreateInformation.PipelineCachePath,						FileType::FILE_TYPE_CACHED_PIPELINES);
 			FilePath::Register(InSystemCreateInformation.MaterialPath,							FileType::FILE_TYPE_MATERIALS);
 			FilePath::Register(InSystemCreateInformation.AnimationPath,							FileType::FILE_TYPE_ANIMATIONS);
+			FilePath::Register(InSystemCreateInformation.SFXSoundPath,							FileType::FILE_TYPE_SFX_SOUNDS);
+			FilePath::Register(InSystemCreateInformation.BGMSoundPath,							FileType::FILE_TYPE_BGM_SOUNDS);
 
 			_Timer						= CreateTimer(TimeType::TIME_TYPE_DEFAULT);
 			_Logs						= CreateMultiChannelLog({ LogType::LOG_TYPE_CONSOLE/*, LogType::LOG_TYPE_FILE*/ });
@@ -85,6 +89,7 @@ namespace Eternal
 
 		void System::InitializeSystem()
 		{
+			_AudioSystem				= CreateAudioSystem();
 			_Renderer					= _SystemCreateInformation.CreateCustomRendererFunction ? _SystemCreateInformation.CreateCustomRendererFunction(*_GraphicsContext) : new RendererPBR(*_GraphicsContext);
 			_Imgui						= new Imgui(*_GraphicsContext, *_Renderer, _Input);
 
@@ -120,6 +125,8 @@ namespace Eternal
 				_Imgui->DestroyContext(_Frames[FrameIndex].ImguiFrameContext);
 			Destroy(_Imgui);
 			Destroy(_Renderer);
+			delete _AudioSystem;
+			_AudioSystem = nullptr;
 
 			DestroyGraphicsContext(_GraphicsContext);
 
@@ -267,6 +274,7 @@ namespace Eternal
 			UpdatePlatform();
 			_Timer->Update();
 			_Input->Update();
+			GetAudioSystem().UpdateAudioSystem();
 			GetAnimationSystem().UpdateAnimationSystem(static_cast<float>(_Timer->GetDeltaTimeSeconds()));
 		}
 

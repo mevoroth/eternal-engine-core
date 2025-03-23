@@ -3,6 +3,7 @@
 #include "Core/SystemCreateInformation.hpp"
 #include "Parallel/ParallelSystem.hpp"
 #include "Graphics/GraphicsContext.hpp"
+#include "Resources/AudioFactory.hpp"
 #include "Resources/TextureFactory.hpp"
 #include "Resources/Streaming.hpp"
 #include "Resources/Payload.hpp"
@@ -14,6 +15,11 @@
 
 namespace Eternal
 {
+	namespace Audio
+	{
+		class AudioSystem;
+	}
+
 	namespace Graphics
 	{
 		struct GraphicsContextCreateInformation;
@@ -77,6 +83,7 @@ namespace Eternal
 	namespace Core
 	{
 		using namespace std;
+		using namespace Eternal::Audio;
 		using namespace Eternal::Graphics;
 		using namespace Eternal::GraphicsEngine;
 		using namespace Eternal::Time;
@@ -279,6 +286,12 @@ namespace Eternal
 				return *_Streaming;
 			}
 
+			inline AudioSystem& GetAudioSystem()
+			{
+				ETERNAL_ASSERT(_AudioSystem);
+				return *_AudioSystem;
+			}
+
 			inline Renderer& GetRenderer()
 			{
 				ETERNAL_ASSERT(_Renderer);
@@ -289,6 +302,11 @@ namespace Eternal
 			{
 				ETERNAL_ASSERT(_Timer);
 				return *_Timer;
+			}
+
+			inline AudioFactory& GetAudioFactory()
+			{
+				return _AudioFactory;
 			}
 
 			inline TextureFactory& GetTextureFactory()
@@ -335,6 +353,7 @@ namespace Eternal
 			void _LoadBuiltin();
 			
 			SystemCreateInformation&									_SystemCreateInformation;
+			AudioFactory												_AudioFactory;
 			TextureFactory												_TextureFactory;
 			MaterialUpdateBatcher										_MaterialUpdateBatcher;
 			ParallelSystem*												_ParallelSystem				= nullptr;
@@ -342,6 +361,7 @@ namespace Eternal
 			Timer*														_Timer						= nullptr;
 			Log*														_Logs						= nullptr;
 			Streaming*													_Streaming					= nullptr;
+			AudioSystem*												_AudioSystem				= nullptr;
 			Renderer*													_Renderer					= nullptr;
 			AnimationSystem*											_AnimationSystem			= nullptr;
 
