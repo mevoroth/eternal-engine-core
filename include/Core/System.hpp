@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/SystemCreateInformation.hpp"
+#include "Core/DebugDraw/DebugDrawPrimitives.hpp"
 #include "Parallel/ParallelSystem.hpp"
 #include "Graphics/GraphicsContext.hpp"
 #include "Resources/AudioFactory.hpp"
@@ -10,8 +11,6 @@
 #include "Bit/BitField.hpp"
 #include "Imgui/Imgui.hpp"
 #include <array>
-
-#include "Log/Log.hpp"
 
 namespace Eternal
 {
@@ -241,7 +240,8 @@ namespace Eternal
 			PayloadQueueType DelayedDestroyedRequests;
 			DynamicBitField<> MeshCollectionsVisibility;
 			DynamicBitField<> MeshCollectionsBoundingBoxVisibility;
-			
+			Debug::DebugDrawPrimitives DebugPrimitives;
+
 			AtomicS32* SystemState											= nullptr;
 			AccelerationStructure* MeshCollectionsAccelerationStructure		= nullptr;
 
