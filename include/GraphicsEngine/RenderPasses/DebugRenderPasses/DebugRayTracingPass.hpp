@@ -18,8 +18,8 @@ namespace Eternal
 
 			virtual void Render(_In_ GraphicsContext& InContext, _In_ System& InSystem, _In_ Renderer& InRenderer) override final;
 
-			virtual void GetInputs(_Out_ FrameGraphPassInputs& OutInputs) const override;
-			virtual void GetOutputs(_Out_ FrameGraphPassOutputs& OutOutputs) const override;
+			virtual void GetInputs(_Out_ FrameGraphPassInputs& OutInputs) const override final;
+			virtual void GetOutputs(_Out_ FrameGraphPassOutputs& OutOutputs) const override final;
 
 		private:
 
