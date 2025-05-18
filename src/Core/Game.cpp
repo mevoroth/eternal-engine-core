@@ -165,5 +165,10 @@ namespace Eternal
 		{
 			return _DeltaSeconds * _TimeDilation;
 		}
+
+		void Game::PauseGame()
+		{
+			_TimeDilation = 0.0;
+		}
 	}
 }

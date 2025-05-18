@@ -56,6 +56,8 @@ namespace Eternal
 
 			TimeSecondsT GetGameDeltaSeconds() const;
 
+			void PauseGame();
+
 		protected:
 			void Update();
 			void UpdateDebug();
