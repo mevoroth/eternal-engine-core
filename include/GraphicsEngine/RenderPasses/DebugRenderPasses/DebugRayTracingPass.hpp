@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GraphicsEngine/Pass.hpp"
-#include "ShadersReflection/RayTracing/Debug/HLSLRayGenerationConstants.hpp"
+#include "ShadersReflection/RayTracing/DebugRayTracing/HLSLRayGenerationConstants.hpp"
 
 namespace Eternal
 {

@@ -1,4 +1,4 @@
-#include "GraphicsEngine/RenderPasses/Debug/DebugObjectBoundingBoxPass.hpp"
+#include "GraphicsEngine/RenderPasses/DebugRenderPasses/DebugObjectBoundingBoxPass.hpp"
 #include "Core/System.hpp"
 #include "Mesh/Mesh.hpp"
 #include "Components/TransformComponent.hpp"

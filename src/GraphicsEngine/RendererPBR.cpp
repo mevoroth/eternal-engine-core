@@ -8,8 +8,8 @@
 #include "GraphicsEngine/RenderPasses/RayTracedReflectionsPass.hpp"
 #include "GraphicsEngine/RenderPasses/VolumetricCloudsPass.hpp"
 #include "GraphicsEngine/RenderPasses/TonemappingPass.hpp"
-#include "GraphicsEngine/RenderPasses/Debug/DebugObjectBoundingBoxPass.hpp"
-#include "GraphicsEngine/RenderPasses/Debug/DebugRayTracingPass.hpp"
+#include "GraphicsEngine/RenderPasses/DebugRenderPasses/DebugObjectBoundingBoxPass.hpp"
+#include "GraphicsEngine/RenderPasses/DebugRenderPasses/DebugRayTracingPass.hpp"
 
 namespace Eternal
 {

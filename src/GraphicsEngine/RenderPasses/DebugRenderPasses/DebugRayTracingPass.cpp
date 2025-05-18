@@ -1,4 +1,4 @@
-#include "GraphicsEngine/RenderPasses/Debug/DebugRayTracingPass.hpp"
+#include "GraphicsEngine/RenderPasses/DebugRenderPasses/DebugRayTracingPass.hpp"
 #include "Core/System.hpp"
 
 namespace Eternal
