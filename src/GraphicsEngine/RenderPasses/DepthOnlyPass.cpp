@@ -12,7 +12,10 @@ namespace Eternal
 			, _DepthStencilView(InDepthStencilView)
 			, _DepthOnlyViewConstantBufferView(InDepthOnlyViewConstantBufferView)
 		{
-			vector<string> Defines;
+			vector<string> Defines =
+			{
+				"OBJECT_HAS_INSTANCES", "1"
+			};
 
 			vector<RootSignatureParameter> ParametersVSPS =
 			{

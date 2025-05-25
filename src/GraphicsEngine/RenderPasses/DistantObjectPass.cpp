@@ -17,6 +17,7 @@ namespace Eternal
 
 			vector<string> Defines =
 			{
+				"OBJECT_HAS_INSTANCES",		"1",
 				"OBJECT_NEEDS_NORMAL",		"1"
 			};
 
