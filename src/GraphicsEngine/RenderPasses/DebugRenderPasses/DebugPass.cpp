@@ -1,5 +1,4 @@
 #include "GraphicsEngine/RenderPasses/DebugRenderPasses/DebugPass.hpp"
-#include "GraphicData/MeshVertexFormat.hpp"
 #include "Core/System.hpp"
 #include "Core/DebugDraw/DebugDrawPrimitives.hpp"
 
@@ -11,6 +10,7 @@ namespace Eternal
 
 		DebugPass::DebugPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 			: _DebugPerDrawConstantBuffer(InContext, "DebugPerDrawConstantBuffer")
+			, _DebugVertexBuffer(InContext, "DebugVertexBuffer")
 		{
 			GlobalResources& InGlobalResources = InRenderer.GetGlobalResources();
 
@@ -22,9 +22,7 @@ namespace Eternal
 				RootSignatureCreateInformation(
 					{
 						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VERTEX),
-						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VERTEX),
-						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VERTEX),
-						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_STRUCTURED_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VERTEX)
+						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_CONSTANT_BUFFER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_VERTEX)
 					},
 					/*InHasInputAssembler=*/ true
 				)
@@ -46,9 +44,9 @@ namespace Eternal
 				RenderPassCreateInformation(
 					InContext.GetMainViewport(),
 					{
-						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Clear_Store, InGlobalResources.GetGBufferLuminance().GetRenderTargetDepthStencilView())
+						RenderTargetInformation(BlendStateNone, RenderTargetOperator::Load_Store, InGlobalResources.GetGBufferLuminance().GetRenderTargetDepthStencilView())
 					},
-					InGlobalResources.GetGBufferDepthStencil().GetRenderTargetDepthStencilView(), RenderTargetOperator::Clear_Store
+					InGlobalResources.GetGBufferDepthStencil().GetRenderTargetDepthStencilView(), RenderTargetOperator::Load_Store
 				)
 			);
 
@@ -80,17 +78,23 @@ namespace Eternal
 			if (DebugPrimitives.Lines.size() <= 0)
 				return;
 
+			{
+				MapScope<PositionVertex> VertexBufferMapScope(_DebugVertexBuffer);
+				memcpy(VertexBufferMapScope.GetDataPointer(), DebugPrimitives.Lines.data(), sizeof(PositionVertex) * DebugPrimitives.Lines.size());
+			}
+
 			CommandListScope DebugCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "DebugPass");
 			{
 				_DebugDescriptorTable->SetDescriptor(0, static_cast<View*>(_DebugPerDrawConstantBuffer));
-				//_DebugDescriptorTable->SetDescriptor(1, );
-				_DebugDescriptorTable->SetDescriptor(2, InRenderer.GetGlobalResources().GetViewConstantBufferView());
+				_DebugDescriptorTable->SetDescriptor(1, InRenderer.GetGlobalResources().GetViewConstantBufferView());
 
+				const Resource* CurrentVertexBUffer = _DebugVertexBuffer;
 
 				DebugCommandList->BeginRenderPass(*_DebugRenderPass);
+				DebugCommandList->SetVertexBuffers(&CurrentVertexBUffer);
 				DebugCommandList->SetGraphicsPipeline(*_Pipeline);
 				DebugCommandList->SetGraphicsDescriptorTable(InContext, *_DebugDescriptorTable);
-				DebugCommandList->DrawInstanced(2, DebugPrimitives.Lines.size() / 2);
+				DebugCommandList->DrawInstanced(static_cast<uint32_t>(DebugPrimitives.Lines.size()), 1);
 				DebugCommandList->EndRenderPass();
 			}
 		}

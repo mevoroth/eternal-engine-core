@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GraphicsEngine/Pass.hpp"
+#include "GraphicData/MeshVertexFormat.hpp"
 #include "ShadersReflection/HLSLPerDrawConstants.hpp"
 
 namespace Eternal
@@ -29,6 +30,7 @@ namespace Eternal
 			InputLayout*							_DebugInputLayout		= nullptr;
 			RenderPass*								_DebugRenderPass		= nullptr;
 			FixedConstantBuffer<PerDrawConstants>	_DebugPerDrawConstantBuffer;
+			VertexBuffer<PositionVertex>			_DebugVertexBuffer;
 
 		};
 	}
