@@ -151,20 +151,20 @@ namespace Eternal
 					"black.tga"
 				)
 			);
-			_Streaming->EnqueueRequest_MainThread(
-				new TextureRequest(
-					FilePath::Find("noise_curl_3d_xyzw.dds", FileType::FILE_TYPE_TEXTURES),
-					"noise_curl_3d_xyzw",
-					"noise_curl_3d_xyzw"
-				)
-			);
-			_Streaming->EnqueueRequest_MainThread(
-				new TextureRequest(
-					FilePath::Find("cloud_base.dds", FileType::FILE_TYPE_TEXTURES),
-					"cloud_base",
-					"cloud_base"
-				)
-			);
+			//_Streaming->EnqueueRequest_MainThread(
+			//	new TextureRequest(
+			//		FilePath::Find("noise_curl_3d_xyzw.dds", FileType::FILE_TYPE_TEXTURES),
+			//		"noise_curl_3d_xyzw",
+			//		"noise_curl_3d_xyzw"
+			//	)
+			//);
+			//_Streaming->EnqueueRequest_MainThread(
+			//	new TextureRequest(
+			//		FilePath::Find("cloud_base.dds", FileType::FILE_TYPE_TEXTURES),
+			//		"cloud_base",
+			//		"cloud_base"
+			//	)
+			//);
 			{
 				for (uint32_t TextureIndex = 0; TextureIndex < static_cast<uint32_t>(TextureType::TEXTURE_TYPE_COUNT); ++TextureIndex)
 				{
@@ -266,6 +266,8 @@ namespace Eternal
 				if (CurrentGameFrame.MeshCollectionsVisibility.GetBitCount() == OldestFrame.MeshCollectionsVisibility.GetBitCount())
 					CurrentGameFrame.MeshCollectionsVisibility = OldestFrame.MeshCollectionsVisibility;
 			}
+
+			CurrentGameFrame.DebugPrimitives.Lines.clear();
 		}
 
 		void System::Update()
