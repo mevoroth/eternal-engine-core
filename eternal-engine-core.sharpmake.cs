@@ -4,24 +4,10 @@
 
 namespace EternalEngine
 {
-	[Sharpmake.Generate]
-	public class EternalEngineCoreProject : EternalEngineBaseProject
+	public class EternalEngineCoreProjectUtils
 	{
-		public EternalEngineCoreProject()
-			: base(
-				"core",
-				new EternalEngineProjectSettings(
-					EternalEngineProjectSettingsFlags.EEPSF_IncludeSettingsHeader |
-					EternalEngineProjectSettingsFlags.EEPSF_IncludeHLSLReflection
-				)
-			)
+		public static void ConfigureAll(Project.Configuration InConfiguration, ITarget InTarget, System.Type InTargetType)
 		{
-		}
-
-		public override void ConfigureAll(Configuration InConfiguration, Target InTarget)
-		{
-			base.ConfigureAll(InConfiguration, InTarget);
-
 			// Include paths
 			InConfiguration.IncludePaths.AddRange(new string[] {
 				@"$(SolutionDir)eternal-engine-core\CorePrivate\include",
@@ -36,8 +22,61 @@ namespace EternalEngine
 				EternalEngineSettings.FBXSDKPath + @"\include",
 			});
 
-			InConfiguration.AddPublicDependency<EternalEngineExternProject>(InTarget);
-			InConfiguration.AddPublicDependency<EternalEngineUtilsProject>(InTarget);
+			if (InTargetType == typeof(Target))
+			{
+				InConfiguration.AddPublicDependency<EternalEngineExternProject>(InTarget);
+				InConfiguration.AddPublicDependency<EternalEngineUtilsProject>(InTarget);
+			}
+
+			if (InTargetType == typeof(AndroidTarget))
+			{
+				InConfiguration.AddPublicDependency<EternalEngineExternAndroidProject>(InTarget);
+				InConfiguration.AddPublicDependency<EternalEngineUtilsAndroidProject>(InTarget);
+			}
+		}
+	}
+
+	[Sharpmake.Generate]
+	public class EternalEngineCoreProject : EternalEngineBaseProject
+	{
+		public EternalEngineCoreProject()
+			: base(
+				typeof(Target),
+				"core",
+				new EternalEngineProjectSettings(
+					EternalEngineProjectSettingsFlags.EEPSF_IncludeSettingsHeader |
+					EternalEngineProjectSettingsFlags.EEPSF_IncludeHLSLReflection
+				)
+			)
+		{
+		}
+
+		public override void ConfigureAll(Configuration InConfiguration, ITarget InTarget)
+		{
+			base.ConfigureAll(InConfiguration, InTarget);
+			EternalEngineCoreProjectUtils.ConfigureAll(InConfiguration, InTarget, Targets.TargetType);
+		}
+	}
+
+	[Sharpmake.Generate]
+	public class EternalEngineCoreAndroidProject : EternalEngineBaseAndroidProject
+	{
+		public EternalEngineCoreAndroidProject()
+			: base(
+				typeof(AndroidTarget),
+				"core",
+				new EternalEngineProjectSettings(
+					EternalEngineProjectSettingsFlags.EEPSF_IncludeSettingsHeader |
+					EternalEngineProjectSettingsFlags.EEPSF_IncludeHLSLReflection
+				)
+			)
+		{
+		}
+
+		public override void ConfigureAll(Configuration InConfiguration, ITarget InTarget)
+		{
+			base.ConfigureAll(InConfiguration, InTarget);
+			EternalEngineCoreProjectUtils.ConfigureAll(InConfiguration, InTarget, Targets.TargetType);
 		}
 	}
 }
