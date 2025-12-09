@@ -1,4 +1,5 @@
 #include "Platform/Windows/WindowsSystem.hpp"
+#include "Platform/Android/AndroidSystem.hpp"
 #include "Core/System.hpp"
 #if ETERNAL_USE_PRIVATE
 #include "Platform/SystemFactoryPrivate.hpp"
@@ -18,6 +19,10 @@ namespace Eternal
 
 #if ETERNAL_PLATFORM_WINDOWS
 			OutSystem = new WindowsSystem(InSystemCreateInformation);
+#endif
+
+#if ETERNAL_PLATFORM_ANDROID
+			OutSystem = new AndroidSystem(InSystemCreateInformation);
 #endif
 
 			ETERNAL_ASSERT(OutSystem);

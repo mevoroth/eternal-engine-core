@@ -20,17 +20,23 @@
 
 #endif
 
+struct ANativeActivity;
+
 namespace Eternal
 {
 	namespace Core
 	{
 		struct MainInput
 		{
-			const char* ApplicationName	= nullptr;
-			HINSTANCE hInstance			= nullptr;
-			HINSTANCE hPrevInstance		= nullptr;
-			LPSTR lpCmdLine				= nullptr;
-			int nCmdShow				= 0;
+			const char* ApplicationName				= nullptr;
+			HINSTANCE hInstance						= nullptr;
+			HINSTANCE hPrevInstance					= nullptr;
+			LPSTR lpCmdLine							= nullptr;
+			int nCmdShow							= 0;
+
+			ANativeActivity* AndroidNativeActivity	= nullptr;
+			void* AndroidSavedState					= nullptr;
+			size_t AndroidSavedStateSize			= 0ull;
 		};
 
 		SystemCreateInformation CreateSystemInformation(_In_ const MainInput& InMaintInput);
