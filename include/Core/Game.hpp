@@ -83,6 +83,8 @@ namespace Eternal
 			{
 				_CurrentGameState = new GameStateType(static_cast<Game&>(*this));
 			}
+
+			void RunGame();
 		};
 	}
 }

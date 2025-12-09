@@ -170,5 +170,13 @@ namespace Eternal
 		{
 			_TimeDilation = 0.0;
 		}
+
+#if !ETERNAL_PLATFORM_ANDROID
+		template<typename GameStateType>
+		void StartGame<GameStateType>::RunGame()
+		{
+			Run();
+		}
+#endif
 	}
 }
