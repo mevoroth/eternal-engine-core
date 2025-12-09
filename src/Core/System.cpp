@@ -418,7 +418,7 @@ namespace Eternal
 							ImGui::TableNextRow();
 							{
 								ImGui::TableNextColumn();
-								ImGui::Text(TexturesIterator->first.c_str());
+								ImGui::Text("%s", TexturesIterator->first.c_str());
 							}
 							{
 								ImGui::TableNextColumn();
