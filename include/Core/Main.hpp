@@ -1,55 +1,27 @@
 #pragma once
 
-#include "Core/SystemCreateInformation.hpp"
+#include "Core/MainInput.hpp"
 #include "Core/Game.hpp"
+#include "Core/SystemCreateInformation.hpp"
 #include "DebugTools/Debug.hpp"
 #include "File/FilePath.hpp"
 #include "Graphics/Types/DeviceType.hpp"
-
-#if ETERNAL_PLATFORM_WINDOWS
-#include <Windows.h>
-#else
-
-#ifndef HINSTANCE
-#define HINSTANCE	void*
-#endif
-
-#ifndef LPSTR
-#define LPSTR		const char*
-#endif
-
-#endif
-
-struct ANativeActivity;
 
 namespace Eternal
 {
 	namespace Core
 	{
-		struct MainInput
-		{
-			const char* ApplicationName				= nullptr;
-			HINSTANCE hInstance						= nullptr;
-			HINSTANCE hPrevInstance					= nullptr;
-			LPSTR lpCmdLine							= nullptr;
-			int nCmdShow							= 0;
-
-			ANativeActivity* AndroidNativeActivity	= nullptr;
-			void* AndroidSavedState					= nullptr;
-			size_t AndroidSavedStateSize			= 0ull;
-		};
-
-		SystemCreateInformation CreateSystemInformation(_In_ const MainInput& InMaintInput);
 		template<typename CustomSetupType, typename GameStateType>
-		int Main(_In_ const MainInput& InMaintInput)
+		int Main(_In_ const MainInput& InMainInput)
 		{
 			using namespace Eternal::FileSystem;
 
-			Eternal::DebugTools::WaitForDebugger();
+			//Eternal::DebugTools::WaitForDebugger();
 
 			//OPTICK_APP(InMainInput.ApplicationName);
 			
-			SystemCreateInformation SystemInformation = CreateSystemInformation(InMaintInput);
+			SystemCreateInformation SystemInformation = CreateSystemInformation(InMainInput);
+			SystemInformation.ExecutableInput	= std::move(InMainInput);
 			SystemInformation.FBXPath			= FilePath::MakePath("assets\\fbx\\");
 			SystemInformation.FBXCachePath		= FilePath::MakePath("assets\\fbx\\cache\\");
 			SystemInformation.ShaderIncludePath	= { FilePath::MakePath("eternal-engine-shaders\\Shaders\\"),
@@ -65,17 +37,12 @@ namespace Eternal
 
 			CustomSetupType::SetupCustomSystemCreateInformation(SystemInformation);
 
-			GameCreateInformation GameInformation(SystemInformation);
+			GameCreateInformation GameInformation(std::move(SystemInformation));
 
-			StartGame<GameStateType> EternalGame(GameInformation);
-			EternalGame.Run();
+			StartGame<GameStateType>* EternalGame = new StartGame<GameStateType>(std::move(GameInformation));
+			EternalGame->RunGame();
 
 			return 0;
 		}
 	}
 }
-
-#if !ETERNAL_PLATFORM_WINDOWS
-#undef HINSTANCE
-#undef LPSTR
-#endif

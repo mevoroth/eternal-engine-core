@@ -344,6 +344,7 @@ namespace Eternal
 			virtual void UpdatePlatform() {}
 
 		protected:
+			SystemCreateInformation&									_SystemCreateInformation;
 			Input*														_Input						= nullptr;
 			InputMapping*												_InputMapping				= nullptr;
 			GraphicsContext*											_GraphicsContext			= nullptr;
@@ -352,7 +353,6 @@ namespace Eternal
 		private:
 			void _LoadBuiltin();
 			
-			SystemCreateInformation&									_SystemCreateInformation;
 			AudioFactory												_AudioFactory;
 			TextureFactory												_TextureFactory;
 			MaterialUpdateBatcher										_MaterialUpdateBatcher;

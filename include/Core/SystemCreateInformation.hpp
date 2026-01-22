@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Core/MainInput.hpp"
 #include <vector>
 #include <string>
 
@@ -29,7 +30,10 @@ namespace Eternal
 		struct SystemCreateInformation
 		{
 			SystemCreateInformation(_In_ GraphicsContextCreateInformation* InContextInformation);
+			SystemCreateInformation(_Inout_ SystemCreateInformation&& InOutSystemCreateInformation);
 			~SystemCreateInformation();
+
+			MainInput ExecutableInput;
 
 			GraphicsContextCreateInformation* ContextInformation		= nullptr;
 			Game* GameContext											= nullptr;
@@ -47,5 +51,7 @@ namespace Eternal
 			string SFXSoundPath;
 			string BGMSoundPath;
 		};
+
+		SystemCreateInformation CreateSystemInformation(_In_ const MainInput& InMainInput);
 	}
 }

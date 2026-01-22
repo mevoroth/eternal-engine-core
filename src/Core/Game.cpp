@@ -17,11 +17,10 @@ namespace Eternal
 		using namespace Eternal::Resources;
 		using namespace Eternal::GraphicsCommands;
 
-		Game::Game(_In_ GameCreateInformation& InGameCreateInformation)
-			: _World(*this)
+		Game::Game(_In_ GameCreateInformation&& InGameCreateInformation)
+			: _GameCreateInformation(std::move(InGameCreateInformation))
+			, _World(*this)
 		{
-			InGameCreateInformation.SystemInformation.GameContext = this;
-			_System = CreateSystem(InGameCreateInformation.SystemInformation);
 		}
 
 		Game::~Game()
@@ -172,10 +171,11 @@ namespace Eternal
 		}
 
 #if !ETERNAL_PLATFORM_ANDROID
-		template<typename GameStateType>
-		void StartGame<GameStateType>::RunGame()
+		void RunGame(_In_ GameCreateInformation& InGameCreateInformation, _Inout_ Game* InOutGame)
 		{
-			Run();
+			InGameCreateInformation.SystemInformation.GameContext = InOutGame;
+			InOutGame->_System = CreateSystem(InGameCreateInformation.SystemInformation);
+			InOutGame->Run();
 		}
 #endif
 	}

@@ -14,6 +14,8 @@ namespace Eternal
 
 			AndroidSystem(_In_ SystemCreateInformation& InSystemCreateInformation);
 
+			virtual void UpdatePlatform() override;
+
 		};
 	}
 }

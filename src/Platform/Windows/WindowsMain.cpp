@@ -1,7 +1,7 @@
-#include "Core/Main.hpp"
-
 #if ETERNAL_PLATFORM_WINDOWS
 
+#include "Core/MainInput.hpp"
+#include "Core/SystemCreateInformation.hpp"
 #include "Graphics/Types.hpp"
 #include "Platform/Microsoft/MicrosoftProcess.hpp"
 #include "Windows/WindowsArguments.hpp"
@@ -11,7 +11,7 @@ namespace Eternal
 {
 	namespace Core
 	{
-		SystemCreateInformation CreateSystemInformation(_In_ const MainInput& InMaintInput)
+		SystemCreateInformation CreateSystemInformation(_In_ const MainInput& InMainInput)
 		{
 			RenderSettings Settings(
 				DeviceType::DEVICE_TYPE_DEFAULT,
@@ -19,12 +19,12 @@ namespace Eternal
 				/*InIsVSync =*/ true
 			);
 			WindowsArguments WinArguments(
-				static_cast<HINSTANCE>(InMaintInput.hInstance),
-				static_cast<HINSTANCE>(InMaintInput.hPrevInstance),
-				static_cast<LPSTR>(InMaintInput.lpCmdLine),
-				InMaintInput.nCmdShow,
-				InMaintInput.ApplicationName,
-				InMaintInput.ApplicationName,
+				static_cast<HINSTANCE>(InMainInput.hInstance),
+				static_cast<HINSTANCE>(InMainInput.hPrevInstance),
+				static_cast<LPSTR>(InMainInput.lpCmdLine),
+				InMainInput.nCmdShow,
+				InMainInput.ApplicationName,
+				InMainInput.ApplicationName,
 				Platform::MicrosoftProcess::WindowProc
 			);
 			WindowsGraphicsContextCreateInformation* ContextCreateInformation = new WindowsGraphicsContextCreateInformation(Settings, WinArguments);
