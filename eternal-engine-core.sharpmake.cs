@@ -18,7 +18,6 @@ namespace EternalEngine
 				@"$(SolutionDir)eternal-engine-extern\rapidjson\include",
 				@"$(SolutionDir)eternal-engine-extern\renderdoc",
 				@"$(SolutionDir)eternal-engine-shaders",
-				EternalEngineSettings.VulkanPath + @"\Include",
 				EternalEngineSettings.FBXSDKPath + @"\include",
 			});
 
