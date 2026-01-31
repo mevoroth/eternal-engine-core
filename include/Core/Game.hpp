@@ -3,6 +3,8 @@
 #include "Core/World.hpp"
 #include "Core/SystemCreateInformation.hpp"
 
+struct android_app;
+
 namespace Eternal
 {
 	namespace Time
@@ -27,6 +29,7 @@ namespace Eternal
 			SystemCreateInformation SystemInformation;
 		};
 
+		void AndroidApplicationOnAppCmd(_In_ android_app* InAndroidApplication, _In_ int32_t InCommand);
 		void* AndroidApplicationEntry(_In_ void* InAndroidApplication);
 		void RunGame(_In_ GameCreateInformation& InGameCreateInformation, _Inout_ Game* InOutGame);
 
@@ -79,6 +82,7 @@ namespace Eternal
 			TimeSecondsT			_DeltaSeconds		= 0.0;
 			TimeSecondsT			_TimeDilation		= 1.0;
 
+			friend void AndroidApplicationOnAppCmd(_In_ android_app* InAndroidApplication, _In_ int32_t InCommand);
 			friend void* AndroidApplicationEntry(_In_ void* InAndroidApplication);
 			friend void RunGame(_In_ GameCreateInformation& InGameCreateInformation, _Inout_ Game* InOutGame);
 		};

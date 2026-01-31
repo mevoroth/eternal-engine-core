@@ -11,6 +11,42 @@ namespace Eternal
 	{
 		using namespace Eternal::Graphics;
 
+		void AndroidSystem::AndroidLooperProcess(_In_ android_app* InAndroidApplication)
+		{
+			android_poll_source* AndroidPollSource	= nullptr;
+			int FileDescriptor						= 0;
+			int Events								= 0;
+
+			int AndroidLooperPollOnceResult = ALooper_pollOnce(-1, &FileDescriptor, &Events, reinterpret_cast<void**>(&AndroidPollSource));
+
+			switch (AndroidLooperPollOnceResult)
+			{
+			case ALOOPER_POLL_WAKE:
+			{
+				return;
+			} break;
+			case ALOOPER_POLL_CALLBACK:
+			{
+			} break;
+			case ALOOPER_POLL_TIMEOUT:
+			{
+			} break;
+			case ALOOPER_POLL_ERROR:
+			{
+			} break;
+			default:
+			{
+				if (AndroidLooperPollOnceResult < 0)
+				{
+					ETERNAL_BREAK();
+					return;
+				}
+			} break;
+			}
+
+			AndroidPollSource->process(InAndroidApplication, AndroidPollSource);
+		}
+
 		AndroidSystem::AndroidSystem(_In_ SystemCreateInformation& InSystemCreateInformation)
 			: System(InSystemCreateInformation)
 		{
@@ -19,17 +55,7 @@ namespace Eternal
 
 		void AndroidSystem::UpdatePlatform()
 		{
-			android_poll_source* AndroidPollSource	= nullptr;
-			int FileDescriptor						= 0;
-			int Events								= 0;
-
-			if (ALooper_pollOnce(0, &FileDescriptor, &Events, reinterpret_cast<void**>(&AndroidPollSource)) < 0)
-			{
-				ETERNAL_BREAK();
-				return;
-			}
-
-			AndroidPollSource->process(reinterpret_cast<android_app*>(_SystemCreateInformation.ExecutableInput.AndroidNativeActivity->instance), AndroidPollSource);
+			AndroidLooperProcess(reinterpret_cast<android_app*>(_SystemCreateInformation.ExecutableInput.AndroidNativeActivity->instance));
 		}
 	}
 }

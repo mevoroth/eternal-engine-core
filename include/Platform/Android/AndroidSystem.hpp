@@ -1,8 +1,10 @@
 #pragma once
 
+#if ETERNAL_PLATFORM_ANDROID
+
 #include "Core/System.hpp"
 
-#if ETERNAL_PLATFORM_ANDROID
+struct android_app;
 
 namespace Eternal
 {
@@ -11,6 +13,8 @@ namespace Eternal
 		class AndroidSystem : public System
 		{
 		public:
+
+			static void AndroidLooperProcess(_In_ android_app* InAndroidApplication);
 
 			AndroidSystem(_In_ SystemCreateInformation& InSystemCreateInformation);
 
