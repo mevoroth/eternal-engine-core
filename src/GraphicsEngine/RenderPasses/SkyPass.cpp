@@ -31,7 +31,7 @@ namespace Eternal
 			Shader* AtmosphereCubeMapPixel = InContext.GetShader(ShaderCreateInformation(
 				ShaderType::SHADER_TYPE_PIXEL,
 				"AtmosphereCubeMapPixel",
-				"Volumetrics\\atmosphere.pixel.hlsl",
+				"Volumetrics/atmosphere.pixel.hlsl",
 				Defines
 			));
 

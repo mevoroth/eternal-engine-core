@@ -78,12 +78,12 @@ namespace Eternal
 			Shader* ImguiVertex = InContext.GetShader(ShaderCreateInformation(
 				ShaderType::SHADER_TYPE_VERTEX,
 				"ImguiVertex",
-				"imgui\\imgui.vertex.hlsl"
+				"Imgui/imgui.vertex.hlsl"
 			));
 			Shader* ImguiPixel = InContext.GetShader(ShaderCreateInformation(
 				ShaderType::SHADER_TYPE_PIXEL,
 				"ImguiPixel",
-				"imgui\\imgui.pixel.hlsl"
+				"Imgui/imgui.pixel.hlsl"
 			));
 			
 			_ImguiBlendState = new BlendState(
