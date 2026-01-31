@@ -13,8 +13,7 @@ namespace Eternal
 		{
 			RenderSettings Settings(
 				DeviceType::DEVICE_TYPE_DEFAULT,
-				1600, 900,
-				/*InIsVSync =*/ false
+				0, 0
 			);
 			AndroidGraphicsContextCreateInformation* ContextCreateInformation = new AndroidGraphicsContextCreateInformation(Settings);
 
