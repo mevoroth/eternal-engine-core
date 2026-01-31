@@ -103,7 +103,7 @@ namespace Eternal
 									State.AnimationProperty	= CastedProperty;
 
 									Handle.CollectionIndex	= CollectionIndex;
-									Handle.PropertyIndex	= InOutTimeline.AnimationProperties.PushBack(move(State));
+									Handle.PropertyIndex	= InOutTimeline.AnimationProperties.PushBack(std::move(State));
 									IsRegistered = true;
 								}
 							}
@@ -118,7 +118,7 @@ namespace Eternal
 					NewCollection.AnimationProperties.Reserve(16);
 					AnimationState<AnimationCompositeType> NewAnimationState;
 					NewAnimationState.AnimationProperty = CastedProperty;
-					Handle.PropertyIndex = NewCollection.AnimationProperties.PushBack(move(NewAnimationState));
+					Handle.PropertyIndex = NewCollection.AnimationProperties.PushBack(std::move(NewAnimationState));
 
 					NewCollection.AnimationData = InAnimation;
 					_AnimationCollections.push_back(std::move(NewCollection));
