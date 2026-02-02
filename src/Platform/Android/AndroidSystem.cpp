@@ -3,6 +3,7 @@
 #include "Platform/Android/AndroidSystem.hpp"
 #include "Graphics/GraphicsContextFactory.hpp"
 #include "Android/AndroidGraphicsContext.hpp"
+#include "Input/InputFactory.hpp"
 #include <android/native_app_glue/android_native_app_glue.h>
 
 namespace Eternal
@@ -10,6 +11,9 @@ namespace Eternal
 	namespace Core
 	{
 		using namespace Eternal::Graphics;
+		using namespace Eternal::InputSystem;
+
+		std::vector<InputType> System::InputChannels = { InputType::INPUT_TYPE_TOUCH };
 
 		void AndroidSystem::AndroidLooperProcess(_In_ android_app* InAndroidApplication)
 		{

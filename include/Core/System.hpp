@@ -45,6 +45,8 @@ namespace Eternal
 	{
 		class Input;
 		class InputMapping;
+
+		enum class InputType;
 	}
 
 	namespace Import
@@ -252,6 +254,8 @@ namespace Eternal
 		class System
 		{
 		public:
+
+			static std::vector<InputType> InputChannels;
 
 			System(_In_ SystemCreateInformation& InSystemCreateInformation);
 			virtual ~System();
