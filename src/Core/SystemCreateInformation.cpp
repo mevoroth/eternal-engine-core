@@ -26,6 +26,7 @@ namespace Eternal
 			, AnimationPath(std::move(InOutSystemCreateInformation.AnimationPath))
 			, SFXSoundPath(std::move(InOutSystemCreateInformation.SFXSoundPath))
 			, BGMSoundPath(std::move(InOutSystemCreateInformation.BGMSoundPath))
+			, ConfigurationPath(std::move(InOutSystemCreateInformation.ConfigurationPath))
 		{
 			InOutSystemCreateInformation.ContextInformation = nullptr;
 		}

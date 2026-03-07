@@ -4,6 +4,7 @@
 #include "GraphicData/GlobalResources.hpp"
 #include "Graphics/GraphicsInclude.hpp"
 #include "NextGenGraphics/FrameGraph.hpp"
+#include "Configuration/ConfigurationSetting.hpp"
 
 namespace Eternal
 {

@@ -34,6 +34,7 @@ namespace Eternal
 			SystemInformation.AnimationPath		= FilePath::MakePath("assets\\animations\\");
 			SystemInformation.SFXSoundPath		= FilePath::MakePath("assets\\sounds\\sfx\\");
 			SystemInformation.BGMSoundPath		= FilePath::MakePath("assets\\sounds\\bgm\\");
+			SystemInformation.ConfigurationPath	= FilePath::MakePath("config\\");
 
 			CustomSetupType::SetupCustomSystemCreateInformation(SystemInformation);
 

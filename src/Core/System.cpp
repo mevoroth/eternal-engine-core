@@ -4,6 +4,7 @@
 #include "Audio/AudioSystem.hpp"
 #include "Audio/AudioSystemFactory.hpp"
 #include "Animation/AnimationSystem.hpp"
+#include "Configuration/ConfigurationSetting.hpp"
 #include "Graphics/GraphicsInclude.hpp"
 #include "GraphicsEngine/RendererPBR.hpp"
 #include "File/FilePath.hpp"
@@ -66,6 +67,7 @@ namespace Eternal
 			FilePath::Register(InSystemCreateInformation.AnimationPath,							FileType::FILE_TYPE_ANIMATIONS);
 			FilePath::Register(InSystemCreateInformation.SFXSoundPath,							FileType::FILE_TYPE_SFX_SOUNDS);
 			FilePath::Register(InSystemCreateInformation.BGMSoundPath,							FileType::FILE_TYPE_BGM_SOUNDS);
+			FilePath::Register(InSystemCreateInformation.ConfigurationPath,						FileType::FILE_TYPE_CONFIGURATIONS);
 
 			_Timer						= CreateTimer(TimeType::TIME_TYPE_DEFAULT);
 			_Logs						= CreateMultiChannelLog({ LogType::LOG_TYPE_CONSOLE/*, LogType::LOG_TYPE_FILE*/ });
@@ -85,6 +87,8 @@ namespace Eternal
 
 			string CurrentDirectoryPath = FilePath::CurrentDirectory();
 			LogWrite(LogInfo, LogEngine, CurrentDirectoryPath);
+
+			LoadConfiguration();
 		}
 
 		void System::InitializeSystem()
@@ -274,6 +278,7 @@ namespace Eternal
 		{
 			ETERNAL_PROFILER(BASIC)();
 			UpdatePlatform();
+			UpdateConfiguration();
 			_Timer->Update();
 			_Input->Update();
 			GetAudioSystem().UpdateAudioSystem();

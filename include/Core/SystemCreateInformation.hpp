@@ -50,6 +50,7 @@ namespace Eternal
 			string AnimationPath;
 			string SFXSoundPath;
 			string BGMSoundPath;
+			string ConfigurationPath;
 		};
 
 		SystemCreateInformation CreateSystemInformation(_In_ const MainInput& InMainInput);
