@@ -43,7 +43,6 @@ namespace Eternal
 		{
 			(void)InSystem;
 			(void)InRenderer;
-			//GraphicsCommandListScope PresentCommandList = InContext.CreateNewGraphicsCommandList(InContext.GetCurrentFrameBackBufferRenderPass(), "Present");
 			CommandListScope PresentCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "Present");
 
 			_PresentDescriptorTable->SetDescriptor(0, InRenderer.GetGlobalResources().GetGBufferLuminance().GetShaderResourceView());
