@@ -65,7 +65,7 @@ namespace Eternal
 
 			{
 				MapScope<PerDrawConstants> PerDrawBufferMapScope(_DebugPerDrawConstantBuffer);
-				PerDrawBufferMapScope->SubMeshToWorldTransposed = Matrix4x4::Identity;
+				PerDrawBufferMapScope->SubMeshToWorldTransposed = Matrix4x4::Identity();
 			}
 		}
 

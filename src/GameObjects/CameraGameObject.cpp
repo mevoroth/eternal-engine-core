@@ -29,11 +29,11 @@ namespace Eternal
 			TransformComponent* Component = GetComponent<TransformComponent>();
 
 			Transform CameraTransform = Component->GetTransform();
-			CameraTransform.SetTranslation(Vector3::Zero);
+			CameraTransform.SetTranslation(Vector3::Zero());
 
 			Matrix4x4 ViewToWorld = CameraTransform.GetLocalToWorld();
-			Vector4 Forward	= ViewToWorld * Vector4::ForwardPosition;
-			Vector4 Right	= ViewToWorld * Vector4::RightPosition;
+			Vector4 Forward	= ViewToWorld * Vector4::ForwardPosition();
+			Vector4 Right	= ViewToWorld * Vector4::RightPosition();
 
 			Vector3 ForwardVector(Forward.x, Forward.y, Forward.z);
 			Vector3 RightVector(Right.x, Right.y, Right.z);
