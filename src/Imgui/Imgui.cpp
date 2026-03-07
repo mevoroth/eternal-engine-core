@@ -95,13 +95,16 @@ namespace Eternal
 				BlendOperator::BLEND_OPERATOR_ADD
 			);
 
-			RenderPassCreateInformation ImguiRenderPassCreateInformation(
-				InContext.GetMainViewport(),
-				{
-					RenderTargetInformation(*_ImguiBlendState, RenderTargetOperator::Load_Store, InRenderer.GetGlobalResources().GetGBufferLuminance().GetRenderTargetDepthStencilView())
-				}
-			);
-			_ImguiRenderPass = CreateRenderPass(InContext, ImguiRenderPassCreateInformation);
+			for (uint32_t RenderPassIndex = 0; RenderPassIndex < GlobalResources::TemporaryLuminanceTexturesCount; ++RenderPassIndex)
+			{
+				RenderPassCreateInformation ImguiRenderPassCreateInformation(
+					InContext.GetMainViewport(),
+					{
+						RenderTargetInformation(*_ImguiBlendState, RenderTargetOperator::Load_Store, InRenderer.GetGlobalResources().GetGBufferLuminance(RenderPassIndex).GetRenderTargetDepthStencilView())
+					}
+				);
+				_ImguiRenderPasses[RenderPassIndex] = CreateRenderPass(InContext, ImguiRenderPassCreateInformation);
+			}
 
 			vector<VertexStreamBase> ImguiVertexStreams =
 			{
@@ -133,7 +136,7 @@ namespace Eternal
 			GraphicsPipelineCreateInformation ImguiPipelineCreateInformation(
 				_ImguiRootSignature,
 				_ImguiInputLayout,
-				_ImguiRenderPass,
+				_ImguiRenderPasses[0],
 				ImguiVertex,
 				ImguiPixel,
 				DepthStencilNoneNone,
@@ -285,7 +288,8 @@ namespace Eternal
 			DestroySampler(_ImguiBilinearSampler);
 			DestroyRootSignature(_ImguiRootSignature);
 			DestroyInputLayout(_ImguiInputLayout);
-			DestroyRenderPass(_ImguiRenderPass);
+			for (uint32_t RenderPassIndex = 0; RenderPassIndex < GlobalResources::TemporaryLuminanceTexturesCount; ++RenderPassIndex)
+				DestroyRenderPass(_ImguiRenderPasses[RenderPassIndex]);
 			delete _ImguiBlendState;
 			_ImguiBlendState = nullptr;
 		}
@@ -415,7 +419,7 @@ namespace Eternal
 				};
 				ImguiCommandList->Transition(ImguiResourceTransitions, ETERNAL_ARRAYSIZE(ImguiResourceTransitions));
 
-				ImguiCommandList->BeginRenderPass(*_ImguiRenderPass);
+				ImguiCommandList->BeginRenderPass(*_ImguiRenderPasses[InRenderer.GetGlobalResources().GetCurrentLuminanceIndex()]);
 				ImguiCommandList->SetGraphicsPipeline(*_ImguiPipeline);
 
 				_ImGui_Render(ImguiDrawData, RenderContext, InContext, ImguiCommandList);

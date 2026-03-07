@@ -90,26 +90,26 @@ namespace Eternal
 			};
 
 			vector<InputKey>			_MappedKeys;
-			Input*						_Input = nullptr;
+			Input*						_Input														= nullptr;
 
 			ImguiFontMetaData			_ImguiFontMetaData;
-			uint32_t					_PreviousDrawCount = 1;
+			uint32_t					_PreviousDrawCount											= 1;
 
 			// Graphics resources
-			MultiBuffered<Resource>*	_ImguiConstantBuffer		= nullptr;
-			MultiBuffered<View>*		_ImguiConstantBufferView	= nullptr;
-			MultiBuffered<Resource>*	_ImguiVertexBuffer			= nullptr;
-			MultiBuffered<Resource>*	_ImguiIndexBuffer			= nullptr;
+			MultiBuffered<Resource>*	_ImguiConstantBuffer										= nullptr;
+			MultiBuffered<View>*		_ImguiConstantBufferView									= nullptr;
+			MultiBuffered<Resource>*	_ImguiVertexBuffer											= nullptr;
+			MultiBuffered<Resource>*	_ImguiIndexBuffer											= nullptr;
 			
-			RenderPass*					_ImguiRenderPass			= nullptr;
-			Pipeline*					_ImguiPipeline				= nullptr;
-			Sampler*					_ImguiBilinearSampler		= nullptr;
-			InputLayout*				_ImguiInputLayout			= nullptr;
-			RootSignature*				_ImguiRootSignature			= nullptr;
-			BlendState*					_ImguiBlendState			= nullptr;
-			DescriptorTable*			_ImguiDescriptorTable		= nullptr;
-			Resource*					_ImguiFontTexture			= nullptr;
-			View*						_ImguiFontTextureView		= nullptr;
+			RenderPass*					_ImguiRenderPasses[GraphicsContext::FrameBufferingCount]	= {};
+			Pipeline*					_ImguiPipeline												= nullptr;
+			Sampler*					_ImguiBilinearSampler										= nullptr;
+			InputLayout*				_ImguiInputLayout											= nullptr;
+			RootSignature*				_ImguiRootSignature											= nullptr;
+			BlendState*					_ImguiBlendState											= nullptr;
+			DescriptorTable*			_ImguiDescriptorTable										= nullptr;
+			Resource*					_ImguiFontTexture											= nullptr;
+			View*						_ImguiFontTextureView										= nullptr;
 		};
 	}
 }
