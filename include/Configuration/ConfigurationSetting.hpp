@@ -5,6 +5,11 @@
 
 namespace Eternal
 {
+	namespace Time
+	{
+		class Timer;
+	}
+
 	namespace Core
 	{
 		template<typename SettingType>
@@ -14,7 +19,7 @@ namespace Eternal
 		void WriteConfigurationValue(_In_ rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator>& InAllocator, _In_ const std::vector<SettingType>& InSettingValue, _In_ const std::string& InSettingKey, _Out_ rapidjson::Value& OutConfiguration);
 
 		void LoadConfiguration();
-		void UpdateConfiguration();
+		void UpdateConfiguration(_In_ const Time::Timer* InTimer);
 
 		template<typename SettingType>
 		class ConfigurationSetting

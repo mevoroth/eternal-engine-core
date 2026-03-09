@@ -278,8 +278,8 @@ namespace Eternal
 		{
 			ETERNAL_PROFILER(BASIC)();
 			UpdatePlatform();
-			UpdateConfiguration();
 			_Timer->Update();
+			UpdateConfiguration(_Timer);
 			_Input->Update();
 			GetAudioSystem().UpdateAudioSystem();
 			GetAnimationSystem().UpdateAnimationSystem(static_cast<float>(_Timer->GetDeltaTimeSeconds()));

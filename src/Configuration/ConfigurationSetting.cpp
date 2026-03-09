@@ -4,7 +4,9 @@
 #include "File/FileFactory.hpp"
 #include "File/FilePath.hpp"
 #include "Math/Math.hpp"
+#include "Time/Timer.hpp"
 #include "rapidjson/allocators.h"
+#include "rapidjson/prettywriter.h"
 
 namespace Eternal
 {
@@ -20,9 +22,12 @@ namespace Eternal
 
 		template<> void ReadConfigurationValue(_In_ const rapidjson::Document& InConfiguration, _In_ const std::string& InSettingKey, _Inout_ std::vector<Types::Vector3>& InOutSettingValue)
 		{
+			if (!InConfiguration.HasMember(InSettingKey.c_str()))
+				return;
+
 			const auto& ConfigurationArray = InConfiguration[InSettingKey.c_str()].GetArray();
 
-			for (uint32_t SettingArrayIndex = 0, SettingArrayCount = Math::Min<uint32_t>(ConfigurationArray.Size(), InOutSettingValue.size()); SettingArrayIndex < SettingArrayCount; ++SettingArrayIndex)
+			for (uint32_t SettingArrayIndex = 0, SettingArrayCount = Math::Min<uint32_t>(ConfigurationArray.Size(), static_cast<uint32_t>(InOutSettingValue.size())); SettingArrayIndex < SettingArrayCount; ++SettingArrayIndex)
 			{
 				InOutSettingValue[SettingArrayIndex] = Types::Vector3(
 					ConfigurationArray[SettingArrayIndex]["x"].GetFloat(),
@@ -48,14 +53,20 @@ namespace Eternal
 		template<> void WriteConfigurationValue(_In_ rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator>& InAllocator, _In_ const std::vector<Types::Vector3>& InSettingValue, _In_ const std::string& InSettingKey, _Out_ rapidjson::Value& OutConfiguration)
 		{
 			ETERNAL_ASSERT(!OutConfiguration.HasMember(InSettingKey.c_str()));
-			//OutConfiguration.AddMember(InSettingKey.c_str(), rapidjson::Value().Move(), InAllocator);
-			rapidjson::Value& ConfigurationValue = OutConfiguration[InSettingKey.c_str()].SetArray();
+			OutConfiguration.AddMember(rapidjson::StringRef(InSettingKey.c_str()), rapidjson::Value(rapidjson::kArrayType), InAllocator);
+			rapidjson::Value& ConfigurationValue = OutConfiguration[InSettingKey.c_str()];
+
+			ConfigurationValue.Reserve(InSettingValue.size(), InAllocator);
 
 			for (uint32_t SettingArrayIndex = 0; SettingArrayIndex < InSettingValue.size(); ++SettingArrayIndex)
 			{
-				ConfigurationValue[SettingArrayIndex]["x"] = InSettingValue[SettingArrayIndex].x;
-				ConfigurationValue[SettingArrayIndex]["y"] = InSettingValue[SettingArrayIndex].y;
-				ConfigurationValue[SettingArrayIndex]["z"] = InSettingValue[SettingArrayIndex].z;
+				ConfigurationValue.PushBack(rapidjson::Value(rapidjson::kObjectType), InAllocator);
+
+				rapidjson::Value& CurrentSettingEntry = ConfigurationValue[SettingArrayIndex];
+
+				CurrentSettingEntry.AddMember("x", InSettingValue[SettingArrayIndex].x, InAllocator);
+				CurrentSettingEntry.AddMember("y", InSettingValue[SettingArrayIndex].y, InAllocator);
+				CurrentSettingEntry.AddMember("z", InSettingValue[SettingArrayIndex].z, InAllocator);
 			}
 		}
 
@@ -77,20 +88,29 @@ namespace Eternal
 			rapidjson::Document JsonGlobalConfiguration;
 			JsonGlobalConfiguration.Parse(reinterpret_cast<const char*>(GlobalConfigurationContent.Content), GlobalConfigurationContent.Size);
 
-			ConfigurationSetting<float>::LoadConfiguration(JsonGlobalConfiguration);
-			ConfigurationSetting<Types::Vector3>::LoadConfiguration(JsonGlobalConfiguration);
+			if (JsonGlobalConfiguration.IsObject())
+			{
+				ConfigurationSetting<float>::LoadConfiguration(JsonGlobalConfiguration);
+				ConfigurationSetting<Types::Vector3>::LoadConfiguration(JsonGlobalConfiguration);
+			}
 
 			UnloadFileFromMemory(GlobalConfigurationContent);
 		}
 
-		void UpdateConfiguration()
+		void UpdateConfiguration(_In_ const Time::Timer* InTimer)
 		{
 			using namespace FileSystem;
 
-			bool IsDirty = false;
+			static constexpr Time::TimeSecondsT LastUpdateConfigurationFrequency = Time::TimeSecondsT(0.5);
+			static Time::TimeSecondsT LastUpdateConfiguration = Time::TimeSecondsT(0.0);
+			static bool IsDirty = false;
+
 			IsDirty |= ConfigurationSetting<float>::UpdateConfiguration();
 			IsDirty |= ConfigurationSetting<Types::Vector3>::UpdateConfiguration();
-			if (IsDirty)
+
+			Time::TimeSecondsT CurrentTimeSeconds = InTimer->GetTimeSeconds();
+
+			if (IsDirty && (LastUpdateConfiguration + LastUpdateConfigurationFrequency < CurrentTimeSeconds))
 			{
 				rapidjson::Document JsonGlobalConfiguration;
 				rapidjson::Value& GlobalConfigurationRoot = JsonGlobalConfiguration.SetObject();
@@ -102,9 +122,17 @@ namespace Eternal
 					string GlobalConfigurationFullPath = FilePath::FindOrCreate("global.config", FileType::FILE_TYPE_CONFIGURATIONS);
 
 					FileScope GlobalConfigurationFileScope(GlobalConfigurationFullPath, FileOpenMode::FILE_OPEN_MODE_WRITE);
-					
-					GlobalConfigurationFileScope->Write(reinterpret_cast<const uint8_t*>(JsonGlobalConfiguration.GetString()), JsonGlobalConfiguration.GetStringLength());
+					{
+						rapidjson::StringBuffer JsonGlobalConfigurationBuffer;
+						rapidjson::PrettyWriter<rapidjson::StringBuffer> JsonGlobalConfigurationWriter(JsonGlobalConfigurationBuffer);
+						JsonGlobalConfiguration.Accept(JsonGlobalConfigurationWriter);
+
+						GlobalConfigurationFileScope->Write(reinterpret_cast<const uint8_t*>(JsonGlobalConfigurationBuffer.GetString()), JsonGlobalConfigurationBuffer.GetLength());
+					}
 				}
+
+				LastUpdateConfiguration = CurrentTimeSeconds;
+				IsDirty = false;
 			}
 		}
 	}
