@@ -1,4 +1,4 @@
-#include "GraphicsEngine/PostProcesses/ChromaticAberrationPass.hpp"
+#include "GraphicsEngine/RenderPasses/PostProcesses/ChromaticAberrationPass.hpp"
 #include "imgui.h"
 
 namespace Eternal
@@ -12,9 +12,9 @@ namespace Eternal
 		static constexpr int32_t ThreadGroupCountZ = 1;
 
 		static ConfigurationSetting<Vector3> ChromaticAberrationColorMask("ChromaticAberrationColorMask", Vector3::One(), CHROMATIC_ABERRATION_OCTAVES_COUNT);
-		static float ChromaticAberrationDirection[CHROMATIC_ABERRATION_OCTAVES_COUNT] = { 0.0f };
-		static float ChromaticAberrationStrength[CHROMATIC_ABERRATION_OCTAVES_COUNT] = { 1.0f };
-		static int ChromaticAberrationOctavesCount = CHROMATIC_ABERRATION_OCTAVES_COUNT;
+		static ConfigurationSetting<float> ChromaticAberrationDirection("ChromaticAberrationDirection", 0.0f, CHROMATIC_ABERRATION_OCTAVES_COUNT);
+		static ConfigurationSetting<float> ChromaticAberrationStrength("ChromaticAberrationStrength", 1.0f, CHROMATIC_ABERRATION_OCTAVES_COUNT);
+		static ConfigurationSetting<int> ChromaticAberrationOctavesCount("ChromaticAberrationOctavesCount", CHROMATIC_ABERRATION_OCTAVES_COUNT);
 
 		ChromaticAberrationPass::ChromaticAberrationPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 			: _ChromaticAberrationConstantBuffer(InContext, "ChromaticAberrationBuffer")
