@@ -16,7 +16,8 @@ namespace Eternal
 		{
 			for (uint32_t SettingArrayIndex = 0; SettingArrayIndex < InOutSettingValue.size(); ++SettingArrayIndex)
 			{
-				InOutSettingValue[SettingArrayIndex] = InConfiguration[InSettingKey.c_str()].GetArray()[SettingArrayIndex].GetFloat();
+				if (InConfiguration.HasMember(InSettingKey.c_str()))
+					InOutSettingValue[SettingArrayIndex] = InConfiguration[InSettingKey.c_str()].GetArray()[SettingArrayIndex].GetFloat();
 			}
 		}
 
@@ -42,10 +43,13 @@ namespace Eternal
 		template<> void WriteConfigurationValue(_In_ rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator>& InAllocator, _In_ const std::vector<float>& InSettingValue, _In_ const std::string& InSettingKey, _Out_ rapidjson::Value& OutConfiguration)
 		{
 			ETERNAL_ASSERT(!OutConfiguration.HasMember(InSettingKey.c_str()));
-			rapidjson::Value& ConfigurationValue = OutConfiguration[InSettingKey.c_str()].SetArray();
+			OutConfiguration.AddMember(rapidjson::StringRef(InSettingKey.c_str()), rapidjson::Value(rapidjson::kArrayType), InAllocator);
+			rapidjson::Value& ConfigurationValue = OutConfiguration[InSettingKey.c_str()];
 
 			for (uint32_t SettingArrayIndex = 0; SettingArrayIndex < InSettingValue.size(); ++SettingArrayIndex)
 			{
+				ConfigurationValue.PushBack(rapidjson::Value(rapidjson::kNumberType), InAllocator);
+
 				ConfigurationValue[SettingArrayIndex] = InSettingValue[SettingArrayIndex];
 			}
 		}

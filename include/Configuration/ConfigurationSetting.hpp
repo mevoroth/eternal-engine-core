@@ -91,6 +91,11 @@ namespace Eternal
 				ConfigurationSettings.erase(std::find(ConfigurationSettings.begin(), ConfigurationSettings.end(), this));
 			}
 
+			SettingType* operator&()
+			{
+				return &_SettingValue[0];
+			}
+
 			operator SettingType& ()
 			{
 				return _SettingValue[0];
