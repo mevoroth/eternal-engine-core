@@ -4,6 +4,11 @@
 
 namespace Eternal
 {
+	namespace FileSystem
+	{
+		struct FileSystemPathStorage;
+		using FileSystemPath = FileSystemPathStorage;
+	}
 	namespace Core
 	{
 		class Level;
@@ -11,6 +16,7 @@ namespace Eternal
 	namespace Resources
 	{
 		using namespace Eternal::Core;
+		using namespace Eternal::FileSystem;
 
 		struct LevelPayload : public Payload
 		{
@@ -19,7 +25,7 @@ namespace Eternal
 
 		struct LevelRequest : public StreamingRequest
 		{
-			LevelRequest(_In_ const string& InPath);
+			LevelRequest(_In_ const FileSystemPath& InPath);
 		};
 	}
 }

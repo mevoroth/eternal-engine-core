@@ -25,7 +25,7 @@ namespace Eternal
 			ETERNAL_PROFILER(BASIC)();
 			OutPayload = _ImportLevel->Import(InRequest->RequestPath);
 			ETERNAL_ASSERT(OutPayload);
-			LogWrite(LogInfo, LogImport, string("Loaded [") + InRequest->RequestPath + "]");
+			LogWrite(LogInfo, LogImport, string("Loaded [") + InRequest->RequestPath.Path + "]");
 		}
 
 		void LevelLoader::DestroyPayloadLoader()

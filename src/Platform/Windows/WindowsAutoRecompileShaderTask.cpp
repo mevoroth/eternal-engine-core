@@ -38,7 +38,7 @@ namespace Eternal
 		{
 			_AutoRecompileShaderData = new AutoRecompileShaderPrivateData();
 
-			const vector<string>& FolderPaths							= FilePath::GetFolderPaths(FileType::FILE_TYPE_SHADERS);
+			const vector<FileSystemPath>& FolderPaths					= FilePath::GetFolderPaths(FileType::FILE_TYPE_SHADERS);
 			vector<HANDLE>& DirectoryHandles							= _AutoRecompileShaderData->DirectoryHandles;
 			vector<OVERLAPPED>& DirectoryOverlappeds					= _AutoRecompileShaderData->DirectoryOverlappeds;
 			vector<array<uint8_t, 1024>>& AutoRecompileChangeBuffers	= _AutoRecompileShaderData->AutoRecompileChangeBuffers;
@@ -50,7 +50,7 @@ namespace Eternal
 			for (uint32_t FolderIndex = 0; FolderIndex < DirectoryHandles.size(); ++FolderIndex)
 			{
 				DirectoryHandles[FolderIndex] = CreateFile(
-					FolderPaths[FolderIndex].c_str(),
+					FolderPaths[FolderIndex].Path.c_str(),
 					FILE_LIST_DIRECTORY,
 					FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
 					NULL,
@@ -144,10 +144,10 @@ namespace Eternal
 
 					if (FileNotifyInformation->Action == FILE_ACTION_RENAMED_NEW_NAME)
 					{
-						string FullPathSource = FilePath::Find(FileNameString, FileType::FILE_TYPE_SHADERS);
-						if (FullPathSource.length() > 0)
+						FileSystemPath FullPathSource = FilePath::Find(FileSystemPath(FileNameString), FileType::FILE_TYPE_SHADERS);
+						if (FullPathSource.IsValid())
 						{
-							ResolvedPipelineDependency PipelineDependencies = _Context.GetPipelineLibrary().ResolveSource(FullPathSource);
+							ResolvedPipelineDependency PipelineDependencies = _Context.GetPipelineLibrary().ResolveSource(FullPathSource.Path);
 							if (PipelineDependencies.IsShaderSourceResolved())
 								_Context.RegisterPipelineRecompile(PipelineDependencies);
 						}

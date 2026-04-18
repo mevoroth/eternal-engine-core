@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Core/MainInput.hpp"
+#include "File/FilePath.hpp"
 #include <vector>
 #include <string>
 
@@ -20,6 +21,7 @@ namespace Eternal
 	namespace Core
 	{
 		using namespace std;
+		using namespace Eternal::FileSystem;
 		using namespace Eternal::Graphics;
 		using namespace Eternal::GraphicsEngine;
 
@@ -39,18 +41,18 @@ namespace Eternal
 			Game* GameContext											= nullptr;
 			CreateCustomRendererFunctor CreateCustomRendererFunction	= nullptr;
 
-			vector<string> ShaderIncludePath;
-			string ShaderPDBPath;
-			string FBXPath;
-			string FBXCachePath;
-			string TexturePath;
-			string LevelPath;
-			string PipelineCachePath;
-			string MaterialPath;
-			string AnimationPath;
-			string SFXSoundPath;
-			string BGMSoundPath;
-			string ConfigurationPath;
+			vector<FileSystemPath> ShaderIncludePath;
+			FileSystemPath ShaderPDBPath;
+			FileSystemPath FBXPath;
+			FileSystemPath FBXCachePath;
+			FileSystemPath TexturePath;
+			FileSystemPath LevelPath;
+			FileSystemPath PipelineCachePath;
+			FileSystemPath MaterialPath;
+			FileSystemPath AnimationPath;
+			FileSystemPath SFXSoundPath;
+			FileSystemPath BGMSoundPath;
+			FileSystemPath ConfigurationPath;
 		};
 
 		SystemCreateInformation CreateSystemInformation(_In_ const MainInput& InMainInput);

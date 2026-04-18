@@ -50,7 +50,7 @@ namespace Eternal
 
 						MeshGameData GameData;
 						std::string* MeshPath = GameData.Load<std::string>(MeshItem);
-						MeshRequest* Request = new MeshRequest(*MeshPath);
+						MeshRequest* Request = new MeshRequest(FileSystemPath(*MeshPath));
 						delete MeshPath;
 
 						uint32_t GameObjectCount = 0;

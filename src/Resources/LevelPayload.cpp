@@ -6,7 +6,7 @@ namespace Eternal
 {
 	namespace Resources
 	{
-		LevelRequest::LevelRequest(_In_ const string& InPath)
+		LevelRequest::LevelRequest(_In_ const FileSystemPath& InPath)
 			: StreamingRequest(InPath, FileType::FILE_TYPE_LEVELS)
 		{
 		}

@@ -56,18 +56,18 @@ namespace Eternal
 			, _GameIndex(CreateAtomicS32())
 		{
 			for (uint32_t IncludeIndex = 0; IncludeIndex < InSystemCreateInformation.ShaderIncludePath.size(); ++IncludeIndex)
-				FilePath::Register(InSystemCreateInformation.ShaderIncludePath[IncludeIndex],	FileType::FILE_TYPE_SHADERS);
-			FilePath::Register(InSystemCreateInformation.ShaderPDBPath,							FileType::FILE_TYPE_SHADERS_PDB);
-			FilePath::Register(InSystemCreateInformation.LevelPath,								FileType::FILE_TYPE_LEVELS);
-			FilePath::Register(InSystemCreateInformation.FBXPath,								FileType::FILE_TYPE_MESHES);
-			FilePath::Register(InSystemCreateInformation.FBXCachePath,							FileType::FILE_TYPE_CACHED_MESHES);
-			FilePath::Register(InSystemCreateInformation.TexturePath,							FileType::FILE_TYPE_TEXTURES);
-			FilePath::Register(InSystemCreateInformation.PipelineCachePath,						FileType::FILE_TYPE_CACHED_PIPELINES);
-			FilePath::Register(InSystemCreateInformation.MaterialPath,							FileType::FILE_TYPE_MATERIALS);
-			FilePath::Register(InSystemCreateInformation.AnimationPath,							FileType::FILE_TYPE_ANIMATIONS);
-			FilePath::Register(InSystemCreateInformation.SFXSoundPath,							FileType::FILE_TYPE_SFX_SOUNDS);
-			FilePath::Register(InSystemCreateInformation.BGMSoundPath,							FileType::FILE_TYPE_BGM_SOUNDS);
-			FilePath::Register(InSystemCreateInformation.ConfigurationPath,						FileType::FILE_TYPE_CONFIGURATIONS);
+				FilePath::Register(FileSystemPath(InSystemCreateInformation.ShaderIncludePath[IncludeIndex]),	FileType::FILE_TYPE_SHADERS);
+			FilePath::Register(FileSystemPath(InSystemCreateInformation.ShaderPDBPath),							FileType::FILE_TYPE_SHADERS_PDB);
+			FilePath::Register(FileSystemPath(InSystemCreateInformation.LevelPath),								FileType::FILE_TYPE_LEVELS);
+			FilePath::Register(FileSystemPath(InSystemCreateInformation.FBXPath),								FileType::FILE_TYPE_MESHES);
+			FilePath::Register(FileSystemPath(InSystemCreateInformation.FBXCachePath),							FileType::FILE_TYPE_CACHED_MESHES);
+			FilePath::Register(FileSystemPath(InSystemCreateInformation.TexturePath),							FileType::FILE_TYPE_TEXTURES);
+			FilePath::Register(FileSystemPath(InSystemCreateInformation.PipelineCachePath),						FileType::FILE_TYPE_CACHED_PIPELINES);
+			FilePath::Register(FileSystemPath(InSystemCreateInformation.MaterialPath),							FileType::FILE_TYPE_MATERIALS);
+			FilePath::Register(FileSystemPath(InSystemCreateInformation.AnimationPath),							FileType::FILE_TYPE_ANIMATIONS);
+			FilePath::Register(FileSystemPath(InSystemCreateInformation.SFXSoundPath),							FileType::FILE_TYPE_SFX_SOUNDS);
+			FilePath::Register(FileSystemPath(InSystemCreateInformation.BGMSoundPath),							FileType::FILE_TYPE_BGM_SOUNDS);
+			FilePath::Register(FileSystemPath(InSystemCreateInformation.ConfigurationPath),						FileType::FILE_TYPE_CONFIGURATIONS);
 
 			_Timer						= CreateTimer(TimeType::TIME_TYPE_DEFAULT);
 			_Logs						= CreateMultiChannelLog({ LogType::LOG_TYPE_CONSOLE/*, LogType::LOG_TYPE_FILE*/ });
@@ -85,7 +85,7 @@ namespace Eternal
 			TaskCreateInformation StreamingCreateInformation("StreamingTask");
 			_StreamingTask				= new StreamingTask(StreamingCreateInformation, *_Streaming);
 
-			string CurrentDirectoryPath = FilePath::CurrentDirectory();
+			FileSystemPath CurrentDirectoryPath = FilePath::CurrentDirectory();
 			LogWrite(LogInfo, LogEngine, CurrentDirectoryPath);
 
 			LoadConfiguration();
@@ -150,7 +150,7 @@ namespace Eternal
 		{
 			_Streaming->EnqueueRequest_MainThread(
 				new TextureRequest(
-					FilePath::Find("black.tga", FileType::FILE_TYPE_TEXTURES),
+					FilePath::Find(FileSystemPath("black.tga"), FileType::FILE_TYPE_TEXTURES),
 					"black",
 					"black.tga"
 				)
@@ -176,7 +176,7 @@ namespace Eternal
 						continue;
 
 					TextureRequest* DefaultMaterialTexture = new TextureRequest(
-						FilePath::Find("black.tga", FileType::FILE_TYPE_TEXTURES),
+						FilePath::Find(FileSystemPath("black.tga"), FileType::FILE_TYPE_TEXTURES),
 						"black",
 						"black.tga"
 					);
@@ -186,7 +186,7 @@ namespace Eternal
 				}
 
 				TextureRequest* DefaultNormalTexture = new TextureRequest(
-					FilePath::Find("defaultnormal.tga", FileType::FILE_TYPE_TEXTURES),
+					FilePath::Find(FileSystemPath("defaultnormal.tga"), FileType::FILE_TYPE_TEXTURES),
 					"defaultnormal",
 					"defaultnormal.tga"
 				);

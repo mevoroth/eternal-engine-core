@@ -22,8 +22,8 @@ namespace Eternal
 		{
 			LevelPayload* OutLevelPayload = nullptr;
 
-			string FullPath = FilePath::Find(InName, FileType::FILE_TYPE_LEVELS);
-			if (FullPath.size() > 0)
+			FileSystemPath FullPath = FilePath::Find(FileSystemPath(InName), FileType::FILE_TYPE_LEVELS);
+			if (FullPath.IsValid())
 			{
 				string LevelContent;
 

@@ -76,7 +76,18 @@ namespace Eternal
 		{
 			using namespace FileSystem;
 
-			string GlobalConfigurationFullPath = FilePath::FindOrCreate("global.config", FileType::FILE_TYPE_CONFIGURATIONS);
+			FileSystemPath GlobalConfigurationFullPath = FilePath::FindOrCreate(FileSystemPath("global.config"), FileType::FILE_TYPE_CONFIGURATIONS);
+
+			FileSystemPath DirectoryPath;
+			FileSystemPath FileNameDummy;
+			FileSystemPath FileExtensionDummy;
+			FilePath::SplitPath(GlobalConfigurationFullPath, DirectoryPath, FileNameDummy, FileExtensionDummy);
+
+			if (!DirectoryExists(DirectoryPath))
+			{
+				bool CreateDirectoryResult = FileSystem::CreateDirectories(DirectoryPath);
+				ETERNAL_ASSERT(CreateDirectoryResult);
+			}
 
 			if (!FileExists(GlobalConfigurationFullPath))
 			{
@@ -119,7 +130,7 @@ namespace Eternal
 				ConfigurationSetting<Types::Vector3>::WriteConfiguration(Allocator, GlobalConfigurationRoot);
 
 				{
-					string GlobalConfigurationFullPath = FilePath::FindOrCreate("global.config", FileType::FILE_TYPE_CONFIGURATIONS);
+					FileSystemPath GlobalConfigurationFullPath = FilePath::FindOrCreate(FileSystemPath("global.config"), FileType::FILE_TYPE_CONFIGURATIONS);
 
 					FileScope GlobalConfigurationFileScope(GlobalConfigurationFullPath, FileOpenMode::FILE_OPEN_MODE_WRITE);
 					{
