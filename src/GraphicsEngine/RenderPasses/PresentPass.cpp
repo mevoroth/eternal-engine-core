@@ -49,8 +49,8 @@ namespace Eternal
 			_PresentDescriptorTable->SetDescriptor(1, InContext.GetPointClampSampler());
 
 			{
-				ResourceTransition LuminanceToCopySource(InRenderer.GetGlobalResources().GetGBufferLuminance().GetShaderResourceView(), TransitionState::TRANSITION_PIXEL_SHADER_READ);
-				ResourceTransitionScope LuminanceToCopySourceScope(*PresentCommandList, &LuminanceToCopySource, 1);
+				ResourceTransition LuminanceToPixelShaderRead(InRenderer.GetGlobalResources().GetGBufferLuminance().GetShaderResourceView(), TransitionState::TRANSITION_PIXEL_SHADER_READ);
+				ResourceTransitionScope LuminanceToPixelShaderReadScope(*PresentCommandList, &LuminanceToPixelShaderRead, 1);
 
 				PresentCommandList->BeginRenderPass(InContext.GetCurrentFrameBackBufferRenderPass());
 				PresentCommandList->SetGraphicsPipeline(*_Pipeline);
