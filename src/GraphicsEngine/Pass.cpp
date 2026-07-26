@@ -14,13 +14,21 @@ namespace Eternal
 
 		Pass::~Pass()
 		{
-			DestroyPipeline(_Pipeline);
-			DestroyRootSignature(_RootSignature);
+			if (_Pipeline)
+				DestroyPipeline(_Pipeline);
+
+			if (_RootSignature)
+				DestroyRootSignature(_RootSignature);
 		}
 
 		bool Pass::CanRenderPass() const
 		{
-			return _IsPassEnabled && _Pipeline && _Pipeline->IsPipelineCompiled();
+			return _IsPassEnabled && _CanRenderPass();
+		}
+
+		bool Pass::_CanRenderPass() const
+		{
+			return _Pipeline && _Pipeline->IsPipelineCompiled();
 		}
 	}
 }

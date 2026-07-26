@@ -47,6 +47,8 @@ namespace Eternal
 
 			static Renderer* StaticRenderer;
 
+			virtual bool _CanRenderPass() const;
+
 			RootSignature*	_RootSignature	= nullptr;
 			Pipeline*		_Pipeline		= nullptr;
 			bool			_IsPassEnabled	= true;
