@@ -88,10 +88,10 @@ namespace Eternal
 				_DebugDescriptorTable->SetDescriptor(0, static_cast<View*>(_DebugPerDrawConstantBuffer));
 				_DebugDescriptorTable->SetDescriptor(1, InRenderer.GetGlobalResources().GetViewConstantBufferView());
 
-				const Resource* CurrentVertexBUffer = _DebugVertexBuffer;
+				const Resource* CurrentVertexBuffer = _DebugVertexBuffer;
 
 				DebugCommandList->BeginRenderPass(*_DebugRenderPass);
-				DebugCommandList->SetVertexBuffers(&CurrentVertexBUffer);
+				DebugCommandList->SetVertexBuffers(&CurrentVertexBuffer);
 				DebugCommandList->SetGraphicsPipeline(*_Pipeline);
 				DebugCommandList->SetGraphicsDescriptorTable(InContext, *_DebugDescriptorTable);
 				DebugCommandList->DrawInstanced(static_cast<uint32_t>(DebugPrimitives.Lines.size()), 1);
