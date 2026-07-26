@@ -8,6 +8,8 @@ namespace Eternal
 	using namespace Eternal::Math;
 	using namespace Eternal::Types;
 
+	static constexpr float DebugDrawFront = 0.0f;
+
 	void DebugDrawCircle(_Inout_ Core::System& InOutSystem, const Vector2& InCenter, float Radius)
 	{
 		RotationMatrix2x2 RotationMatrix(PI_2 / 16.0f);
@@ -16,16 +18,16 @@ namespace Eternal
 		for (uint32_t Index = 0; Index < 16; ++Index)
 		{
 			Vector2 NextOffset = RotationMatrix * Offset;
-			InOutSystem.GetGameFrame().DebugPrimitives.Lines.push_back(Vector3(InCenter + Offset, 1.0f));
-			InOutSystem.GetGameFrame().DebugPrimitives.Lines.push_back(Vector3(InCenter + NextOffset, 1.0f));
+			InOutSystem.GetGameFrame().DebugPrimitives.Lines.push_back(Vector3(InCenter + Offset,		DebugDrawFront));
+			InOutSystem.GetGameFrame().DebugPrimitives.Lines.push_back(Vector3(InCenter + NextOffset,	DebugDrawFront));
 			Offset = NextOffset;
 		}
 	}
 
 	template<> void DebugDrawLine(_Inout_ Core::System& InOutSystem, const Vector2& InStart, const Vector2& InEnd)
 	{
-		InOutSystem.GetGameFrame().DebugPrimitives.Lines.push_back(Vector3(InStart,	1.0f));
-		InOutSystem.GetGameFrame().DebugPrimitives.Lines.push_back(Vector3(InEnd,	1.0f));
+		InOutSystem.GetGameFrame().DebugPrimitives.Lines.push_back(Vector3(InStart,	DebugDrawFront));
+		InOutSystem.GetGameFrame().DebugPrimitives.Lines.push_back(Vector3(InEnd,	DebugDrawFront));
 	}
 
 	template<> void DebugDrawLine(_Inout_ Core::System& InOutSystem, const Vector3& InStart, const Vector3& InEnd)
