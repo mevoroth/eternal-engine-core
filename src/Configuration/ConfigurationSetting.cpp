@@ -12,6 +12,15 @@ namespace Eternal
 {
 	namespace Core
 	{
+		template<> void ReadConfigurationValue(_In_ const rapidjson::Document& InConfiguration, _In_ const std::string& InSettingKey, _Inout_ std::vector<int>& InOutSettingValue)
+		{
+			for (uint32_t SettingArrayIndex = 0; SettingArrayIndex < InOutSettingValue.size(); ++SettingArrayIndex)
+			{
+				if (InConfiguration.HasMember(InSettingKey.c_str()))
+					InOutSettingValue[SettingArrayIndex] = InConfiguration[InSettingKey.c_str()].GetArray()[SettingArrayIndex].GetInt();
+			}
+		}
+
 		template<> void ReadConfigurationValue(_In_ const rapidjson::Document& InConfiguration, _In_ const std::string& InSettingKey, _Inout_ std::vector<float>& InOutSettingValue)
 		{
 			for (uint32_t SettingArrayIndex = 0; SettingArrayIndex < InOutSettingValue.size(); ++SettingArrayIndex)
@@ -39,6 +48,20 @@ namespace Eternal
 		}
 
 		//////////////////////////////////////////////////////////////////////////
+
+		template<> void WriteConfigurationValue(_In_ rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator>& InAllocator, _In_ const std::vector<int>& InSettingValue, _In_ const std::string& InSettingKey, _Out_ rapidjson::Value& OutConfiguration)
+		{
+			ETERNAL_ASSERT(!OutConfiguration.HasMember(InSettingKey.c_str()));
+			OutConfiguration.AddMember(rapidjson::StringRef(InSettingKey.c_str()), rapidjson::Value(rapidjson::kArrayType), InAllocator);
+			rapidjson::Value& ConfigurationValue = OutConfiguration[InSettingKey.c_str()];
+
+			for (uint32_t SettingArrayIndex = 0; SettingArrayIndex < InSettingValue.size(); ++SettingArrayIndex)
+			{
+				ConfigurationValue.PushBack(rapidjson::Value(rapidjson::kNumberType), InAllocator);
+
+				ConfigurationValue[SettingArrayIndex] = InSettingValue[SettingArrayIndex];
+			}
+		}
 
 		template<> void WriteConfigurationValue(_In_ rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator>& InAllocator, _In_ const std::vector<float>& InSettingValue, _In_ const std::string& InSettingKey, _Out_ rapidjson::Value& OutConfiguration)
 		{
@@ -105,6 +128,7 @@ namespace Eternal
 
 			if (JsonGlobalConfiguration.IsObject())
 			{
+				ConfigurationSetting<int>::LoadConfiguration(JsonGlobalConfiguration);
 				ConfigurationSetting<float>::LoadConfiguration(JsonGlobalConfiguration);
 				ConfigurationSetting<Types::Vector3>::LoadConfiguration(JsonGlobalConfiguration);
 			}
@@ -120,6 +144,7 @@ namespace Eternal
 			static Time::TimeSecondsT LastUpdateConfiguration = Time::TimeSecondsT(0.0);
 			static bool IsDirty = false;
 
+			IsDirty |= ConfigurationSetting<int>::UpdateConfiguration();
 			IsDirty |= ConfigurationSetting<float>::UpdateConfiguration();
 			IsDirty |= ConfigurationSetting<Types::Vector3>::UpdateConfiguration();
 
@@ -130,6 +155,7 @@ namespace Eternal
 				rapidjson::Document JsonGlobalConfiguration;
 				rapidjson::Value& GlobalConfigurationRoot = JsonGlobalConfiguration.SetObject();
 				rapidjson::MemoryPoolAllocator<rapidjson::CrtAllocator>& Allocator = JsonGlobalConfiguration.GetAllocator();
+				ConfigurationSetting<int>::WriteConfiguration(Allocator, GlobalConfigurationRoot);
 				ConfigurationSetting<float>::WriteConfiguration(Allocator, GlobalConfigurationRoot);
 				ConfigurationSetting<Types::Vector3>::WriteConfiguration(Allocator, GlobalConfigurationRoot);
 
