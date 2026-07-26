@@ -14,8 +14,22 @@ namespace Eternal
 		{
 			GlobalResources& InGlobalResources = InRenderer.GetGlobalResources();
 
-			Shader* DebugVertex	= InContext.GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_VERTEX, "DebugVertex", "object.vertex.hlsl"));
-			Shader* DebugPixel	= InContext.GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_PIXEL, "DebugColorPixel", "DebugShaders/debugcolor.pixel.hlsl"));
+			Shader* DebugVertex	= InContext.GetShader(
+				ShaderCreateInformation(
+					ShaderType::SHADER_TYPE_VERTEX, "DebugVertex", "object.vertex.hlsl",
+					{
+						"OBJECT_NEEDS_COLOR", "1"
+					}
+				)
+			);
+			Shader* DebugPixel	= InContext.GetShader(
+				ShaderCreateInformation(
+					ShaderType::SHADER_TYPE_PIXEL, "DebugColorPixel", "DebugShaders/debugcolor.pixel.hlsl",
+					{
+						"OBJECT_NEEDS_COLOR", "1"
+					}
+				)
+			);
 
 			_RootSignature			= CreateRootSignature(
 				InContext,
@@ -33,8 +47,9 @@ namespace Eternal
 			_DebugInputLayout		= CreateInputLayout(
 				InContext,
 				{
-					VertexStream<PositionVertex>({
-						{ Format::FORMAT_RGB323232_FLOAT,	VertexDataType::VERTEX_DATA_TYPE_POSITION }
+					VertexStream<Position2DColorVertex>({
+						{ Format::FORMAT_RGB323232_FLOAT,	VertexDataType::VERTEX_DATA_TYPE_POSITION },
+						{ Format::FORMAT_RGBA8888_UNORM,	VertexDataType::VERTEX_DATA_TYPE_COLOR }
 					})
 				}
 			);
@@ -79,8 +94,8 @@ namespace Eternal
 				return;
 
 			{
-				MapScope<PositionVertex> VertexBufferMapScope(_DebugVertexBuffer);
-				memcpy(VertexBufferMapScope.GetDataPointer(), DebugPrimitives.Lines.data(), sizeof(PositionVertex) * DebugPrimitives.Lines.size());
+				MapScope<Position2DColorVertex> VertexBufferMapScope(_DebugVertexBuffer);
+				memcpy(VertexBufferMapScope.GetDataPointer(), DebugPrimitives.Lines.data(), sizeof(Position2DColorVertex) * DebugPrimitives.Lines.size());
 			}
 
 			CommandListScope DebugCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "DebugPass");

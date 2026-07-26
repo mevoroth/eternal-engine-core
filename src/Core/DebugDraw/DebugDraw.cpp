@@ -8,31 +8,45 @@ namespace Eternal
 	using namespace Eternal::Math;
 	using namespace Eternal::Types;
 
-	static constexpr float DebugDrawFront = 0.0f;
+	static constexpr float DebugDrawFrontDepth = 0.0f;
 
-	void DebugDrawCircle(_Inout_ Core::System& InOutSystem, const Vector2& InCenter, float Radius)
+	constexpr uint32_t DebugDrawCircleParameters::SubdivisionCountDefault;
+
+	template<> void DebugDrawLine(_Inout_ Core::System& InOutSystem, const Vector2& InStart, const Vector2& InEnd, _In_ const DebugDrawParameters& InDebugDrawParameters)
 	{
-		RotationMatrix2x2 RotationMatrix(PI_2 / 16.0f);
+		InOutSystem.GetGameFrame().DebugPrimitives.Lines.push_back({
+			Vector3(InStart,	DebugDrawFrontDepth),
+			InDebugDrawParameters.Color
+		});
+		InOutSystem.GetGameFrame().DebugPrimitives.Lines.push_back({
+			Vector3(InEnd,		DebugDrawFrontDepth),
+			InDebugDrawParameters.Color
+
+		});
+	}
+
+	template<> void DebugDrawLine(_Inout_ Core::System& InOutSystem, const Vector3& InStart, const Vector3& InEnd, _In_ const DebugDrawParameters& InDebugDrawParameters)
+	{
+		InOutSystem.GetGameFrame().DebugPrimitives.Lines.push_back({
+			InStart,
+			InDebugDrawParameters.Color
+		});
+		InOutSystem.GetGameFrame().DebugPrimitives.Lines.push_back({
+			InEnd,
+			InDebugDrawParameters.Color
+		});
+	}
+
+	void DebugDrawCircle(_Inout_ Core::System& InOutSystem, const Vector2& InCenter, float Radius, _In_ const DebugDrawCircleParameters& InDebugDrawCircleParameters)
+	{
+		RotationMatrix2x2 RotationMatrix(PI_2 / static_cast<float>(InDebugDrawCircleParameters.SubdivisionCount));
 		Vector2 Offset(Radius, 0.0f);
 
-		for (uint32_t Index = 0; Index < 16; ++Index)
+		for (uint32_t Index = 0; Index < InDebugDrawCircleParameters.SubdivisionCount; ++Index)
 		{
 			Vector2 NextOffset = RotationMatrix * Offset;
-			InOutSystem.GetGameFrame().DebugPrimitives.Lines.push_back(Vector3(InCenter + Offset,		DebugDrawFront));
-			InOutSystem.GetGameFrame().DebugPrimitives.Lines.push_back(Vector3(InCenter + NextOffset,	DebugDrawFront));
+			DebugDrawLine(InOutSystem, InCenter + Offset, InCenter + NextOffset, InDebugDrawCircleParameters);
 			Offset = NextOffset;
 		}
-	}
-
-	template<> void DebugDrawLine(_Inout_ Core::System& InOutSystem, const Vector2& InStart, const Vector2& InEnd)
-	{
-		InOutSystem.GetGameFrame().DebugPrimitives.Lines.push_back(Vector3(InStart,	DebugDrawFront));
-		InOutSystem.GetGameFrame().DebugPrimitives.Lines.push_back(Vector3(InEnd,	DebugDrawFront));
-	}
-
-	template<> void DebugDrawLine(_Inout_ Core::System& InOutSystem, const Vector3& InStart, const Vector3& InEnd)
-	{
-		InOutSystem.GetGameFrame().DebugPrimitives.Lines.push_back(InStart);
-		InOutSystem.GetGameFrame().DebugPrimitives.Lines.push_back(InEnd);
 	}
 }

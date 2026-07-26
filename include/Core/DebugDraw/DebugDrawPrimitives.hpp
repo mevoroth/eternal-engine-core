@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Types/Types.hpp"
+#include "GraphicData/MeshVertexFormat.hpp"
 
 namespace Eternal
 {
@@ -17,7 +17,7 @@ namespace Eternal
 
 				DebugDrawPrimitives();
 
-				vector<Vector3> Lines;
+				vector<GraphicData::Position2DColorVertex> Lines;
 			};
 		}
 	}

@@ -30,7 +30,7 @@ namespace Eternal
 			InputLayout*							_DebugInputLayout		= nullptr;
 			RenderPass*								_DebugRenderPass		= nullptr;
 			FixedConstantBuffer<PerDrawConstants>	_DebugPerDrawConstantBuffer;
-			VertexBuffer<PositionVertex>			_DebugVertexBuffer;
+			VertexBuffer<Position2DColorVertex>		_DebugVertexBuffer;
 
 		};
 	}
