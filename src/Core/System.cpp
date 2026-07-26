@@ -209,6 +209,7 @@ namespace Eternal
 					Sleep(10);
 				}
 			}
+			_Timer->Update();
 			GetParallelSystem().StartFrame();
 			GetImgui().Begin(CurrentGameFrame.ImguiFrameContext);
 			GetStreaming().GatherPayloads_MainThread(CurrentGameFrame.MaterialUpdateBatches);
@@ -250,6 +251,8 @@ namespace Eternal
 				// Camera
 				CurrentGameFrame.ViewCamera = OldestFrame.PendingViewCamera ? OldestFrame.PendingViewCamera : OldestFrame.ViewCamera;
 				OldestFrame.PendingViewCamera = nullptr;
+
+				CurrentGameFrame.CurrentTime = _Timer->GetFrameTimeSeconds();
 			}
 			{
 				SystemFrame& OldestFrame = GetOldestGameFrame();
@@ -278,7 +281,6 @@ namespace Eternal
 		{
 			ETERNAL_PROFILER(BASIC)();
 			UpdatePlatform();
-			_Timer->Update();
 			UpdateConfiguration(_Timer);
 			_Input->Update();
 			GetAudioSystem().UpdateAudioSystem();

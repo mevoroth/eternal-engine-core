@@ -33,6 +33,8 @@ namespace Eternal
 
 	namespace Time
 	{
+		using TimeSecondsT = double;
+
 		class Timer;
 	}
 
@@ -249,6 +251,8 @@ namespace Eternal
 
 			Camera* ViewCamera												= nullptr;
 			Camera* PendingViewCamera										= nullptr;
+
+			Time::TimeSecondsT CurrentTime									= 0.0;
 		};
 
 		class System
