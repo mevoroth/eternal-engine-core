@@ -1,4 +1,4 @@
-#include "GraphicsEngine/MipMapGeneration.hpp"
+#include "GraphicsEngine/Utility/MipMapGeneration.hpp"
 #include "Graphics/GraphicsContext.hpp"
 #include "Graphics/Pipeline.hpp"
 #include "Graphics/PipelineFactory.hpp"
@@ -41,7 +41,7 @@ namespace Eternal
 				"SPIRV_FORMAT_RGBA8",
 				"SPIRV_FORMAT_R11FG11FB10F"
 			};
-			ETERNAL_STATIC_ASSERT(ETERNAL_ARRAYSIZE(MIPMAP_TEXTURE_FORMAT_HLSLS) == static_cast<uint32_t>(MipMapTextureFormat::MIPMAP_TEXTURE_FORMAT_COUNT), "Mismatch between MipMapTextureFormat and MIPMAP_TEXTURE_FORMAT_SPIRVS");
+			ETERNAL_STATIC_ASSERT(ETERNAL_ARRAYSIZE(MIPMAP_TEXTURE_FORMAT_SPIRVS) == static_cast<uint32_t>(MipMapTextureFormat::MIPMAP_TEXTURE_FORMAT_COUNT), "Mismatch between MipMapTextureFormat and MIPMAP_TEXTURE_FORMAT_SPIRVS");
 		}
 
 		MipMapGeneration::MipMapGeneration(_In_ GraphicsContext& InContext)
@@ -83,7 +83,7 @@ namespace Eternal
 									ShaderCreateInformation(
 										ShaderType::SHADER_TYPE_COMPUTE,
 										MipMapShaderName,
-										"MipMap/mipmap.compute.hlsl",
+										"Utility/mipmap.compute.hlsl",
 										{
 											"MIPMAP_TEXTURE_TYPE",		MIPMAP_TEXTURE_TYPE_NAMES[TextureTypeIndex],
 											"MIPMAP_TEXTURE_FORMAT",	MIPMAP_TEXTURE_FORMAT_HLSLS[FormatIndex],
