@@ -11,14 +11,19 @@ namespace Eternal
 		static constexpr int32_t ThreadGroupCountY = 32;
 		static constexpr int32_t ThreadGroupCountZ = 1;
 
-		static ConfigurationSetting<Vector3> ChromaticAberrationColorMask("ChromaticAberrationColorMask", Vector3::One(), CHROMATIC_ABERRATION_OCTAVES_COUNT);
-		static ConfigurationSetting<float> ChromaticAberrationDirection("ChromaticAberrationDirection", 0.0f, CHROMATIC_ABERRATION_OCTAVES_COUNT);
-		static ConfigurationSetting<float> ChromaticAberrationStrength("ChromaticAberrationStrength", 1.0f, CHROMATIC_ABERRATION_OCTAVES_COUNT);
+		static ConfigurationSetting<Vector3> ChromaticAberrationOctaveColorMask("ChromaticAberrationOctaveColorMask", Vector3::One(), CHROMATIC_ABERRATION_OCTAVES_COUNT);
+		static ConfigurationSetting<float> ChromaticAberrationOctaveDirection("ChromaticAberrationOctaveDirection", 0.0f, CHROMATIC_ABERRATION_OCTAVES_COUNT);
+		static ConfigurationSetting<float> ChromaticAberrationOctaveMagnitude("ChromaticAberrationOctaveMagnitude", 1.0f, CHROMATIC_ABERRATION_OCTAVES_COUNT);
 		static ConfigurationSetting<int> ChromaticAberrationOctavesCount("ChromaticAberrationOctavesCount", CHROMATIC_ABERRATION_OCTAVES_COUNT);
+		static ConfigurationSetting<float> ChromaticAberrationOffsetDirection("ChromaticAberrationOffsetDirection", 0.0f);
+		static ConfigurationSetting<float> ChromaticAberrationOffsetMagnitude("ChromaticAberrationOffsetMagnitude", 0.0f);
+		static ConfigurationSetting<float> ChromaticAberrationStrength("ChromaticAberrationStrength", 0.0f);
 
 		ChromaticAberrationPass::ChromaticAberrationPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 			: _ChromaticAberrationConstantBuffer(InContext, "ChromaticAberrationBuffer")
 		{
+			_IsPassEnabled = false;
+
 			char ThreadGroupCountXString[4];
 			char ThreadGroupCountYString[4];
 			char ThreadGroupCountZString[4];
@@ -87,26 +92,32 @@ namespace Eternal
 				ResourceTransitionScope VolumetricCloudsTransitionScope(*ChromaticAberrationCommandList, Transitions, ETERNAL_ARRAYSIZE(Transitions));
 
 				{
-					MapRange ChromaticAberrationMapRange(sizeof(ChromaticAberrationConstants));
-					MapScope<ChromaticAberrationConstants> ChromaticAberrationConstantsMapScope(*_ChromaticAberrationConstantBuffer.ResourceBuffer, ChromaticAberrationMapRange);
+					MapScope<ChromaticAberrationConstants> ChromaticAberrationConstantsMapScope(*_ChromaticAberrationConstantBuffer.ResourceBuffer);
 					
 					const Vector2 AspectRatio(
 						1.0f / static_cast<float>(InContext.GetBackBufferViewport().GetWidth()),
 						1.0f / static_cast<float>(InContext.GetBackBufferViewport().GetHeight())
 					);
 					
+					const Vector2 PrecomputedOffsetDirection = Vector2(
+						Math::Sin(Math::FMod(ChromaticAberrationOffsetDirection * Math::PI_2, Math::PI_2)),
+						Math::Cos(Math::FMod(ChromaticAberrationOffsetDirection * Math::PI_2 + Math::PI_2, Math::PI_2))
+					) * AspectRatio * ChromaticAberrationOffsetMagnitude;
+
 					float ChromaticAberrationOctavesCountRcp = 1.0f / static_cast<float>(ChromaticAberrationOctavesCount);
 
 					for (uint32_t OctaveIndex = 0; OctaveIndex < CHROMATIC_ABERRATION_OCTAVES_COUNT; ++OctaveIndex)
 					{
-						ChromaticAberrationConstantsMapScope->ChromaticAberrationOctaves[OctaveIndex].OctaveMask = ChromaticAberrationColorMask[OctaveIndex] * ChromaticAberrationOctavesCountRcp;
+						ChromaticAberrationConstantsMapScope->ChromaticAberrationOctaves[OctaveIndex].OctaveMask = ChromaticAberrationOctaveColorMask[OctaveIndex] * ChromaticAberrationOctavesCountRcp;
 						ChromaticAberrationConstantsMapScope->ChromaticAberrationOctaves[OctaveIndex].OctaveDirection = Vector2(
-							Math::Sin(Math::FMod(ChromaticAberrationDirection[OctaveIndex] * Math::PI_2, Math::PI_2)),
-							Math::Cos(Math::FMod(ChromaticAberrationDirection[OctaveIndex] * Math::PI_2 + Math::PI_2, Math::PI_2))
+							Math::Sin(Math::FMod(ChromaticAberrationOctaveDirection[OctaveIndex] * Math::PI_2, Math::PI_2)),
+							Math::Cos(Math::FMod(ChromaticAberrationOctaveDirection[OctaveIndex] * Math::PI_2 + Math::PI_2, Math::PI_2))
 							
-						) * AspectRatio * ChromaticAberrationStrength[OctaveIndex];
-						ChromaticAberrationConstantsMapScope->ChromaticAberrationOctaves[OctaveIndex].OctaveStrength = ChromaticAberrationStrength[OctaveIndex];
+						) * AspectRatio * ChromaticAberrationOctaveMagnitude[OctaveIndex] + PrecomputedOffsetDirection;
+						ChromaticAberrationConstantsMapScope->ChromaticAberrationOctaves[OctaveIndex].OctaveStrength = ChromaticAberrationOctaveMagnitude[OctaveIndex];
 					}
+
+					ChromaticAberrationConstantsMapScope->ChromaticAberrationStrength = ChromaticAberrationStrength;
 
 					ChromaticAberrationConstantsMapScope->ChromaticAberrationOctavesCount = static_cast<uint32_t>(ChromaticAberrationOctavesCount);
 				}
@@ -132,19 +143,23 @@ namespace Eternal
 			{
 				for (uint32_t OctaveIndex = 0; OctaveIndex < CHROMATIC_ABERRATION_OCTAVES_COUNT; ++OctaveIndex)
 				{
-					char ChromaticAberrationMaskLabel[256];
-					char ChromaticAberrationDirectionLabel[256];
-					char ChromaticAberrationStrengthLabel[256];
+					char ChromaticAberrationOctaveColorMaskLabel[256];
+					char ChromaticAberrationOctaveDirectionLabel[256];
+					char ChromaticAberrationOctaveMagnitudeLabel[256];
 
-					sprintf_s(ChromaticAberrationMaskLabel, "Chromatic Aberration Color Mask %d", OctaveIndex);
-					sprintf_s(ChromaticAberrationDirectionLabel, "Chromatic aberration direction %d", OctaveIndex);
-					sprintf_s(ChromaticAberrationStrengthLabel, "Chromatic aberration strength %d", OctaveIndex);
+					sprintf_s(ChromaticAberrationOctaveColorMaskLabel, "Chromatic Aberration Octave Color Mask %d", OctaveIndex);
+					sprintf_s(ChromaticAberrationOctaveDirectionLabel, "Chromatic Aberration Octave Direction %d", OctaveIndex);
+					sprintf_s(ChromaticAberrationOctaveMagnitudeLabel, "Chromatic Aberration Octave Magnitude %d", OctaveIndex);
 
-					ImGui::ColorEdit3(ChromaticAberrationMaskLabel, &ChromaticAberrationColorMask[OctaveIndex].x);
-					ImGui::SliderFloat(ChromaticAberrationDirectionLabel, &ChromaticAberrationDirection[OctaveIndex], 0.0f, 1.0f);
-					ImGui::SliderFloat(ChromaticAberrationStrengthLabel, &ChromaticAberrationStrength[OctaveIndex], 0.0f, 100.0f);
+					ImGui::ColorEdit3(ChromaticAberrationOctaveColorMaskLabel, &ChromaticAberrationOctaveColorMask[OctaveIndex].x);
+					ImGui::SliderFloat(ChromaticAberrationOctaveDirectionLabel, &ChromaticAberrationOctaveDirection[OctaveIndex], 0.0f, 1.0f);
+					ImGui::SliderFloat(ChromaticAberrationOctaveMagnitudeLabel, &ChromaticAberrationOctaveMagnitude[OctaveIndex], 0.0f, 100.0f);
 				}
-				ImGui::SliderInt("ChromaticAberration", &ChromaticAberrationOctavesCount, 1, CHROMATIC_ABERRATION_OCTAVES_COUNT);
+				ImGui::SliderInt("Chromatic Aberration Octave", &ChromaticAberrationOctavesCount, 1, CHROMATIC_ABERRATION_OCTAVES_COUNT);
+				ImGui::SliderFloat("Chromatic Aberration Direction", &ChromaticAberrationOffsetDirection, 0.0f, 1.0f);
+				ImGui::SliderFloat("Chromatic Aberration Offset Magnitude", &ChromaticAberrationOffsetMagnitude, 0.0f, 100.0f);
+				ImGui::SliderFloat("Chromatic Aberration Strength", &ChromaticAberrationStrength, 0.0f, 10.0f);
+				
 				ImGui::TreePop();
 			}
 		}
