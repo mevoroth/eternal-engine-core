@@ -76,8 +76,7 @@ namespace Eternal
 			CommandListScope VolumetricCloudsCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "VolumetricClouds");
 
 			{
-				MapRange VolumetricCloudsMapRange(sizeof(VolumetricCloudsConstants));
-				MapScope<VolumetricCloudsConstants> VolumetricCloudsConstantsMapScope(*_VolumetricCloudsConstantBuffer.ResourceBuffer, VolumetricCloudsMapRange);
+				MapScope<VolumetricCloudsConstants> VolumetricCloudsConstantsMapScope(*_VolumetricCloudsConstantBuffer.ResourceBuffer);
 				VolumetricCloudsConstantsMapScope->CloudsBottomLayerRadiusMeters		= VolumetricCloudsBottomLayerMeters;
 				VolumetricCloudsConstantsMapScope->CloudsTopLayerRadiusMeters			= VolumetricCloudsTopLayerMeters;
 				VolumetricCloudsConstantsMapScope->CloudsBottomLayerRadiusMetersSquared	= VolumetricCloudsBottomLayerMeters * VolumetricCloudsBottomLayerMeters;

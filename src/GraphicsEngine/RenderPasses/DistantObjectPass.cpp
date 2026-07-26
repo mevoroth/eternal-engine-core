@@ -1,5 +1,5 @@
 #include "GraphicsEngine/RenderPasses/DistantObjectPass.hpp"
-#include "GraphicsEngine/StencilAllocation.hpp"
+#include "GraphicsEngine/Utility/StencilAllocation.hpp"
 
 namespace Eternal
 {

@@ -1,5 +1,5 @@
 #include "GraphicsEngine/RenderPasses/OpaquePass.hpp"
-#include "GraphicsEngine/StencilAllocation.hpp"
+#include "GraphicsEngine/Utility/StencilAllocation.hpp"
 #include "Core/System.hpp"
 #include "GraphicData/MeshVertexFormat.hpp"
 #include "Material/Material.hpp"

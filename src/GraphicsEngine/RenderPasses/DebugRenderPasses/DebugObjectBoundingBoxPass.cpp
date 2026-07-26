@@ -71,8 +71,7 @@ namespace Eternal
 
 			CommandListScope DebugObjectBoundingBoxCommandList = InContext.CreateNewCommandList(CommandType::COMMAND_TYPE_GRAPHICS, "DebugObjectBoundingBoxPass");
 
-			MapRange DebugObjectBoundingBoxPerInstanceBufferMapRange(sizeof(CubePerInstanceInformation) * 4096);
-			MapScope<CubePerInstanceInformation> DebugObjectBoundingBoxPerInstanceBufferMapScope(*_DebugObjectBoundingBoxPerInstanceBuffer.ResourceBuffer, DebugObjectBoundingBoxPerInstanceBufferMapRange);
+			MapScope<CubePerInstanceInformation> DebugObjectBoundingBoxPerInstanceBufferMapScope(*_DebugObjectBoundingBoxPerInstanceBuffer.ResourceBuffer);
 
 			ResourceTransition DebugObjectBoundingBoxResourceTransition(InRenderer.GetGlobalResources().GetGBufferDepthStencil().GetRenderTargetDepthStencilView(), TransitionState::TRANSITION_DEPTH_STENCIL_WRITE);
 			DebugObjectBoundingBoxCommandList->Transition(DebugObjectBoundingBoxResourceTransition);

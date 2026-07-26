@@ -58,8 +58,7 @@ namespace Eternal
 				float AspectRatio = static_cast<float>(InContext.GetMainViewport().GetHeight()) / static_cast<float>(InContext.GetMainViewport().GetWidth());
 				float Border = 0.1f;
 
-				MapRange RayGenerationBufferMapRange(sizeof(RayGenerationConstants));
-				MapScope<RayGenerationConstants> RayGenerationBufferMapScope(*_DebugRayTracingRayGenerationConstantBuffer.ResourceBuffer, RayGenerationBufferMapRange);
+				MapScope<RayGenerationConstants> RayGenerationBufferMapScope(*_DebugRayTracingRayGenerationConstantBuffer.ResourceBuffer);
 				RayGenerationBufferMapScope->Viewport	= { -1.0f, -1.0f, 1.0f, 1.0f };
 				RayGenerationBufferMapScope->Stencil	= {
 					-1.0f + Border / AspectRatio, -1.0f + Border,

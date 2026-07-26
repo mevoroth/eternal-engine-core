@@ -1,5 +1,5 @@
 #include "GraphicsEngine/RenderPasses/DirectLightingPass.hpp"
-#include "GraphicsEngine/StencilAllocation.hpp"
+#include "GraphicsEngine/Utility/StencilAllocation.hpp"
 #include "Light/Light.hpp"
 #include "Core/System.hpp"
 #include "Types/Types.hpp"
@@ -91,8 +91,7 @@ namespace Eternal
 
 			const vector<ObjectsList<Light>::InstancedObjects>& Lights = InSystem.GetRenderFrame().Lights;
 			{
-				MapRange LightsBufferMapRange(sizeof(LightInformation) * (*_DirectLightingLightsBuffer.ResourceBuffer)->GetElementCount());
-				MapScope<LightInformation> LightsBufferMapScope(*_DirectLightingLightsBuffer.ResourceBuffer, LightsBufferMapRange);
+				MapScope<LightInformation> LightsBufferMapScope(*_DirectLightingLightsBuffer.ResourceBuffer);
 
 				for (uint32_t LightIndex = 0; LightIndex < Lights.size(); ++LightIndex)
 				{
@@ -106,8 +105,7 @@ namespace Eternal
 			}
 
 			{
-				MapRange DirectLightingMapRange(sizeof(DirectLightingConstants));
-				MapScope<DirectLightingConstants> DirectLightingConstantsMapScope(*_DirectLightingConstantBuffer.ResourceBuffer, DirectLightingMapRange);
+				MapScope<DirectLightingConstants> DirectLightingConstantsMapScope(*_DirectLightingConstantBuffer.ResourceBuffer);
 				DirectLightingConstantsMapScope->LightsCount = 1;// static_cast<uint32_t>(Lights.size());
 			}
 

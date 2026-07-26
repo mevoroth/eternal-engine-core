@@ -362,8 +362,7 @@ namespace Eternal
 				//////////////////////////////////////////////////////////////////////////
 				// Map
 				{
-					MapRange UploadBufferMapRange(UploadBufferSize);
-					MapScope<> UploadBufferMapScope(*ImguiFontUploadTexture, UploadBufferMapRange);
+					MapScope<> UploadBufferMapScope(*ImguiFontUploadTexture, UploadBufferSize);
 					memcpy(UploadBufferMapScope.GetDataPointer(), _ImguiFontMetaData.Pixels, UploadBufferSize);
 				}
 
@@ -555,7 +554,7 @@ namespace Eternal
 				_ImguiDescriptorTable->SetDescriptor(2, _ImguiBilinearSampler);
 
 			{
-				StackAllocation<View> ProjectionConstantsViews(alloca(GetViewSize(InContext) * (InDrawData.CmdListsCount + 1)), GetViewSize(InContext), InDrawData.CmdListsCount + 1);
+				StackAllocation<View> ProjectionConstantsViews(ETERNAL_STACK_VIEWS_PARAMETERS(InDrawData.CmdListsCount + 1));
 				_ImGui_SetupRenderState(InDrawData, InImguiContext, InContext, InImguiCommandList, ProjectionConstantsViews);
 
 				_PreviousDrawCount = 0;
