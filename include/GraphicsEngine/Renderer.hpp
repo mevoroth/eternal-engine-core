@@ -1,6 +1,8 @@
 #pragma once
 
-#include "GraphicsEngine/MipMapGeneration.hpp"
+#include "GraphicsEngine/Utility/Clear.hpp"
+#include "GraphicsEngine/Utility/MipMapGeneration.hpp"
+#include "GraphicsEngine/Utility/StackHelper.hpp"
 #include "NextGenGraphics/FrameGraph.hpp"
 #include "NextGenGraphics/StencilTracker.hpp"
 #include <vector>
@@ -52,6 +54,7 @@ namespace Eternal
 
 			StencilTracker& GetStencilTracker() { return _StencilTracker; }
 			MipMapGeneration& GetMipMapGeneration() { return _MipMapGeneration; }
+			Clear& GetClear() { return _Clear; }
 
 		protected:
 
@@ -59,6 +62,7 @@ namespace Eternal
 
 			FrameGraph			_FrameGraph;
 			StencilTracker		_StencilTracker;
+			Clear				_Clear;
 			MipMapGeneration	_MipMapGeneration;
 			GlobalResources*	_GlobalResources	= nullptr;
 			vector<Pass*>		_Passes;

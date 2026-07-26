@@ -18,7 +18,8 @@ namespace Eternal
 		}
 
 		Renderer::Renderer(_In_ GraphicsContext& InContext, _In_ GlobalResources* InGlobalResources, _In_ const std::function<vector<Pass*>(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)>& InPassPopulateFunction)
-			: _MipMapGeneration(InContext)
+			: _Clear(InContext)
+			, _MipMapGeneration(InContext)
 			, _GlobalResources(InGlobalResources)
 			, _Passes(InPassPopulateFunction(InContext, *this))
 			, _PresentPass(new PresentPass(InContext, *this))
@@ -56,6 +57,7 @@ namespace Eternal
 			_StencilTracker.Validate();
 			if (_GlobalResources->BeginRender(InContext, InSystem))
 			{
+				_Clear.BeginRender();
 				if (UseFrameGraph)
 				{
 					_FrameGraph.RunGraph(
@@ -73,6 +75,7 @@ namespace Eternal
 							_Passes[PassIndex]->Render(InContext, InSystem, *this);
 					}
 				}
+				_Clear.EndRender();
 			}
 		}
 
