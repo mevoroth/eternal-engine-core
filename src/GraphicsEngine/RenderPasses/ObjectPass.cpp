@@ -15,6 +15,7 @@ namespace Eternal
 
 		ObjectPass::~ObjectPass()
 		{
+			DestroyMultiBufferedResource(_ObjectPerDrawInstanceBuffer);
 			DestroyRenderPass(_ObjectRenderPass);
 			DestroyInputLayout(_ObjectInputLayout);
 			DestroyDescriptorTable(_ObjectDescriptorTable);
@@ -139,17 +140,15 @@ namespace Eternal
 
 			InPerPassFunctor(InContext, InRenderer);
 
-			MapRange PerInstanceBufferMapRange(sizeof(PerInstanceInformation) * (*_ObjectPerInstanceBuffer.ResourceBuffer)->GetElementCount());
-			MapScope<PerInstanceInformation> PerInstanceBufferMapScope(*_ObjectPerInstanceBuffer.ResourceBuffer, PerInstanceBufferMapRange);
+			MapScope<PerInstanceInformation> PerInstanceBufferMapScope(*_ObjectPerInstanceBuffer.ResourceBuffer);
 
-			MapRange PerDrawInstanceBufferMapRange(sizeof(PerDrawInstanceConstants) * (*_ObjectPerDrawInstanceBuffer)->GetElementCount());
-			MapScope<PerDrawInstanceConstants> PerDrawInstanceBufferMapScope(*_ObjectPerDrawInstanceBuffer, PerDrawInstanceBufferMapRange);
+			MapScope<PerDrawInstanceConstants> PerDrawInstanceBufferMapScope(*_ObjectPerDrawInstanceBuffer);
 
 			uint32_t PerDrawCount = 0;
 			for (uint32_t CollectionIndex = 0; CollectionIndex < MeshCollections.size(); ++CollectionIndex)
 				PerDrawCount += static_cast<uint32_t>(MeshCollections[CollectionIndex].Instances.size());
 
-			StackAllocation<View> ObjectPerDrawInstanceBufferViews(alloca(GetViewSize(InContext) * PerDrawCount), GetViewSize(InContext), PerDrawCount);
+			StackAllocation<View> ObjectPerDrawInstanceBufferViews(ETERNAL_STACK_VIEWS_PARAMETERS(PerDrawCount));
 
 			uint32_t DrawInstanceCount	= 0;
 
