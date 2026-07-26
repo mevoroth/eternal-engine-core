@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GraphicsEngine/Pass.hpp"
-#include "ShadersReflection/MipMap/HLSLMipMapConstants.hpp"
+#include "ShadersReflection/Utility/HLSLMipMapConstants.hpp"
 
 namespace Eternal
 {

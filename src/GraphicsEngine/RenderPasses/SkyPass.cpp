@@ -87,8 +87,7 @@ namespace Eternal
 			{
 				const vector<ObjectsList<Light>::InstancedObjects>& Lights = InSystem.GetRenderFrame().Lights;
 
-				MapRange AtmosphereMapRange(sizeof(AtmosphereConstants));
-				MapScope<AtmosphereConstants> AtmosphereConstantsMapScope(InRenderer.GetGlobalResources().GetAtmosphereConstantBuffer(), AtmosphereMapRange);
+				MapScope<AtmosphereConstants> AtmosphereConstantsMapScope(InRenderer.GetGlobalResources().GetAtmosphereConstantBuffer());
 				for (int PhaseGIndex = 0; PhaseGIndex < VOLUMETRIC_PHASE_COUNT; ++PhaseGIndex)
 					AtmosphereConstantsMapScope->AtmospherePhaseG[PhaseGIndex]		= 1.0f - AtmospherePhaseG[PhaseGIndex];
 				AtmosphereConstantsMapScope->AtmospherePhaseBlend					= AtmospherePhaseBlend;
@@ -113,8 +112,7 @@ namespace Eternal
 			SkyCommandList->Transition(SkyTransition);
 
 			{
-				MapRange MipMapBufferMapRange(sizeof(MipMapConstants));
-				MapScope<MipMapConstants> MipMapMapScope(*_MipMapConstantBuffer.ResourceBuffer, MipMapBufferMapRange);
+				MapScope<MipMapConstants> MipMapMapScope(*_MipMapConstantBuffer.ResourceBuffer);
 
 				View* SkyMipView = InRenderer.GetGlobalResources().GetSkyMipShaderResourceViews()[0];
 				MipMapMapScope->TextureSize = Uint4(SkyMipView->GetResource().GetWidth(), SkyMipView->GetResource().GetHeight(), SkyMipView->GetResource().GetDepthOrArraySize(), 0);
