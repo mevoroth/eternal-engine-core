@@ -45,6 +45,7 @@ namespace Eternal
 			{
 				UploadViewCameraToBuffer(
 					InRenderer.GetGlobalResources().GetShadowMapViewConstantBuffer(),
+					InSystem.GetRenderFrame().CurrentTime,
 					Lights[0].Object->GetShadow().ShadowCamera,
 					static_cast<float>(InGlobalResources.GetShadowMapViewport().GetWidth()),
 					static_cast<float>(InGlobalResources.GetShadowMapViewport().GetHeight())
