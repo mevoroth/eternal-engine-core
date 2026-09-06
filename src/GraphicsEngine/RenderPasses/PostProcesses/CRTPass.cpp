@@ -17,8 +17,6 @@ namespace Eternal
 		CRTPass::CRTPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 			: _CRTConstantBuffer(InContext, "CRTBuffer")
 		{
-			_IsPassEnabled = false;
-
 			char ThreadGroupCountXString[4];
 			char ThreadGroupCountYString[4];
 			char ThreadGroupCountZString[4];

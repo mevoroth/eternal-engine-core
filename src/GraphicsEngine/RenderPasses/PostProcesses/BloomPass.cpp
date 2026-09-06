@@ -22,8 +22,6 @@ namespace Eternal
 
 		BloomPass::BloomPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 		{
-			_IsPassEnabled = false;
-
 			using namespace Eternal::Memory;
 
 			char ThreadGroupCountXString[4];

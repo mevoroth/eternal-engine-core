@@ -22,8 +22,6 @@ namespace Eternal
 		ChromaticAberrationPass::ChromaticAberrationPass(_In_ GraphicsContext& InContext, _In_ Renderer& InRenderer)
 			: _ChromaticAberrationConstantBuffer(InContext, "ChromaticAberrationBuffer")
 		{
-			_IsPassEnabled = false;
-
 			char ThreadGroupCountXString[4];
 			char ThreadGroupCountYString[4];
 			char ThreadGroupCountZString[4];
