@@ -121,11 +121,11 @@ namespace Eternal
 			void RegisterAllComponents();
 			void UnregisterAllComponents();
 
+			Level* GetParent();
+
 			virtual void UpdateDebug() {}
 
 		protected:
-
-			Level* GetParent();
 
 			struct GameObjectState
 			{
