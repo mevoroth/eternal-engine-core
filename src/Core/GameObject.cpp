@@ -17,6 +17,12 @@ namespace Eternal
 			_Components.reserve(World::ComponentsPerGameObjectInitialPool);
 		}
 
+		GameObject::GameObject(_In_ Level& InLevel)
+			: GameObject()
+		{
+			InLevel.AddGameObject(this);
+		}
+
 		void GameObject::SetWorld(_In_ World* InWorld)
 		{
 			WorldObject::SetWorld(InWorld);

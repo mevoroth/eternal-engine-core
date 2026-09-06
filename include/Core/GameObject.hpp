@@ -22,6 +22,7 @@ namespace Eternal
 		{
 		public:
 			GameObject();
+			GameObject(_In_ Level& InLevel);
 
 			virtual void Update(_In_ const TimeSecondsT InDeltaSeconds)
 			{
